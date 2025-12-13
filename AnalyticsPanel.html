@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Running Coach Pro - Analytics</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.1.16/umd/Recharts.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-card: #1a2332;
+      --accent-blue: #3b82f6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border-color: #334155;
+    }
+    
+    * { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+    .mono { font-family: 'Space Mono', monospace; }
+    
+    body {
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #0f172a 50%, #1e1b4b 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      margin: 0;
+    }
+    
+    .spinner {
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top: 3px solid var(--accent-blue);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    .slide-in { animation: slideIn 0.3s ease-out; }
+    
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      transition: all 0.3s;
+    }
+    
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .metric-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.05));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: var(--accent-blue);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    
+    .btn-secondary {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+    
+    .help-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid var(--accent-blue);
+      color: var(--accent-blue);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+      transition: all 0.2s;
+    }
+    
+    .help-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      transform: scale(1.1);
+    }
+    
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .zone-bar {
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.1);
+      overflow: hidden;
+    }
+    
+    .zone-fill {
+      height: 100%;
+      transition: width 0.5s;
+    }
+    
+    input[type="date"] {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+    
+    input[type="date"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    @media (max-width: 640px) {
+      .metric-card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+    const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, ComposedChart } = Recharts;
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQr84Yu0lTkKMnqtgYDD5NP4i_n5qS4eM",
+      authDomain: "runningcoachdata.firebaseapp.com",
+      projectId: "runningcoachdata",
+      storageBucket: "runningcoachdata.firebasestorage.app",
+      messagingSenderId: "364279562892",
+      appId: "1:364279562892:web:7acd6bbac8c8113177f1a9"
+    };
+
+    // Constants
+    const LTHR = 165;
+    const ZONES = {
+      z1: { name: 'Recovery', hrMax: 124, color: '#93c5fd' },
+      z2: { name: 'Easy', hrMin: 124, hrMax: 140, color: '#60a5fa' },
+      z3: { name: 'Moderate', hrMin: 140, hrMax: 157, color: '#3b82f6' },
+      z4: { name: 'Threshold', hrMin: 157, hrMax: 168, color: '#2563eb' },
+      z5: { name: 'Maximum', hrMin: 168, color: '#1e40af' }
+    };
+
+    const TIME_RANGES = [
+      { label: 'Last 7 Days', days: 7 },
+      { label: 'Last 30 Days', days: 30 },
+      { label: 'Last 3 Months', days: 90 },
+      { label: 'Last Year', days: 365 },
+      { label: 'All Time', days: null }
+    ];
+
+    // Help Database
+    const HELP_DATABASE = {
+      ctl: {
+        title: 'CTL - Chronic Training Load (Fitness)',
+        description: 'CTL represents your long-term fitness level, calculated as a 42-day exponential moving average of daily Training Stress Score (TSS). Higher CTL = better aerobic conditioning.',
+        interpretation: 'Normal Range: 20-40 for beginners, 40-60 for intermediate, 60-80+ for advanced runners. Marathon target: 55-65. Below 30 is concerning (insufficient fitness), above 80 may lead to burnout.',
+        formula: 'CTL = 42-day exponential weighted average of TSS'
+      },
+      atl: {
+        title: 'ATL - Acute Training Load (Fatigue)',
+        description: 'ATL measures short-term fatigue from recent training, calculated as a 7-day exponential moving average of TSS. Shows your current accumulated fatigue.',
+        interpretation: 'Normal Range: 15-50. Higher ATL = more recent fatigue. ATL > CTL by 50% is concerning (excessive fatigue). During taper, ATL should drop to 20-30% below CTL.',
+        formula: 'ATL = 7-day exponential weighted average of TSS'
+      },
+      tsb: {
+        title: 'TSB - Training Stress Balance (Form)',
+        description: 'TSB = CTL minus ATL. Indicates current readiness to perform. Positive = fresh/rested, Negative = fatigued but building fitness.',
+        interpretation: 'Normal Range: -30 to +15. Optimal training: -10 to -20 (building fitness). Race day target: -5 to +5. Below -30 is concerning (overtraining risk), above +10 = detraining.',
+        formula: 'TSB = CTL - ATL'
+      },
+      acwr: {
+        title: 'ACWR - Acute:Chronic Workload Ratio',
+        description: 'Compares recent load (ATL) to long-term capacity (CTL). Key injury risk indicator - shows if you\'re training within your capacity.',
+        interpretation: 'Normal Range: 0.8-1.3. Below 0.8: undertraining (detraining). 1.0-1.3: optimal (building fitness safely). Above 1.3 is concerning (high injury risk - reduce volume immediately). Above 1.5 is dangerous.',
+        formula: 'ACWR = ATL ÷ CTL'
+      },
+      volume: {
+        title: 'Weekly Running Volume',
+        description: 'Total kilometers run per week. Foundation of marathon training - builds aerobic capacity and endurance.',
+        interpretation: 'Normal Range: Beginners 20-40km/week, Intermediate 40-65km/week, Advanced 65-100km/week. Marathon peak: 50-70km. Below 25km/week is concerning for marathon training, above 100km increases injury risk significantly.',
+        formula: 'Sum of all run distances in timeframe'
+      },
+      pace: {
+        title: 'Z2 Pace (Easy Pace)',
+        description: 'Your running pace at Zone 2 heart rate (124-140 bpm). As fitness improves, you run faster at same heart rate - key indicator of aerobic development.',
+        interpretation: 'Normal progression: 5-10 sec/km improvement per mesocycle. Beginner Z2: 6:30-7:30/km, Intermediate: 5:30-6:30/km, Advanced: 4:30-5:30/km. No improvement over 6 weeks is concerning.',
+        formula: 'Average pace of runs in Z2 heart rate range'
+      },
+      marathon: {
+        title: 'Marathon Time Prediction',
+        description: 'Estimated finish time based on current Z2 pace efficiency. Marathon pace is typically 15-20 seconds/km slower than Z2 pace.',
+        interpretation: 'Accuracy improves as CTL approaches 55-65. Early training predictions may be optimistic. Sub-4:00 requires Z2 pace ~5:30/km. Predictions within 5% of actual are normal, more than 10% off is concerning.',
+        formula: '(Z2 pace + 18 seconds) × 42.195km'
+      },
+      injury: {
+        title: 'Injury Risk Assessment',
+        description: 'Based on ACWR and volume changes. Predicts injury likelihood based on training load management.',
+        interpretation: 'Low (Green): ACWR 0.8-1.3, safe to proceed. Moderate (Amber): ACWR 1.3-1.5, monitor closely. High (Red): ACWR >1.5, reduce immediately. Concerning: Any injuries, ACWR >1.5, or volume jumps >15% weekly.',
+        formula: 'Primary factor: ACWR; Secondary: weekly volume change %'
+      },
+      recovery: {
+        title: 'Recovery Readiness Score',
+        description: 'Composite score (0-100) showing how prepared you are for training, based on TSB, fatigue patterns, and ACWR.',
+        interpretation: 'Normal Range: 60-90%. Above 90%: excellent - ready for any workout. 70-89%: good. 50-69%: moderate - consider easy day. Below 50% is concerning - prioritize rest.',
+        formula: 'Weighted combination of TSB (50%) and ACWR (50%)'
+      },
+      zones: {
+        title: 'Heart Rate Training Zones (LTHR 165)',
+        description: 'Personalized zones based on Lactate Threshold HR:\n• Z1 (≤124): Recovery\n• Z2 (124-140): Easy aerobic\n• Z3 (140-157): Moderate tempo\n• Z4 (157-168): Threshold\n• Z5 (>168): Maximum',
+        interpretation: 'Normal distribution in base phase: Z1-Z2: 75-80%, Z3: 10-15%, Z4-Z5: 5-10%. Too much Z3-Z5 (>30%) is concerning - risks overtraining. All Z1 (<100% Z1-Z2) means insufficient intensity.',
+        formula: 'Based on LTHR 165 bpm'
+      },
+      pmc: {
+        title: 'Performance Management Chart',
+        description: 'Visual representation of CTL, ATL, and TSB over time. Shows fitness building, fatigue accumulation, and form. The relationship between these three metrics tells the complete training story.',
+        interpretation: 'Normal pattern: CTL rising gradually, ATL oscillating, TSB negative during build. Concerning patterns: CTL dropping, TSB below -30, ATL spike without CTL rise.',
+        formula: 'Three lines: CTL (blue), ATL (orange), TSB (green area)'
+      },
+      sessions: {
+        title: 'Total Sessions',
+        description: 'Number of training sessions in selected timeframe. Helps verify filtering and shows training frequency.',
+        interpretation: 'Normal Range: 4-6 sessions/week for marathon training. 3 or fewer is concerning (insufficient frequency), 7+ may lead to burnout. Consistency matters more than volume.',
+        formula: 'Count of all logged sessions in timeframe'
+      }
+    };
+
+    // Utilities
+    const calculateTSS = (session) => {
+      const sessionType = session.sessionType;
+      const actual = session.actual || session;
+      
+      if (sessionType === "Futsal") {
+        return (actual.duration / 60) * 95 * (actual.rpe / 8);
+      }
+      if (sessionType === "Pedicab") {
+        const routeMultiplier = session.routeType === 'hilly' ? 1.3 : 1.0;
+        return (actual.duration / 60) * 12 * routeMultiplier;
+      }
+      if (sessionType?.includes("Run")) {
+        const intensityFactor = actual.rpe ? (actual.rpe / 6) : 1.0;
+        return actual.distance * 6.5 * intensityFactor;
+      }
+      if (sessionType === "Strength Training") {
+        return (actual.duration / 60) * 30;
+      }
+      return 50;
+    };
+
+    const parseSessionDate = (dateStr) => {
+      if (dateStr.includes('-')) {
+        return new Date(dateStr);
+      }
+      const [day, month] = dateStr.split(' ');
+      const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+      return new Date(new Date().getFullYear(), monthMap[month], parseInt(day));
+    };
+
+    const calculateCTL = (sessions, targetDate) => {
+      const date = new Date(targetDate);
+      const relevantSessions = sessions.filter(s => {
+        const sessionDate = parseSessionDate(s.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        return daysDiff >= 0 && daysDiff < 42;
+      });
+      
+      let ctl = 0;
+      relevantSessions.forEach(session => {
+        const sessionDate = parseSessionDate(session.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        const weight = Math.exp(-daysDiff / 42);
+        ctl += calculateTSS(session) * weight;
+      });
+      
+      return Math.round(ctl / 42);
+    };
+
+    const calculateATL = (sessions, targetDate) => {
+      const date = new Date(targetDate);
+      const relevantSessions = sessions.filter(s => {
+        const sessionDate = parseSessionDate(s.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        return daysDiff >= 0 && daysDiff < 7;
+      });
+      
+      let atl = 0;
+      relevantSessions.forEach(session => {
+        const sessionDate = parseSessionDate(session.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        const weight = Math.exp(-daysDiff / 7);
+        atl += calculateTSS(session) * weight;
+      });
+      
+      return Math.round(atl / 7);
+    };
+
+    const secondsToPace = (seconds) => {
+      if (!seconds || seconds === 0) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.round(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const getHeartRateZone = (hr) => {
+      if (hr < 124) return 'z1';
+      if (hr < 140) return 'z2';
+      if (hr < 157) return 'z3';
+      if (hr < 168) return 'z4';
+      return 'z5';
+    };
+
+    const predictMarathonTime = (avgZ2Pace) => {
+      if (!avgZ2Pace || avgZ2Pace === 0) return "N/A";
+      const marathonPaceSeconds = avgZ2Pace + 18;
+      const marathonTimeSeconds = marathonPaceSeconds * 42.195;
+      const hours = Math.floor(marathonTimeSeconds / 3600);
+      const minutes = Math.floor((marathonTimeSeconds % 3600) / 60);
+      const seconds = Math.round(marathonTimeSeconds % 60);
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const assessInjuryRisk = (acwr) => {
+      const num = parseFloat(acwr);
+      if (num < 0.8) return { level: 'Low', color: 'amber', message: 'Under-training. Consider increasing volume gradually.' };
+      if (num < 1.0) return { level: 'Optimal', color: 'emerald', message: 'Perfect balance of load and recovery.' };
+      if (num < 1.3) return { level: 'Moderate', color: 'amber', message: 'Slightly elevated. Monitor closely, avoid big increases.' };
+      return { level: 'High', color: 'rose', message: 'High injury risk. Reduce training volume immediately.' };
+    };
+
+    const calculateRecoveryScore = (tsb, acwr) => {
+      let score = 50;
+      if (tsb > 5) score += 30;
+      else if (tsb > 0) score += 20;
+      else if (tsb > -10) score += 10;
+      
+      const acwrNum = parseFloat(acwr);
+      if (acwrNum >= 0.8 && acwrNum <= 1.0) score += 30;
+      else if (acwrNum < 1.3) score += 20;
+      else score += 10;
+      
+      return Math.min(100, Math.max(0, score));
+    };
+
+    // Help Button Component
+    const HelpButton = ({ helpKey, onClick }) => (
+      <button 
+        className="help-btn" 
+        onClick={(e) => { e.stopPropagation(); onClick(helpKey); }}
+        title="Click for help"
+      >
+        ?
+      </button>
+    );
+
+    // Help Modal Component
+    const HelpModal = ({ content, onClose }) => (
+      <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4" onClick={onClose}>
+        <div className="card slide-in w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-xl font-bold text-white pr-4">{content.title}</h3>
+            <button onClick={onClose} className="text-slate-400 hover:text-white p-1">×</button>
+          </div>
+          <div className="space-y-4 text-slate-300">
+            <p className="leading-relaxed">{content.description}</p>
+            {content.interpretation && (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                <p className="text-sm font-medium text-blue-400 mb-1">How to interpret:</p>
+                <p className="text-sm">{content.interpretation}</p>
+              </div>
+            )}
+            {content.formula && (
+              <div className="bg-slate-800 rounded-lg p-3">
+                <p className="text-xs text-slate-500 mb-1">Formula:</p>
+                <code className="text-sm text-emerald-400 mono">{content.formula}</code>
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 mt-4">Press ESC or click outside to close</p>
+        </div>
+      </div>
+    );
+
+    // Main Component
+    function AnalyticsDashboard() {
+      const [sessions, setSessions] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [user, setUser] = useState(null);
+      const [timeRange, setTimeRange] = useState(30);
+      const [customStartDate, setCustomStartDate] = useState('');
+      const [customEndDate, setCustomEndDate] = useState('');
+      const [showHelp, setShowHelp] = useState(false);
+      const [helpContent, setHelpContent] = useState({});
+
+      useEffect(() => {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        firebase.auth().signInAnonymously()
+          .then((userCredential) => {
+            setUser(userCredential.user);
+            loadSessions(userCredential.user.uid);
+          })
+          .catch((error) => {
+            console.error("Auth error:", error);
+            setLoading(false);
+          });
+      }, []);
+
+      useEffect(() => {
+        const handleEscape = (e) => {
+          if (e.key === 'Escape' && showHelp) setShowHelp(false);
+        };
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+      }, [showHelp]);
+
+      const loadSessions = async (uid) => {
+        try {
+          const db = firebase.firestore();
+          const snapshot = await db.collection(`users/${uid}/sessions`)
+            .orderBy('date', 'desc')
+            .get();
+          
+          const sessionsData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          
+          setSessions(sessionsData);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error loading sessions:", error);
+          setLoading(false);
+        }
+      };
+
+      const showHelpModal = (key) => {
+        const content = HELP_DATABASE[key] || { title: 'Help', description: 'Information not available.' };
+        setHelpContent(content);
+        setShowHelp(true);
+      };
+
+      const filteredSessions = useMemo(() => {
+        let filtered = sessions;
+
+        if (customStartDate || customEndDate) {
+          filtered = sessions.filter(s => {
+            const sessionDate = parseSessionDate(s.date);
+            if (customStartDate) {
+              const start = new Date(customStartDate);
+              if (sessionDate < start) return false;
+            }
+            if (customEndDate) {
+              const end = new Date(customEndDate);
+              end.setHours(23, 59, 59, 999);
+              if (sessionDate > end) return false;
+            }
+            return true;
+          });
+        } else if (timeRange !== null) {
+          const now = new Date();
+          const cutoff = new Date(now.getTime() - (timeRange * 24 * 60 * 60 * 1000));
+          filtered = sessions.filter(s => parseSessionDate(s.date) >= cutoff);
+        }
+        
+        return filtered;
+      }, [sessions, timeRange, customStartDate, customEndDate]);
+
+      const currentMetrics = useMemo(() => {
+        if (filteredSessions.length === 0) {
+          return { ctl: 0, atl: 0, tsb: 0, acwr: 0, totalDistance: 0, totalTime: 0, totalSessions: 0 };
+        }
+
+        const now = new Date();
+        const ctl = calculateCTL(filteredSessions, now);
+        const atl = calculateATL(filteredSessions, now);
+        const tsb = ctl - atl;
+        const acwr = ctl > 0 ? (atl / ctl).toFixed(2) : 0;
+
+        const totalDistance = filteredSessions.reduce((sum, s) => sum + (s.actual?.distance || 0), 0);
+        const totalTime = filteredSessions.reduce((sum, s) => sum + (s.actual?.duration || 0), 0);
+
+        return {
+          ctl,
+          atl,
+          tsb,
+          acwr,
+          totalDistance: totalDistance.toFixed(1),
+          totalTime: Math.round(totalTime),
+          totalSessions: filteredSessions.length
+        };
+      }, [filteredSessions]);
+
+      const zoneDistribution = useMemo(() => {
+        const zones = { z1: 0, z2: 0, z3: 0, z4: 0, z5: 0 };
+        
+        filteredSessions.forEach(session => {
+          const avgHr = session.actual?.avgHr;
+          if (avgHr && avgHr > 0) {
+            const zone = getHeartRateZone(avgHr);
+            zones[zone] += session.actual?.duration || 0;
+          }
+        });
+
+        const totalTime = Object.values(zones).reduce((sum, time) => sum + time, 0);
+        
+        return Object.entries(zones).map(([zone, time]) => ({
+          zone: ZONES[zone].name,
+          time,
+          percentage: totalTime > 0 ? ((time / totalTime) * 100).toFixed(1) : 0,
+          color: ZONES[zone].color
+        }));
+      }, [filteredSessions]);
+
+      const avgZ2Pace = useMemo(() => {
+        const z2Sessions = filteredSessions.filter(s => {
+          const avgHr = s.actual?.avgHr;
+          return avgHr >= 124 && avgHr <= 140 && s.sessionType?.includes("Run");
+        });
+
+        if (z2Sessions.length === 0) return 0;
+        const totalPace = z2Sessions.reduce((sum, s) => sum + (s.actual?.avgPace || 0), 0);
+        return totalPace / z2Sessions.length;
+      }, [filteredSessions]);
+
+      const marathonPrediction = useMemo(() => predictMarathonTime(avgZ2Pace), [avgZ2Pace]);
+      const injuryRisk = useMemo(() => assessInjuryRisk(currentMetrics.acwr), [currentMetrics.acwr]);
+      const recoveryScore = useMemo(() => calculateRecoveryScore(currentMetrics.tsb, currentMetrics.acwr), [currentMetrics.tsb, currentMetrics.acwr]);
+
+      const pmcData = useMemo(() => {
+        if (filteredSessions.length === 0) return [];
+
+        const sortedSessions = [...filteredSessions].sort((a, b) => 
+          parseSessionDate(a.date) - parseSessionDate(b.date)
+        );
+
+        const dataPoints = [];
+        const startDate = parseSessionDate(sortedSessions[0].date);
+        const endDate = new Date();
+        
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          const dateStr = d.toLocaleDateString('en-AU', { day: '2-digit', month: 'short' });
+          const ctl = calculateCTL(sessions, d);
+          const atl = calculateATL(sessions, d);
+          const tsb = ctl - atl;
+          
+          dataPoints.push({ date: dateStr, CTL: ctl, ATL: atl, TSB: tsb });
+        }
+
+        if (dataPoints.length > 30) {
+          return dataPoints.filter((_, i) => i % 3 === 0);
+        }
+        return dataPoints;
+      }, [filteredSessions, sessions]);
+
+      const weeklyVolumeData = useMemo(() => {
+        const weeks = {};
+        filteredSessions.forEach(session => {
+          const week = session.week || 'Unknown';
+          if (!weeks[week]) {
+            weeks[week] = { week, distance: 0, tss: 0 };
+          }
+          weeks[week].distance += session.actual?.distance || 0;
+          weeks[week].tss += calculateTSS(session);
+        });
+        return Object.values(weeks).sort((a, b) => a.week - b.week);
+      }, [filteredSessions]);
+
+      const paceProgressionData = useMemo(() => {
+        const months = {};
+        filteredSessions.forEach(session => {
+          const avgHr = session.actual?.avgHr;
+          if (avgHr >= 124 && avgHr <= 140 && session.sessionType?.includes("Run")) {
+            const sessionDate = parseSessionDate(session.date);
+            const monthKey = sessionDate.toLocaleDateString('en-AU', { month: 'short' });
+            
+            if (!months[monthKey]) {
+              months[monthKey] = { month: monthKey, totalPace: 0, count: 0 };
+            }
+            months[monthKey].totalPace += session.actual?.avgPace || 0;
+            months[monthKey].count += 1;
+          }
+        });
+
+        return Object.values(months).map(m => ({
+          month: m.month,
+          pace: m.count > 0 ? m.totalPace / m.count : 0
+        }));
+      }, [filteredSessions]);
+
+      const sessionTypeData = useMemo(() => {
+        const types = {};
+        filteredSessions.forEach(session => {
+          const type = session.sessionType;
+          if (!types[type]) types[type] = 0;
+          types[type] += 1;
+        });
+        return Object.entries(types).map(([type, count]) => ({ name: type, value: count }));
+      }, [filteredSessions]);
+
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="spinner mx-auto mb-4"></div>
+              <p className="text-slate-400">Loading analytics...</p>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-8 fade-in">
+              <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
+                🏃 Analytics Dashboard
+              </h1>
+              <p className="text-slate-400">Performance insights and training metrics</p>
+            </div>
+
+            {/* Time Range Filters */}
+            <div className="mb-6 fade-in">
+              <div className="card p-4">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {TIME_RANGES.map(range => (
+                    <button
+                      key={range.label}
+                      onClick={() => {
+                        setTimeRange(range.days);
+                        setCustomStartDate('');
+                        setCustomEndDate('');
+                      }}
+                      className={`btn ${timeRange === range.days && !customStartDate && !customEndDate ? 'btn-primary' : 'btn-secondary'}`}
+                    >
+                      {range.label}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="text-sm text-slate-400">Custom Range:</span>
+                  <input
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => {
+                      setCustomStartDate(e.target.value);
+                      setTimeRange(null);
+                    }}
+                    className="text-sm"
+                  />
+                  <span className="text-slate-400">to</span>
+                  <input
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => {
+                      setCustomEndDate(e.target.value);
+                      setTimeRange(null);
+                    }}
+                    className="text-sm"
+                  />
+                  {(customStartDate || customEndDate) && (
+                    <button
+                      onClick={() => {
+                        setCustomStartDate('');
+                        setCustomEndDate('');
+                        setTimeRange(30);
+                      }}
+                      className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 1: OVERVIEW METRICS */}
+            <div className="mb-8 fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-2xl font-bold">📊 Overview Metrics</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Session Count */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">Sessions</h3>
+                    <HelpButton helpKey="sessions" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-purple-400 mb-1">{currentMetrics.totalSessions}</div>
+                  <p className="text-xs text-slate-500">In timeframe</p>
+                </div>
+
+                {/* Volume */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">Volume</h3>
+                    <HelpButton helpKey="volume" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-cyan-400 mb-1">{currentMetrics.totalDistance}km</div>
+                  <p className="text-xs text-slate-500">{Math.round(currentMetrics.totalTime / 60)}h total</p>
+                </div>
+
+                {/* Avg Pace */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">Avg Z2 Pace</h3>
+                    <HelpButton helpKey="pace" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-indigo-400 mb-1 mono">{secondsToPace(avgZ2Pace)}</div>
+                  <p className="text-xs text-slate-500">Per kilometer</p>
+                </div>
+
+                {/* Marathon Prediction */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">Marathon Prediction</h3>
+                    <HelpButton helpKey="marathon" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-2xl font-bold text-blue-400 mb-1 mono">{marathonPrediction}</div>
+                  <p className="text-xs text-slate-500">Based on Z2 pace</p>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: TRAINING LOAD METRICS */}
+            <div className="mb-8 fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-2xl font-bold">⚡ Training Load & Readiness</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* CTL */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">CTL - Fitness</h3>
+                    <HelpButton helpKey="ctl" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-blue-400 mb-1">{currentMetrics.ctl}</div>
+                  <p className="text-xs text-slate-500">42-day avg load</p>
+                </div>
+
+                {/* ATL */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">ATL - Fatigue</h3>
+                    <HelpButton helpKey="atl" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-amber-400 mb-1">{currentMetrics.atl}</div>
+                  <p className="text-xs text-slate-500">7-day avg load</p>
+                </div>
+
+                {/* TSB */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">TSB - Form</h3>
+                    <HelpButton helpKey="tsb" onClick={showHelpModal} />
+                  </div>
+                  <div className={`text-3xl font-bold mb-1 ${currentMetrics.tsb > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {currentMetrics.tsb > 0 ? '+' : ''}{currentMetrics.tsb}
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    {currentMetrics.tsb > 5 ? '🟢 Well recovered' : currentMetrics.tsb > 0 ? '🟡 Recovering' : '🔴 Fatigued'}
+                  </p>
+                </div>
+
+                {/* ACWR */}
+                <div className="metric-card">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-slate-400">ACWR - Injury Risk</h3>
+                    <HelpButton helpKey="acwr" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-3xl font-bold text-purple-400 mb-1">{currentMetrics.acwr}</div>
+                  <p className={`text-xs text-${injuryRisk.color}-400`}>{injuryRisk.level} Risk</p>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: PERFORMANCE TRENDS */}
+            <div className="mb-8 fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-2xl font-bold">📈 Performance Trends</h2>
+              </div>
+
+              {/* PMC Chart */}
+              <div className="card p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold">Performance Management Chart</h3>
+                  <HelpButton helpKey="pmc" onClick={showHelpModal} />
+                </div>
+                
+                <ResponsiveContainer width="100%" height={300}>
+                  <ComposedChart data={pmcData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="date" stroke="#94a3b8" style={{ fontSize: '12px' }} />
+                    <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} />
+                    <Tooltip
+                      contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                      labelStyle={{ color: '#f8fafc' }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="CTL" stroke="#3b82f6" strokeWidth={2} name="CTL (Fitness)" />
+                    <Line type="monotone" dataKey="ATL" stroke="#f59e0b" strokeWidth={2} name="ATL (Fatigue)" />
+                    <Area type="monotone" dataKey="TSB" fill="#10b981" stroke="#10b981" fillOpacity={0.3} name="TSB (Form)" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+
+                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <p className="text-sm text-blue-400">
+                    💡 {currentMetrics.tsb > 5 ? 'Positive TSB indicates good recovery - ready for hard training!' : currentMetrics.tsb > 0 ? 'Neutral form - maintain current training load.' : 'Negative TSB shows accumulated fatigue - consider recovery.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Volume & Pace Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Weekly Volume */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">Weekly Volume</h3>
+                    <HelpButton helpKey="volume" onClick={showHelpModal} />
+                  </div>
+                  
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={weeklyVolumeData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="week" stroke="#94a3b8" style={{ fontSize: '12px' }} />
+                      <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} />
+                      <Tooltip
+                        contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                      />
+                      <Bar dataKey="distance" fill="#10b981" name="Distance (km)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Pace Progression */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">Pace Progression (Z2)</h3>
+                    <HelpButton helpKey="pace" onClick={showHelpModal} />
+                  </div>
+                  
+                  <ResponsiveContainer width="100%" height={250}>
+                    <LineChart data={paceProgressionData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                      <XAxis dataKey="month" stroke="#94a3b8" style={{ fontSize: '12px' }} />
+                      <YAxis 
+                        stroke="#94a3b8" 
+                        style={{ fontSize: '12px' }}
+                        tickFormatter={(value) => secondsToPace(value)}
+                        domain={['auto', 'auto']}
+                      />
+                      <Tooltip
+                        contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                        formatter={(value) => [secondsToPace(value), 'Pace']}
+                      />
+                      <Line type="monotone" dataKey="pace" stroke="#3b82f6" strokeWidth={2} name="Avg Pace" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 4: DISTRIBUTION ANALYSIS */}
+            <div className="mb-8 fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-2xl font-bold">🎯 Distribution Analysis</h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Zone Distribution */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">Heart Rate Zones</h3>
+                    <HelpButton helpKey="zones" onClick={showHelpModal} />
+                  </div>
+
+                  <div className="space-y-3">
+                    {zoneDistribution.map(zone => (
+                      <div key={zone.zone}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium">{zone.zone}</span>
+                          <span className="text-sm text-slate-400">{zone.percentage}% ({Math.round(zone.time)} min)</span>
+                        </div>
+                        <div className="zone-bar">
+                          <div className="zone-fill" style={{ width: `${zone.percentage}%`, background: zone.color }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                    <p className="text-sm text-emerald-400">
+                      ✓ Target: 75-80% in Z1-Z2. Current: {(parseFloat(zoneDistribution[0]?.percentage || 0) + parseFloat(zoneDistribution[1]?.percentage || 0)).toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
+
+                {/* Session Types */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">Session Types</h3>
+                  </div>
+
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={sessionTypeData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {sessionTypeData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'][index % 5]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 5: RISK & RECOVERY */}
+            <div className="mb-8 fade-in">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-2xl font-bold">🛡️ Risk & Recovery Assessment</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Injury Risk */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold">⚠️ Injury Risk</h3>
+                    <HelpButton helpKey="injury" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold text-${injuryRisk.color}-400 mb-2`}>
+                      {injuryRisk.level}
+                    </div>
+                    <p className="text-sm text-slate-400 mb-2">ACWR: {currentMetrics.acwr}</p>
+                    <p className="text-xs text-slate-500">{injuryRisk.message}</p>
+                  </div>
+                </div>
+
+                {/* Recovery Score */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold">💪 Recovery Readiness</h3>
+                    <HelpButton helpKey="recovery" onClick={showHelpModal} />
+                  </div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-emerald-400 mb-2">{recoveryScore}/100</div>
+                    <p className="text-sm text-slate-400 mb-4">
+                      {recoveryScore >= 80 ? '🟢 Excellent' : recoveryScore >= 60 ? '🟡 Good' : '🔴 Poor'}
+                    </p>
+                    <div className="w-full bg-slate-700 rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full bg-emerald-400 transition-all"
+                        style={{ width: `${recoveryScore}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-sm text-slate-500 fade-in">
+              <p>Last updated: {new Date().toLocaleString('en-AU')}</p>
+            </div>
+          </div>
+
+          {/* Help Modal */}
+          {showHelp && <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<AnalyticsDashboard />, document.getElementById('root'));
+  </script>
+</body>
+</html>

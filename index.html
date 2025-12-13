@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Running Coach Pro</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #1e1b4b 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f8fafc;
+    }
+    
+    .container {
+      text-align: center;
+      padding: 40px;
+      max-width: 600px;
+    }
+    
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .subtitle {
+      font-size: 1.2em;
+      color: #94a3b8;
+      margin-bottom: 50px;
+    }
+    
+    .nav-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    
+    .nav-card {
+      background: rgba(26, 35, 50, 0.8);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 30px;
+      text-decoration: none;
+      color: #f8fafc;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .nav-card:hover {
+      transform: translateY(-5px);
+      border-color: #3b82f6;
+      box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
+    }
+    
+    .icon {
+      font-size: 3em;
+      margin-bottom: 15px;
+    }
+    
+    .nav-title {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .nav-description {
+      font-size: 0.9em;
+      color: #94a3b8;
+    }
+    
+    @media (max-width: 640px) {
+      .nav-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+    }
+    
+    .version {
+      margin-top: 60px;
+      font-size: 0.8em;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏃 Running Coach Pro</h1>
+    <p class="subtitle">Intelligent Training Management System</p>
+    
+    <div class="nav-cards">
+      <a href="AnalyticsPanel.html" class="nav-card">
+        <div class="icon">📊</div>
+        <div class="nav-title">Analytics</div>
+        <div class="nav-description">View performance insights, training metrics, and predictions</div>
+      </a>
+      
+      <a href="HistoryPanel.html" class="nav-card">
+        <div class="icon">📝</div>
+        <div class="nav-title">Session History</div>
+        <div class="nav-description">Log and manage your training sessions</div>
+      </a>
+    </div>
+    
+    <div class="version">
+      v1.0.0 | Phase 3: Integration Complete
+    </div>
+  </div>
+  
+  <script>
+    // Auto-redirect to Analytics if accessing directly
+    // Uncomment the line below if you want Analytics as default landing
+    // window.location.href = 'AnalyticsPanel.html';
+  </script>
+</body>
+</html>
