@@ -457,7 +457,7 @@
           firebase.initializeApp(firebaseConfig);
         }
         
-        firebase.auth().signInWithEmailAndPassword('Nico, 'cops')
+        firebase.auth().signInWithEmailAndPassword('nic@runningcoach.com', 'cops')
         .then((userCredential) => {
           setUser(userCredential.user);
           loadSessions(userCredential.user.uid);
@@ -466,7 +466,7 @@
           console.error("Auth error:", error);
           // If user doesn't exist, create it
           if (error.code === 'auth/user-not-found') {
-            firebase.auth().createUserWithEmailAndPassword('Nico, 'cops')
+            firebase.auth().createUserWithEmailAndPassword('nic@runningcoach.com', 'cops')
               .then((userCredential) => {
                 setUser(userCredential.user);
                 loadSessions(userCredential.user.uid);
