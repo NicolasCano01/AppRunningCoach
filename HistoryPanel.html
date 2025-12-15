@@ -391,12 +391,22 @@
         if (window.app && !window.app.sessions.length) {
           window.app.loadSessions();
         }
+      
       } else {
-        console.log('⏳ Firebase Auth: Signing in anonymously...');
-        auth.signInAnonymously().catch((error) => {
-          console.error('❌ Firebase Auth Error:', error);
-        });
+        console.log('⏳ Firebase Auth: Signing in...');
+        // Use a fixed email for your personal use
+        auth.signInWithEmailAndPassword('nic@runningcoach.com', 'YourSecurePassword123!')
+          .catch((error) => {
+            console.error('❌ Firebase Auth Error:', error);
+            // If user doesn't exist, create it
+            if (error.code === 'auth/user-not-found') {
+              auth.createUserWithEmailAndPassword('nic@runningcoach.com', 'YourSecurePassword123!')
+                .then(() => console.log('✅ User created'))
+                .catch(err => console.error('❌ Create user error:', err));
+            }
+          });
       }
+      
     });
     
     // Wait for auth helper
