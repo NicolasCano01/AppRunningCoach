@@ -456,15 +456,31 @@
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
         }
-        firebase.auth().signInAnonymously()
-          .then((userCredential) => {
-            setUser(userCredential.user);
-            loadSessions(userCredential.user.uid);
-          })
-          .catch((error) => {
-            console.error("Auth error:", error);
+        
+        firebase.auth().signInWithEmailAndPassword('nic@runningcoach.com', 'YourSecurePassword123!')
+        .then((userCredential) => {
+          setUser(userCredential.user);
+          loadSessions(userCredential.user.uid);
+        })
+        .catch((error) => {
+          console.error("Auth error:", error);
+          // If user doesn't exist, create it
+          if (error.code === 'auth/user-not-found') {
+            firebase.auth().createUserWithEmailAndPassword('Nico, 'cops')
+              .then((userCredential) => {
+                setUser(userCredential.user);
+                loadSessions(userCredential.user.uid);
+              })
+              .catch(err => {
+                console.error('Create user error:', err);
+                setLoading(false);
+              });
+          } else {
             setLoading(false);
-          });
+          }
+        });
+
+        
       }, []);
 
       useEffect(() => {
