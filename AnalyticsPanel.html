@@ -39,6 +39,68 @@
       min-height: 100vh;
       color: var(--text-primary);
       margin: 0;
+      padding: 0;
+    }
+    
+    /* Navigation Bar */
+    .nav-bar {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-toggle {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 4px;
+      border-radius: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    
+    .nav-toggle a {
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    
+    .nav-toggle a.active {
+      background: var(--accent-blue);
+      color: white;
+    }
+    
+    .nav-toggle a:not(.active) {
+      color: var(--text-secondary);
+    }
+    
+    .nav-toggle a:not(.active):hover {
+      color: white;
+      background: rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Date/Week Header */
+    .date-week-header {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.05));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    @media (max-width: 640px) {
+      .date-week-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
     
     .spinner {
@@ -172,6 +234,52 @@
     
     @media (max-width: 640px) {
       .metric-card { padding: 16px; }
+      
+      /* Better touch targets on mobile */
+      .help-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+      
+      .btn {
+        padding: 12px 18px;
+        font-size: 15px;
+        min-height: 44px; /* iOS recommended touch target */
+      }
+      
+      .nav-toggle a {
+        padding: 10px 16px;
+        min-width: 80px;
+        text-align: center;
+      }
+      
+      /* Stack metrics vertically on very small screens */
+      .metric-card .text-3xl {
+        font-size: 2rem;
+      }
+      
+      /* Reduce padding on mobile */
+      .card {
+        padding: 16px !important;
+      }
+      
+      /* Make charts more responsive */
+      .recharts-wrapper {
+        font-size: 11px;
+      }
+    }
+    
+    /* Improve scrolling on mobile */
+    @media (max-width: 768px) {
+      body {
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      /* Prevent zoom on input focus */
+      input, select, textarea {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -402,6 +510,16 @@
       return Math.min(100, Math.max(0, score));
     };
 
+    // Calculate current training week (Week 1 starts Nov 10, 2025)
+    const getCurrentTrainingWeek = () => {
+      const startDate = new Date('2025-11-10');
+      const today = new Date();
+      const diffTime = today - startDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const weekNumber = Math.floor(diffDays / 7) + 1;
+      return weekNumber > 0 ? weekNumber : 1;
+    };
+
     // Help Button Component
     const HelpButton = ({ helpKey, onClick }) => (
       <button 
@@ -456,31 +574,15 @@
         if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
         }
-        
-        firebase.auth().signInWithEmailAndPassword('nic@runningcoach.com', 'policias')
-        .then((userCredential) => {
-          setUser(userCredential.user);
-          loadSessions(userCredential.user.uid);
-        })
-        .catch((error) => {
-          console.error("Auth error:", error);
-          // If user doesn't exist, create it
-          if (error.code === 'auth/user-not-found') {
-            firebase.auth().createUserWithEmailAndPassword('nic@runningcoach.com', 'policias')
-              .then((userCredential) => {
-                setUser(userCredential.user);
-                loadSessions(userCredential.user.uid);
-              })
-              .catch(err => {
-                console.error('Create user error:', err);
-                setLoading(false);
-              });
-          } else {
+        firebase.auth().signInAnonymously()
+          .then((userCredential) => {
+            setUser(userCredential.user);
+            loadSessions(userCredential.user.uid);
+          })
+          .catch((error) => {
+            console.error("Auth error:", error);
             setLoading(false);
-          }
-        });
-
-        
+          });
       }, []);
 
       useEffect(() => {
@@ -631,38 +733,93 @@
       }, [filteredSessions, sessions]);
 
       const weeklyVolumeData = useMemo(() => {
+        if (filteredSessions.length === 0) return [];
+
         const weeks = {};
         filteredSessions.forEach(session => {
-          const week = session.week || 'Unknown';
+          const sessionDate = parseSessionDate(session.date);
+          const week = session.week || getWeekNumber(sessionDate);
+          
           if (!weeks[week]) {
-            weeks[week] = { week, distance: 0, tss: 0 };
+            weeks[week] = { 
+              week: `W${week}`, 
+              distance: 0, 
+              tss: 0,
+              date: sessionDate
+            };
           }
           weeks[week].distance += session.actual?.distance || 0;
           weeks[week].tss += calculateTSS(session);
         });
-        return Object.values(weeks).sort((a, b) => a.week - b.week);
+
+        const weekArray = Object.values(weeks).sort((a, b) => {
+          // Extract week number from "W47" format
+          const weekA = parseInt(a.week.substring(1));
+          const weekB = parseInt(b.week.substring(1));
+          return weekA - weekB;
+        });
+
+        // If more than 12 weeks, show only the most recent 12
+        if (weekArray.length > 12) {
+          return weekArray.slice(-12);
+        }
+
+        return weekArray;
       }, [filteredSessions]);
 
+      // Helper function to get week number
+      const getWeekNumber = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+        const yearStart = new Date(d.getFullYear(), 0, 1);
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        return weekNo;
+      };
+
       const paceProgressionData = useMemo(() => {
-        const months = {};
+        const weeks = {};
+        
         filteredSessions.forEach(session => {
           const avgHr = session.actual?.avgHr;
-          if (avgHr >= 124 && avgHr <= 140 && session.sessionType?.includes("Run")) {
+          if (avgHr >= 124 && avgHr <= 140 && session.sessionType?.includes("Run") && session.actual?.avgPace) {
             const sessionDate = parseSessionDate(session.date);
-            const monthKey = sessionDate.toLocaleDateString('en-AU', { month: 'short' });
+            const week = session.week || getWeekNumber(sessionDate);
+            const weekKey = `W${week}`;
             
-            if (!months[monthKey]) {
-              months[monthKey] = { month: monthKey, totalPace: 0, count: 0 };
+            if (!weeks[weekKey]) {
+              weeks[weekKey] = { 
+                week: weekKey, 
+                totalPace: 0, 
+                count: 0,
+                weekNum: week,
+                date: sessionDate
+              };
             }
-            months[monthKey].totalPace += session.actual?.avgPace || 0;
-            months[monthKey].count += 1;
+            weeks[weekKey].totalPace += session.actual.avgPace;
+            weeks[weekKey].count += 1;
           }
         });
 
-        return Object.values(months).map(m => ({
-          month: m.month,
-          pace: m.count > 0 ? m.totalPace / m.count : 0
-        }));
+        const weekArray = Object.values(weeks)
+          .filter(w => w.count > 0)
+          .map(w => ({
+            week: w.week,
+            pace: w.totalPace / w.count,
+            date: w.date
+          }))
+          .sort((a, b) => {
+            const weekA = parseInt(a.week.substring(1));
+            const weekB = parseInt(b.week.substring(1));
+            return weekA - weekB;
+          });
+
+        // If more than 12 weeks, show only the most recent 12
+        if (weekArray.length > 12) {
+          return weekArray.slice(-12);
+        }
+
+        return weekArray;
       }, [filteredSessions]);
 
       const sessionTypeData = useMemo(() => {
@@ -687,20 +844,55 @@
       }
 
       return (
-        <div className="min-h-screen p-4 md:p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <a href="index.html" className="text-blue-400 hover:text-blue-300 text-sm no-underline">← Back to Home</a>
-                <a href="HistoryPanel.html" className="text-purple-400 hover:text-purple-300 text-sm no-underline">📝 History</a>
+        <div className="min-h-screen">
+          {/* Navigation Bar */}
+          <nav className="nav-bar">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between">
+                <a href="index.html" className="flex items-center gap-2 text-xl font-bold text-white hover:text-blue-400 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                  </svg>
+                  RCP
+                </a>
+                
+                <div className="nav-toggle">
+                  <a href="AnalyticsPanel.html" className="active">Analytics</a>
+                  <a href="HistoryPanel.html">History</a>
+                </div>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-                📊 Analytics Dashboard
-              </h1>
-              <p className="text-slate-400">Performance insights and training metrics</p>
             </div>
-            
+          </nav>
+
+          {/* Main Content */}
+          <div className="p-4 md:p-8">
+            <div className="max-w-7xl mx-auto">
+              {/* Header with Date/Week */}
+              <div className="mb-6 fade-in">
+                <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
+                  📊 Analytics Dashboard
+                </h1>
+                
+                <div className="date-week-header">
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Today</p>
+                    <p className="text-lg font-semibold text-white">
+                      {new Date().toLocaleDateString('en-AU', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Training Week</p>
+                    <p className="text-lg font-semibold text-blue-400">
+                      Week {getCurrentTrainingWeek()}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
             {/* Time Range Filters */}
             <div className="mb-6 fade-in">
@@ -896,7 +1088,7 @@
                 </div>
               </div>
 
-              {/* Volume & Pace Row */}
+              {/* Weekly Volume */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Weekly Volume */}
                 <div className="card p-6">
@@ -905,17 +1097,41 @@
                     <HelpButton helpKey="volume" onClick={showHelpModal} />
                   </div>
                   
-                  <ResponsiveContainer width="100%" height={250}>
-                    <BarChart data={weeklyVolumeData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis dataKey="week" stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                      <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                      <Tooltip
-                        contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
-                      />
-                      <Bar dataKey="distance" fill="#10b981" name="Distance (km)" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {weeklyVolumeData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart 
+                        data={weeklyVolumeData}
+                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                        <XAxis 
+                          dataKey="week" 
+                          stroke="#94a3b8" 
+                          style={{ fontSize: '12px' }} 
+                        />
+                        <YAxis 
+                          stroke="#94a3b8" 
+                          style={{ fontSize: '12px' }}
+                          label={{ value: 'km', angle: -90, position: 'insideLeft', style: { fill: '#94a3b8' } }}
+                        />
+                        <Tooltip
+                          contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                          formatter={(value) => [`${value.toFixed(1)} km`, 'Distance']}
+                        />
+                        <Bar 
+                          dataKey="distance" 
+                          fill="#10b981" 
+                          name="Distance (km)"
+                          radius={[8, 8, 0, 0]}
+                          maxBarSize={weeklyVolumeData.length <= 3 ? 60 : weeklyVolumeData.length <= 6 ? 50 : 40}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-slate-500">
+                      <p>No weekly data available</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Pace Progression */}
@@ -925,23 +1141,55 @@
                     <HelpButton helpKey="pace" onClick={showHelpModal} />
                   </div>
                   
-                  <ResponsiveContainer width="100%" height={250}>
-                    <LineChart data={paceProgressionData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                      <XAxis dataKey="month" stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                      <YAxis 
-                        stroke="#94a3b8" 
-                        style={{ fontSize: '12px' }}
-                        tickFormatter={(value) => secondsToPace(value)}
-                        domain={['auto', 'auto']}
-                      />
-                      <Tooltip
-                        contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
-                        formatter={(value) => [secondsToPace(value), 'Pace']}
-                      />
-                      <Line type="monotone" dataKey="pace" stroke="#3b82f6" strokeWidth={2} name="Avg Pace" />
-                    </LineChart>
-                  </ResponsiveContainer>
+                  {paceProgressionData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart 
+                        data={paceProgressionData}
+                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                        <XAxis 
+                          dataKey="week" 
+                          stroke="#94a3b8" 
+                          style={{ fontSize: '12px' }} 
+                        />
+                        <YAxis 
+                          stroke="#94a3b8" 
+                          style={{ fontSize: '12px' }}
+                          tickFormatter={(value) => secondsToPace(value)}
+                          domain={['auto', 'auto']}
+                          reversed={true}
+                          label={{ value: 'min/km', angle: -90, position: 'insideLeft', style: { fill: '#94a3b8' } }}
+                        />
+                        <Tooltip
+                          contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                          formatter={(value) => [secondsToPace(value), 'Avg Pace']}
+                          labelFormatter={(label) => `Week ${label.substring(1)}`}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="pace" 
+                          stroke="#3b82f6" 
+                          strokeWidth={3} 
+                          name="Avg Pace"
+                          dot={{ fill: '#3b82f6', r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-[250px] flex items-center justify-center text-slate-500">
+                      <p>No Z2 pace data available</p>
+                    </div>
+                  )}
+                  
+                  {paceProgressionData.length > 0 && (
+                    <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                      <p className="text-sm text-blue-400">
+                        💡 Tracking weekly Z2 pace - improvement shows aerobic fitness gains
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1055,14 +1303,15 @@
             </div>
 
             {/* Footer */}
-            <div className="text-center text-sm text-slate-500 fade-in">
+            <div className="text-center text-sm text-slate-500 fade-in mt-8">
               <p>Last updated: {new Date().toLocaleString('en-AU')}</p>
             </div>
           </div>
-
-          {/* Help Modal */}
-          {showHelp && <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />}
         </div>
+
+        {/* Help Modal */}
+        {showHelp && <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />}
+      </div>
       );
     }
 
