@@ -53,6 +53,40 @@
       min-height: 100vh;
       color: var(--text-primary);
       margin: 0;
+      padding: 0;
+    }
+    
+    /* Top Navigation Bar */
+    .top-nav {
+      background: rgba(26, 35, 50, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-link {
+      padding: 12px 20px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-block;
+      color: var(--text-primary);
+    }
+    
+    .nav-link:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+    
+    .nav-link.active {
+      background: var(--accent-emerald);
+      color: white;
+    }
+    
+    /* Main content padding */
+    .main-content {
       padding: 20px;
     }
     
@@ -354,7 +388,31 @@
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2 text-xl font-bold">
+        <i data-lucide="activity" class="w-6 h-6 text-emerald-400"></i>
+        <span class="hidden sm:inline">RCP</span>
+      </a>
+      
+      <!-- Panel Toggle -->
+      <div class="flex items-center gap-2">
+        <a href="AnalyticsPanel.html" class="nav-link">
+          Analytics
+        </a>
+        <a href="HistoryPanel.html" class="nav-link active">
+          History
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div id="app"></div>
+  </div>
 
   <script>
     // ==================== FIREBASE CONFIGURATION ====================
