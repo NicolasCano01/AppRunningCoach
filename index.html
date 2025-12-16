@@ -1,133 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Running Coach Pro</title>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Running Coach Pro - Intelligent Training Management</title>
+    <meta name="description" content="Track your training, analyze your performance, and prevent injury with data-driven insights">
     
-    body {
-      background: linear-gradient(135deg, #0a0f1a 0%, #0f172a 50%, #1e1b4b 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #f8fafc;
-    }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    .container {
-      text-align: center;
-      padding: 40px;
-      max-width: 600px;
-    }
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
-      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="style.css">
     
-    .subtitle {
-      font-size: 1.2em;
-      color: #94a3b8;
-      margin-bottom: 50px;
-    }
-    
-    .nav-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-top: 40px;
-    }
-    
-    .nav-card {
-      background: rgba(26, 35, 50, 0.8);
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 30px;
-      text-decoration: none;
-      color: #f8fafc;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-    
-    .nav-card:hover {
-      transform: translateY(-5px);
-      border-color: #3b82f6;
-      box-shadow: 0 10px 40px rgba(59, 130, 246, 0.3);
-    }
-    
-    .icon {
-      font-size: 3em;
-      margin-bottom: 15px;
-    }
-    
-    .nav-title {
-      font-size: 1.5em;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    
-    .nav-description {
-      font-size: 0.9em;
-      color: #94a3b8;
-    }
-    
-    @media (max-width: 640px) {
-      .nav-cards {
-        grid-template-columns: 1fr;
-      }
-      
-      h1 {
-        font-size: 2em;
-      }
-    }
-    
-    .version {
-      margin-top: 60px;
-      font-size: 0.8em;
-      color: #64748b;
-    }
-  </style>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h1>🏃 Running Coach Pro</h1>
-    <p class="subtitle">Intelligent Training Management System</p>
+<body class="flex flex-col min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     
-    <div class="nav-cards">
-      <a href="AnalyticsPanel.html" class="nav-card">
-        <div class="icon">📊</div>
-        <div class="nav-title">Analytics</div>
-        <div class="nav-description">View performance insights, training metrics, and predictions</div>
-      </a>
-      
-      <a href="HistoryPanel.html" class="nav-card">
-        <div class="icon">📝</div>
-        <div class="nav-title">Session History</div>
-        <div class="nav-description">Log and manage your training sessions</div>
-      </a>
-    </div>
-    
-    <div class="version">
-      v1.0.0 | Phase 3: Integration Complete
-    </div>
-  </div>
-  
-  <script>
-    // Auto-redirect to Analytics if accessing directly
-    // Uncomment the line below if you want Analytics as default landing
-    // window.location.href = 'AnalyticsPanel.html';
-  </script>
+    <!-- Hero Section -->
+    <main class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <!-- Animated Icon -->
+        <div class="mb-8 p-6 bg-blue-600/20 rounded-full text-blue-400 animate-pulse hover:animate-bounce transition-all duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-lg">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+        </div>
+        
+        <!-- Title -->
+        <h1 class="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
+            Running <span class="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Coach Pro</span>
+        </h1>
+        
+        <!-- Subtitle -->
+        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed">
+            Track your training, analyze your performance, and prevent injury with simple, data-driven insights.
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+            <!-- Primary Button: Analytics -->
+            <a href="AnalyticsPanel.html" class="group flex-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-5 px-8 rounded-xl transition-all transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 shadow-lg shadow-blue-900/30 flex flex-col items-center justify-center gap-3">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-12 transition-transform">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span class="text-lg">Analytics Dashboard</span>
+                </div>
+                <span class="text-xs text-blue-100 opacity-90">View performance insights and metrics</span>
+            </a>
+            
+            <!-- Secondary Button: History -->
+            <a href="HistoryPanel.html" class="group flex-1 bg-slate-800/80 backdrop-blur-sm hover:bg-slate-700/80 text-white font-bold py-5 px-8 rounded-xl transition-all transform hover:scale-105 border-2 border-slate-700 hover:border-slate-600 hover:shadow-xl flex flex-col items-center justify-center gap-3">
+                <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform">
+                        <path d="M3 3v18h18"/>
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                    </svg>
+                    <span class="text-lg">Session History</span>
+                </div>
+                <span class="text-xs text-slate-400">Log and manage training sessions</span>
+            </a>
+        </div>
+
+        <!-- Features Grid (Optional - can be removed if too much) -->
+        <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
+            <!-- Feature 1 -->
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:border-blue-500/30 transition-all hover:transform hover:scale-105">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Training Load Metrics</h3>
+                <p class="text-slate-400 text-sm">Track CTL, ATL, TSB, and ACWR to optimize training and prevent injury</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:border-emerald-500/30 transition-all hover:transform hover:scale-105">
+                <div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Quick Session Logging</h3>
+                <p class="text-slate-400 text-sm">Log any session in under 60 seconds with smart auto-fill</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6 hover:border-purple-500/30 transition-all hover:transform hover:scale-105">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <h3 class="text-white font-semibold mb-2">Marathon Predictions</h3>
+                <p class="text-slate-400 text-sm">Get accurate race time predictions based on your Z2 pace</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-6 text-center text-slate-500 text-sm border-t border-slate-800">
+        <div class="mb-2">
+            <span>&copy; 2024 Running Coach Pro</span>
+            <span class="mx-2">•</span>
+            <span>Phase 3: Integration Complete</span>
+        </div>
+        <div class="text-xs text-slate-600">
+            Powered by Firebase • Hosted on GitHub Pages
+        </div>
+    </footer>
+
 </body>
 </html>
