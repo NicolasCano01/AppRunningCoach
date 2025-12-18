@@ -457,7 +457,7 @@
           } else {
             console.log('âŒ No user authenticated, attempting sign in...');
             // Auto sign-in with known credentials
-            auth.signInWithEmailAndPassword('nic@runningcoach.com', 'policias')
+            auth.signInWithEmailAndPassword('nic@runningcoach.com', 'cops')
               .then(userCredential => {
                 console.log('âœ… Auto sign-in successful');
                 currentUser = userCredential.user;
@@ -921,17 +921,25 @@
                     <div>
                       <label class="block text-sm text-slate-400 mb-2">Preferred Long Run Day</label>
                       <select id="preferredLongRunDay" class="input-field">
-                        ${allDays.map(day => `
-                          <option value="${day}" ${s.preferredLongRunDay === day ? 'selected' : ''}>${day}</option>
-                        `).join('')}
+                        <option value="Monday" ${s.preferredLongRunDay === 'Monday' ? 'selected' : ''}>Monday</option>
+                        <option value="Tuesday" ${s.preferredLongRunDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
+                        <option value="Wednesday" ${s.preferredLongRunDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
+                        <option value="Thursday" ${s.preferredLongRunDay === 'Thursday' ? 'selected' : ''}>Thursday</option>
+                        <option value="Friday" ${s.preferredLongRunDay === 'Friday' ? 'selected' : ''}>Friday</option>
+                        <option value="Saturday" ${s.preferredLongRunDay === 'Saturday' ? 'selected' : ''}>Saturday</option>
+                        <option value="Sunday" ${s.preferredLongRunDay === 'Sunday' ? 'selected' : ''}>Sunday</option>
                       </select>
                     </div>
                     <div>
                       <label class="block text-sm text-slate-400 mb-2">Preferred Rest Day</label>
                       <select id="preferredRestDay" class="input-field">
-                        ${allDays.map(day => `
-                          <option value="${day}" ${s.preferredRestDay === day ? 'selected' : ''}>${day}</option>
-                        `).join('')}
+                        <option value="Monday" ${s.preferredRestDay === 'Monday' ? 'selected' : ''}>Monday</option>
+                        <option value="Tuesday" ${s.preferredRestDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
+                        <option value="Wednesday" ${s.preferredRestDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
+                        <option value="Thursday" ${s.preferredRestDay === 'Thursday' ? 'selected' : ''}>Thursday</option>
+                        <option value="Friday" ${s.preferredRestDay === 'Friday' ? 'selected' : ''}>Friday</option>
+                        <option value="Saturday" ${s.preferredRestDay === 'Saturday' ? 'selected' : ''}>Saturday</option>
+                        <option value="Sunday" ${s.preferredRestDay === 'Sunday' ? 'selected' : ''}>Sunday</option>
                       </select>
                     </div>
                   </div>
