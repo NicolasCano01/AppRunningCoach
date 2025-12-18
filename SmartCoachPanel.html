@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Running Coach Pro - AI Smart Coach">
+  <meta name="theme-color" content="#0ea5e9">
+  <title>Running Coach Pro - Smart Coach</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a2332;
+      --bg-elevated: #243044;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #8b5cf6;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: #334155;
+    }
+    
+    * { 
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      box-sizing: border-box;
+    }
+    
+    .mono { font-family: 'Space Mono', monospace; }
+    
+    body {
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #0f172a 50%, #1e1b4b 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Top Navigation Bar */
+    .top-nav {
+      background: rgba(26, 35, 50, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav-link {
+      padding: 12px 20px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-block;
+      color: var(--text-primary);
+    }
+    
+    .nav-link:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+    
+    .nav-link.active {
+      background: var(--accent-emerald);
+      color: white;
+    }
+    
+    /* Main content padding */
+    .main-content {
+      padding: 20px;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    .slide-in { animation: slideIn 0.3s ease-out forwards; }
+    
+    /* Loading spinner */
+    .spinner {
+      border: 3px solid rgba(59, 130, 246, 0.2);
+      border-top: 3px solid var(--accent-blue);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    
+    /* Glass morphism */
+    .glass {
+      background: rgba(26, 35, 50, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    /* Card styles */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Input styles */
+    .input-field {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      width: 100%;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: var(--bg-elevated);
+    }
+    
+    .input-field::placeholder {
+      color: var(--text-muted);
+    }
+    
+    /* Button styles */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+      color: white;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-weight: 500;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-secondary:hover {
+      background: #2d3a4f;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
+      color: white;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    /* Modal styles */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.2s ease-out;
+    }
+    
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-weight: 500;
+      z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    
+    .toast-success {
+      background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
+      color: white;
+    }
+    
+    .toast-error {
+      background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    /* Settings Bar */
+    .settings-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .settings-bar-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    
+    .settings-info {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    
+    .settings-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 8px;
+    }
+    
+    .settings-item-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--accent-blue);
+    }
+    
+    .settings-item-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .settings-item-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    /* Gradient text effect */
+    .gradient-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f0abfc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Badge styles */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .badge-immovable {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--accent-amber);
+    }
+    
+    /* Checkbox styles */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    
+    .checkbox-input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--accent-blue);
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 12px;
+      }
+      
+      .settings-bar-content {
+        flex-direction: column;
+      }
+      
+      .settings-info {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-content {
+        margin: 10px;
+        max-height: 95vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2 text-xl font-bold">
+        <i data-lucide="activity" class="w-6 h-6 text-emerald-400"></i>
+        <span class="hidden sm:inline">RCP</span>
+      </a>
+      
+      <!-- Panel Toggle -->
+      <div class="flex items-center gap-2">
+        <a href="AnalyticsPanel.html" class="nav-link">
+          Analytics
+        </a>
+        <a href="HistoryPanel.html" class="nav-link">
+          History
+        </a>
+        <a href="SmartCoachPanel.html" class="nav-link active">
+          Smart Coach
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div id="app"></div>
+  </div>
+
+  <script>
+    // ==================== FIREBASE CONFIGURATION ====================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQr84Yu0lTkKMnqtgYDD5NP4i_n5qS4eM",
+      authDomain: "runningcoachdata.firebaseapp.com",
+      projectId: "runningcoachdata",
+      storageBucket: "runningcoachdata.firebasestorage.app",
+      messagingSenderId: "364279562892",
+      appId: "1:364279562892:web:7acd6bbac8c8113177f1a9"
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    // Global references (will be set after auth)
+    let settingsRef = null;
+    let currentUser = null;
+
+    // ==================== AUTHENTICATION ====================
+    
+    // Wait for auth state to be determined
+    function waitForAuth() {
+      return new Promise((resolve, reject) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          if (user) {
+            console.log('âœ… User authenticated:', user.email);
+            currentUser = user;
+            
+            // Set up Firebase references
+            settingsRef = db.collection('users').doc(user.uid).collection('settings');
+            
+            unsubscribe();
+            resolve(user);
+          } else {
+            console.log('âŒ No user authenticated, attempting sign in...');
+            // Auto sign-in with known credentials
+            auth.signInWithEmailAndPassword('nic@runningcoach.com', 'cops')
+              .then(userCredential => {
+                console.log('âœ… Auto sign-in successful');
+                currentUser = userCredential.user;
+                settingsRef = db.collection('users').doc(userCredential.user.uid).collection('settings');
+                unsubscribe();
+                resolve(userCredential.user);
+              })
+              .catch(error => {
+                console.error('âŒ Auto sign-in failed:', error);
+                unsubscribe();
+                reject(error);
+              });
+          }
+        });
+      });
+    }
+
+    // ==================== HELPER FUNCTIONS ====================
+    
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}"></i>
+        ${message}
+      `;
+      document.body.appendChild(toast);
+      lucide.createIcons();
+      
+      setTimeout(() => {
+        toast.style.animation = 'fadeIn 0.3s ease-out reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    // Calculate week number from anchor date
+    function calculateWeekNumber(anchorDate = '2025-11-10') {
+      const anchor = new Date(anchorDate);
+      const today = new Date();
+      const diffTime = today - anchor;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return Math.floor(diffDays / 7) + 1;
+    }
+    
+    // Get mesocycle info
+    function getMesocycleInfo(weekNumber) {
+      const mesocycleWeek = ((weekNumber - 1) % 4) + 1;
+      const mesocycleType = mesocycleWeek === 4 ? 'Discharge' : 'Charge';
+      return { mesocycleWeek, mesocycleType };
+    }
+    
+    // Format pace from seconds to MM:SS
+    function formatPace(secondsPerKm) {
+      if (!secondsPerKm) return '';
+      const mins = Math.floor(secondsPerKm / 60);
+      const secs = secondsPerKm % 60;
+      return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+    
+    // Parse pace from MM:SS to seconds
+    function parsePace(paceString) {
+      if (!paceString) return null;
+      const parts = paceString.split(':');
+      if (parts.length === 2) {
+        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      }
+      return null;
+    }
+
+    // ==================== SMART COACH PANEL ====================
+    
+    class SmartCoachPanel {
+      constructor() {
+        this.settings = null;
+        this.loading = true;
+        this.showSettingsModal = false;
+        this.editingSettings = null;
+        
+        this.init();
+      }
+      
+      async init() {
+        console.log('ðŸš€ Initializing Smart Coach Panel...');
+        this.render(); // Show loading state
+        
+        try {
+          // Wait for Firebase auth
+          await waitForAuth();
+          console.log('âœ… Auth ready, loading settings...');
+          await this.loadSettings();
+        } catch (error) {
+          console.error('âŒ Initialization error:', error);
+          showToast('Error initializing app', 'error');
+          this.loading = false;
+          this.render();
+        }
+        
+        lucide.createIcons();
+      }
+      
+      async loadSettings() {
+        this.loading = true;
+        this.render();
+        
+        try {
+          console.log('ðŸ"¥ Loading settings from Firebase...');
+          
+          // Get settings document (fixed ID: "settings")
+          const doc = await settingsRef.doc('settings').get();
+          
+          if (doc.exists) {
+            this.settings = { id: doc.id, ...doc.data() };
+            console.log('âœ… Settings loaded:', this.settings);
+          } else {
+            console.log('âš ï¸ No settings found - will show onboarding');
+            this.settings = null;
+          }
+          
+          this.loading = false;
+          this.render();
+        } catch (error) {
+          console.error('âŒ Error loading settings:', error);
+          showToast('Error loading settings: ' + error.message, 'error');
+          this.loading = false;
+          this.render();
+        }
+      }
+      
+      async saveSettings(settingsData) {
+        try {
+          console.log('ðŸ'¾ Saving settings...', settingsData);
+          
+          const settingsToSave = {
+            ...settingsData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+          
+          // Save to fixed document ID "settings"
+          await settingsRef.doc('settings').set(settingsToSave, { merge: true });
+          
+          console.log('âœ… Settings saved successfully');
+          showToast('Settings saved successfully', 'success');
+          
+          // Reload settings
+          await this.loadSettings();
+          this.closeSettingsModal();
+        } catch (error) {
+          console.error('âŒ Error saving settings:', error);
+          showToast('Error saving settings: ' + error.message, 'error');
+        }
+      }
+      
+      openSettingsModal() {
+        // Initialize with existing settings or defaults
+        this.editingSettings = this.settings ? { ...this.settings } : {
+          goalDistance: 'Marathon',
+          targetTime: '3:25:00',
+          targetRaceDate: null,
+          currentPhase: 'Base',
+          availableDays: ['Monday', 'Wednesday', 'Thursday', 'Sunday'],
+          fixedActivities: {
+            Tuesday: { type: 'Futsal', priority: 'immovable', defaults: { distance: 8, duration: 60, tss: 95 } },
+            Saturday: { type: 'Pedicab', priority: 'immovable', defaults: { distance: 18, duration: 360, tss: 72 } },
+            Friday: { type: 'Rest', priority: 'immovable' }
+          },
+          preferredLongRunDay: 'Monday',
+          preferredRestDay: 'Friday',
+          lthr: 165,
+          maxHr: 188,
+          easyPaceRange: { min: 380, max: 400 },
+          activeInjuries: [
+            { 
+              location: 'left_calf', 
+              status: 'monitor',
+              since: '2025-11-01',
+              notes: 'Occasional tightness during longer runs'
+            }
+          ],
+          maxWeeklyVolumeKm: 60,
+          volumeProgressionLimit: 10,
+          week1StartDate: '2025-11-10',
+          autoApprovePlans: false
+        };
+        
+        this.showSettingsModal = true;
+        this.render();
+        this.attachModalEventListeners();
+        lucide.createIcons();
+      }
+      
+      closeSettingsModal() {
+        this.showSettingsModal = false;
+        this.editingSettings = null;
+        this.render();
+        lucide.createIcons();
+      }
+      
+      render() {
+        const app = document.getElementById('app');
+        
+        app.innerHTML = `
+          ${this.loading ? this.renderLoading() : this.renderContent()}
+          ${this.showSettingsModal ? this.renderSettingsModal() : ''}
+        `;
+        
+        this.attachEventListeners();
+        lucide.createIcons();
+      }
+      
+      renderLoading() {
+        return `
+          <div class="flex items-center justify-center" style="height: 70vh;">
+            <div class="text-center">
+              <div class="spinner mx-auto mb-4"></div>
+              <p class="text-slate-400">Loading Smart Coach...</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderContent() {
+        if (!this.settings) {
+          return this.renderOnboarding();
+        }
+        
+        return `
+          <div class="max-w-7xl mx-auto space-y-6">
+            <!-- Header -->
+            <div class="mb-8 fade-in">
+              <h1 class="text-4xl font-bold gradient-text flex items-center gap-3 mb-2">
+                <i data-lucide="brain"></i>
+                AI Smart Coach
+              </h1>
+              <p class="text-slate-400">Intelligent training planning powered by AI</p>
+            </div>
+            
+            <!-- Settings Bar -->
+            ${this.renderSettingsBar()}
+            
+            <!-- Placeholder for Weekly Review & Plan -->
+            <div class="card p-8 text-center fade-in">
+              <div class="mb-4">
+                <i data-lucide="calendar-plus" class="w-16 h-16 mx-auto text-blue-400 mb-4"></i>
+                <h2 class="text-2xl font-bold mb-2">Ready to Generate Your Plan</h2>
+                <p class="text-slate-400 mb-6">AI-powered weekly training plans coming in Sprint 2</p>
+              </div>
+              <button class="btn-primary" disabled>
+                <i data-lucide="sparkles"></i>
+                Generate Next Week's Plan
+                <span class="text-xs opacity-70">(Coming Soon)</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderOnboarding() {
+        return `
+          <div class="max-w-3xl mx-auto mt-12 fade-in">
+            <div class="card p-8 text-center">
+              <div class="mb-6">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center">
+                  <i data-lucide="settings" class="w-10 h-10 text-blue-400"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-3">Welcome to Smart Coach!</h2>
+                <p class="text-slate-400 text-lg">
+                  Let's set up your training preferences to get started with AI-powered coaching
+                </p>
+              </div>
+              
+              <button onclick="app.openSettingsModal()" class="btn-primary text-lg">
+                <i data-lucide="play"></i>
+                Set Up Training Settings
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderSettingsBar() {
+        const s = this.settings;
+        const fixedDays = Object.keys(s.fixedActivities || {}).map(day => {
+          const activity = s.fixedActivities[day];
+          return `${day} (${activity.type})`;
+        }).join(', ');
+        
+        const injury = s.activeInjuries && s.activeInjuries.length > 0 
+          ? s.activeInjuries[0].location.replace('_', ' ')
+          : 'None';
+        
+        return `
+          <div class="settings-bar fade-in">
+            <div class="settings-bar-content">
+              <div class="settings-info">
+                <div class="settings-item">
+                  <i data-lucide="target" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    Goal: <span class="settings-item-value">${s.goalDistance} ${s.targetTime}</span>
+                  </div>
+                </div>
+                
+                <div class="settings-item">
+                  <i data-lucide="calendar" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    Phase: <span class="settings-item-value">${s.currentPhase}</span>
+                  </div>
+                </div>
+                
+                <div class="settings-item">
+                  <i data-lucide="calendar-check" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    Available: <span class="settings-item-value">${s.availableDays ? s.availableDays.length : 0} days</span>
+                  </div>
+                </div>
+                
+                <div class="settings-item">
+                  <i data-lucide="lock" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    Fixed: <span class="settings-item-value">${fixedDays || 'None'}</span>
+                  </div>
+                </div>
+                
+                <div class="settings-item">
+                  <i data-lucide="activity" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    LTHR: <span class="settings-item-value">${s.lthr} bpm</span>
+                  </div>
+                </div>
+                
+                <div class="settings-item">
+                  <i data-lucide="alert-circle" class="settings-item-icon"></i>
+                  <div class="settings-item-text">
+                    Injury: <span class="settings-item-value">${injury}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <button onclick="app.openSettingsModal()" class="btn-secondary shrink-0">
+                <i data-lucide="settings"></i>
+                Edit Settings
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      renderSettingsModal() {
+        const s = this.editingSettings;
+        const allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        
+        return `
+          <div class="modal-backdrop" onclick="if(event.target === this) app.closeSettingsModal()">
+            <div class="modal-content">
+              <!-- Modal Header -->
+              <div class="flex items-center justify-between p-6 border-b border-slate-700">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                  <i data-lucide="settings"></i>
+                  Training Settings
+                </h2>
+                <button onclick="app.closeSettingsModal()" class="text-slate-400 hover:text-white transition-colors">
+                  <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+              </div>
+              
+              <!-- Modal Body -->
+              <div class="p-6 space-y-6">
+                <!-- Goal Configuration -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="target" class="w-5 h-5 text-blue-400"></i>
+                    Goal
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Distance</label>
+                      <select id="goalDistance" class="input-field">
+                        <option value="5K" ${s.goalDistance === '5K' ? 'selected' : ''}>5K</option>
+                        <option value="10K" ${s.goalDistance === '10K' ? 'selected' : ''}>10K</option>
+                        <option value="Half" ${s.goalDistance === 'Half' ? 'selected' : ''}>Half Marathon</option>
+                        <option value="Marathon" ${s.goalDistance === 'Marathon' ? 'selected' : ''}>Marathon</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Target Time</label>
+                      <input type="text" id="targetTime" class="input-field" placeholder="3:25:00" value="${s.targetTime || ''}">
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Race Date (optional)</label>
+                      <input type="date" id="targetRaceDate" class="input-field" value="${s.targetRaceDate || ''}">
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Current Phase</label>
+                      <select id="currentPhase" class="input-field">
+                        <option value="Base" ${s.currentPhase === 'Base' ? 'selected' : ''}>Base</option>
+                        <option value="Build" ${s.currentPhase === 'Build' ? 'selected' : ''}>Build</option>
+                        <option value="Specialty" ${s.currentPhase === 'Specialty' ? 'selected' : ''}>Specialty</option>
+                        <option value="Taper" ${s.currentPhase === 'Taper' ? 'selected' : ''}>Taper</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Availability -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="calendar-check" class="w-5 h-5 text-blue-400"></i>
+                    Availability
+                  </h3>
+                  <p class="text-sm text-slate-400 mb-3">Select days available for training</p>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    ${allDays.map(day => `
+                      <label class="checkbox-container">
+                        <input 
+                          type="checkbox" 
+                          class="checkbox-input available-day" 
+                          value="${day}"
+                          ${s.availableDays && s.availableDays.includes(day) ? 'checked' : ''}
+                        >
+                        <span>${day}</span>
+                      </label>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <!-- Fixed Activities -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="lock" class="w-5 h-5 text-amber-400"></i>
+                    Fixed Activities
+                  </h3>
+                  <p class="text-sm text-slate-400 mb-3">Days with immovable commitments</p>
+                  <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-24 text-sm font-medium">Tuesday:</span>
+                      <input type="text" value="Futsal" class="input-field flex-1" disabled>
+                      <span class="badge badge-immovable">Immovable</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="w-24 text-sm font-medium">Saturday:</span>
+                      <input type="text" value="Pedicab" class="input-field flex-1" disabled>
+                      <span class="badge badge-immovable">Immovable</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                      <span class="w-24 text-sm font-medium">Friday:</span>
+                      <input type="text" value="Rest" class="input-field flex-1" disabled>
+                      <span class="badge badge-immovable">Immovable</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Preferences -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="star" class="w-5 h-5 text-blue-400"></i>
+                    Preferences
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Preferred Long Run Day</label>
+                      <select id="preferredLongRunDay" class="input-field">
+                        ${allDays.map(day => `
+                          <option value="${day}" ${s.preferredLongRunDay === day ? 'selected' : ''}>${day}</option>
+                        `).join('')}
+                      </select>
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Preferred Rest Day</label>
+                      <select id="preferredRestDay" class="input-field">
+                        ${allDays.map(day => `
+                          <option value="${day}" ${s.preferredRestDay === day ? 'selected' : ''}>${day}</option>
+                        `).join('')}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Injury Monitoring -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-rose-400"></i>
+                    Injury Monitoring
+                  </h3>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Active Injury</label>
+                      <input 
+                        type="text" 
+                        id="injuryLocation" 
+                        class="input-field" 
+                        placeholder="e.g., Left calf - monitor"
+                        value="${s.activeInjuries && s.activeInjuries.length > 0 ? s.activeInjuries[0].notes : ''}"
+                      >
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Since</label>
+                      <input 
+                        type="date" 
+                        id="injurySince" 
+                        class="input-field"
+                        value="${s.activeInjuries && s.activeInjuries.length > 0 ? s.activeInjuries[0].since : ''}"
+                      >
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Physiological Data (Read-only for now) -->
+                <div>
+                  <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <i data-lucide="activity" class="w-5 h-5 text-emerald-400"></i>
+                    Physiological Data
+                  </h3>
+                  <p class="text-sm text-slate-400 mb-3">Auto-pulled from Analytics (read-only)</p>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">LTHR</label>
+                      <input type="number" value="${s.lthr}" class="input-field" disabled>
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Max HR</label>
+                      <input type="number" value="${s.maxHr || 188}" class="input-field" disabled>
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Easy Pace Min</label>
+                      <input type="text" value="${formatPace(s.easyPaceRange?.min || 380)}" class="input-field" disabled>
+                    </div>
+                    <div>
+                      <label class="block text-sm text-slate-400 mb-2">Easy Pace Max</label>
+                      <input type="text" value="${formatPace(s.easyPaceRange?.max || 400)}" class="input-field" disabled>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Modal Footer -->
+              <div class="flex items-center justify-end gap-3 p-6 border-t border-slate-700">
+                <button onclick="app.closeSettingsModal()" class="btn-secondary">
+                  Cancel
+                </button>
+                <button onclick="app.handleSaveSettings()" class="btn-success">
+                  <i data-lucide="save"></i>
+                  Save Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      attachEventListeners() {
+        // Event listeners will be attached here as needed
+      }
+      
+      attachModalEventListeners() {
+        // Event listeners for modal inputs would go here
+        // For now, we'll handle them in handleSaveSettings by reading the DOM
+      }
+      
+      handleSaveSettings() {
+        try {
+          // Gather data from form
+          const availableDays = Array.from(
+            document.querySelectorAll('.available-day:checked')
+          ).map(cb => cb.value);
+          
+          const injuryLocation = document.getElementById('injuryLocation').value;
+          const injurySince = document.getElementById('injurySince').value;
+          
+          const settingsData = {
+            goalDistance: document.getElementById('goalDistance').value,
+            targetTime: document.getElementById('targetTime').value,
+            targetRaceDate: document.getElementById('targetRaceDate').value || null,
+            currentPhase: document.getElementById('currentPhase').value,
+            availableDays: availableDays,
+            fixedActivities: this.editingSettings.fixedActivities, // Keep existing
+            preferredLongRunDay: document.getElementById('preferredLongRunDay').value,
+            preferredRestDay: document.getElementById('preferredRestDay').value,
+            lthr: this.editingSettings.lthr,
+            maxHr: this.editingSettings.maxHr,
+            easyPaceRange: this.editingSettings.easyPaceRange,
+            activeInjuries: injuryLocation ? [{
+              location: injuryLocation.toLowerCase().replace(/ /g, '_'),
+              status: 'monitor',
+              since: injurySince || new Date().toISOString().split('T')[0],
+              notes: injuryLocation
+            }] : [],
+            maxWeeklyVolumeKm: this.editingSettings.maxWeeklyVolumeKm || 60,
+            volumeProgressionLimit: this.editingSettings.volumeProgressionLimit || 10,
+            week1StartDate: this.editingSettings.week1StartDate || '2025-11-10',
+            autoApprovePlans: this.editingSettings.autoApprovePlans || false
+          };
+          
+          this.saveSettings(settingsData);
+        } catch (error) {
+          console.error('âŒ Error gathering settings data:', error);
+          showToast('Error saving settings', 'error');
+        }
+      }
+    }
+    
+    // Initialize app
+    const app = new SmartCoachPanel();
+    window.app = app;
+  </script>
+</body>
+</html>
