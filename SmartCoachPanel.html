@@ -870,20 +870,44 @@
                     Availability
                   </h3>
                   <p class="text-sm text-slate-400 mb-3">Select days available for training</p>
+                  
                   <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    ${allDays.map(day => `
-                      <label class="checkbox-container">
-                        <input 
-                          type="checkbox" 
-                          class="checkbox-input available-day" 
-                          value="${day}"
-                          ${s.availableDays && s.availableDays.includes(day) ? 'checked' : ''}
-                        >
-                        <span>${day}</span>
-                      </label>
-                    `).join('')}
-                  </div>
-                </div>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Monday"
+					     ${s.availableDays && s.availableDays.includes('Monday') ? 'checked' : ''}>
+					   <span>Monday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Tuesday"
+					     ${s.availableDays && s.availableDays.includes('Tuesday') ? 'checked' : ''}>
+					   <span>Tuesday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Wednesday"
+					     ${s.availableDays && s.availableDays.includes('Wednesday') ? 'checked' : ''}>
+					   <span>Wednesday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Thursday"
+					     ${s.availableDays && s.availableDays.includes('Thursday') ? 'checked' : ''}>
+					   <span>Thursday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Friday"
+					     ${s.availableDays && s.availableDays.includes('Friday') ? 'checked' : ''}>
+					   <span>Friday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Saturday"
+					     ${s.availableDays && s.availableDays.includes('Saturday') ? 'checked' : ''}>
+					   <span>Saturday</span>
+					 </label>
+					 <label class="checkbox-container">
+					   <input type="checkbox" class="checkbox-input available-day" value="Sunday"
+					     ${s.availableDays && s.availableDays.includes('Sunday') ? 'checked' : ''}>
+					   <span>Sunday</span>
+					 </label>
+				</div>
                 
                 <!-- Fixed Activities -->
                 <div>
