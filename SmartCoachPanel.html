@@ -414,20 +414,18 @@
 	  }
 	  return null;
 	}
+	
+	function formatPace(secondsPerKm) {
+	  if (!secondsPerKm) return '';
+	  const mins = Math.floor(secondsPerKm / 60);
+	  const secs = secondsPerKm % 60;
+	  return `${mins}:${String(secs).padStart(2, '0')}`;
+	}
+
+// ==================== SMART COACH PANEL ====================
 
     // ==================== SMART COACH PANEL ====================
     class SmartCoachPanel {
-    
-    function parsePace(paceString) {
-	  if (!paceString) return null;
-	  const parts = paceString.split(':');
-	  if (parts.length === 2) {
-	    const mins = parseInt(parts[0]);
-	    const secs = parseInt(parts[1]);
-	    return mins * 60 + secs;
-	  }
-	  return null;
-	}
 
       constructor() {
         this.settings = null;
@@ -570,13 +568,12 @@
 			  availableDays: availableDays,
 			  fixedActivities: this.editingFixedActivities || {}, // ✅ Default to empty object
 			  preferredLongRunDay: document.getElementById('preferredLongRunDay').value,
-            preferredLongRunDay: document.getElementById('preferredLongRunDay').value,
 			preferredRestDay: document.getElementById('preferredRestDay').value,
 			lthr: parseInt(document.getElementById('lthr').value) || 165,
 			maxHr: parseInt(document.getElementById('maxHr').value) || 188,
 			easyPaceRange: {
-			  min: this.parsePace(document.getElementById('easyPaceMin').value) || 380,
-			  max: this.parsePace(document.getElementById('easyPaceMax').value) || 400
+			  min: parsePace(document.getElementById('easyPaceMin').value) || 380,
+			  max: parsePace(document.getElementById('easyPaceMax').value) || 400
 			}, 
             activeInjuries: injuryLocation ? [{
               location: injuryLocation.toLowerCase().replace(/ /g, '_'),
@@ -792,9 +789,14 @@
       }
       
       renderSettingsModal() {
-        const s = this.editingSettings;
-        
-        const settingsFormHTML = `
+ 		 const s = this.editingSettings;
+ 		 
+ 		 // Pre-calculate pace values to avoid scope issues
+ 		 const easyPaceMinDisplay = formatPace(s.easyPaceRange?.min || 380);
+ 		 const easyPaceMaxDisplay = formatPace(s.easyPaceRange?.max || 400);
+ 		 
+ 		 const settingsFormHTML = `
+
           <!-- Goal -->
           <div style="margin-bottom: 24px;">
             <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -959,13 +961,13 @@
 			      <input type="number" id="maxHr" value="${s.maxHr || 188}" class="input-field" placeholder="188">
 			    </div>
 			    <div>
-			      <label style="display: block; font-size: 14px; color: #94a3b8; margin-bottom: 8px;">Easy Pace Min (MM:SS)</label>
-			      <input type="text" id="easyPaceMin" value="${formatPace(s.easyPaceRange?.min || 380)}" class="input-field" placeholder="6:20">
-			    </div>
-			    <div>
-			      <label style="display: block; font-size: 14px; color: #94a3b8; margin-bottom: 8px;">Easy Pace Max (MM:SS)</label>
-			      <input type="text" id="easyPaceMax" value="${formatPace(s.easyPaceRange?.max || 400)}" class="input-field" placeholder="6:40">
-			    </div>
+				  <label style="display: block; font-size: 14px; color: #94a3b8; margin-bottom: 8px;">Easy Pace Min (MM:SS)</label>
+				  <input type="text" id="easyPaceMin" value="${easyPaceMinDisplay}" class="input-field" placeholder="6:20">
+				</div>
+				<div>
+				  <label style="display: block; font-size: 14px; color: #94a3b8; margin-bottom: 8px;">Easy Pace Max (MM:SS)</label>
+				  <input type="text" id="easyPaceMax" value="${easyPaceMaxDisplay}" class="input-field" placeholder="6:40">
+				</div>
 			  </div>
 			</div>
         `;
