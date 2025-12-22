@@ -358,6 +358,76 @@
     let settingsRef = null;
     let currentUser = null;
 
+    // ==================== WEEK CALCULATION HELPERS ====================
+    
+    const calculateWeekNumber = (anchorDate) => {
+      const anchor = new Date(anchorDate);
+      const today = new Date();
+      const diffTime = today - anchor;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return Math.floor(diffDays / 7) + 1;
+    };
+    
+    const getMesocycleInfo = (weekNumber) => {
+      const mesocycleWeek = ((weekNumber - 1) % 4) + 1;
+      const mesocycleType = mesocycleWeek === 4 ? 'Discharge' : 'Charge';
+      return { mesocycleWeek, mesocycleType };
+    };
+    
+    const getWeekStartDate = (weekNumber, anchorDate) => {
+      const anchor = new Date(anchorDate);
+      const daysToAdd = (weekNumber - 1) * 7;
+      const weekStart = new Date(anchor);
+      weekStart.setDate(anchor.getDate() + daysToAdd);
+      return weekStart.toISOString().split('T')[0];
+    };
+    
+    
+    const parsePaceToSeconds = (paceString) => {
+      if (!paceString) return 0;
+      const parts = paceString.split(':');
+      if (parts.length !== 2) return 0;
+      return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    };
+    
+    // ==================== CTL/ATL/TSB CALCULATION ====================
+    
+    const calculateCTL = (sessions, currentCTL = 0) => {
+      const CTL_TIME_CONSTANT = 42;
+      let ctl = currentCTL;
+      
+      sessions.forEach(session => {
+        const tss = session.tss || 0;
+        ctl = ctl + (tss - ctl) / CTL_TIME_CONSTANT;
+      });
+      
+      return Math.round(ctl);
+    };
+    
+    const calculateATL = (sessions, currentATL = 0) => {
+      const ATL_TIME_CONSTANT = 7;
+      let atl = currentATL;
+      
+      sessions.forEach(session => {
+        const tss = session.tss || 0;
+        atl = atl + (tss - atl) / ATL_TIME_CONSTANT;
+      });
+      
+      return Math.round(atl);
+    };
+    
+    const calculateTSB = (ctl, atl) => {
+      return Math.round(ctl - atl);
+    };
+    
+    const calculatePerformanceMetrics = (sessions) => {
+      const ctl = calculateCTL(sessions);
+      const atl = calculateATL(sessions);
+      const tsb = calculateTSB(ctl, atl);
+      
+      return { ctl, atl, tsb };
+    };
+
     // ==================== AUTH ====================
     function waitForAuth() {
       return new Promise((resolve, reject) => {
@@ -432,6 +502,8 @@
         this.loading = true;
         this.showSettingsModal = false;
         this.editingSettings = null;
+        this.currentPlan = null;
+        this.generatingPlan = false;
         this.init();
       }
       
@@ -442,6 +514,12 @@
         try {
           await waitForAuth();
           await this.loadSettings();
+          
+          // Load current plan if settings exist
+          if (this.settings) {
+            await this.loadCurrentPlan();
+          }
+          
           console.log('✅ Initialization complete');
         } catch (error) {
           console.error('❌ Init error:', error);
@@ -496,6 +574,252 @@
         } catch (error) {
           console.error('❌ Save error:', error);
           showToast('Error saving', 'error');
+        }
+      }
+      
+      // ==================== SESSION LOADING ====================
+      
+      async loadRecentSessions(weeks = 4) {
+        try {
+          console.log(`📊 Loading last ${weeks} weeks of sessions...`);
+          
+          const weeksAgo = new Date();
+          weeksAgo.setDate(weeksAgo.getDate() - (weeks * 7));
+          const cutoffDate = weeksAgo.toISOString().split('T')[0];
+          
+          const sessionsRef = db.collection('users').doc(currentUser.uid).collection('sessions');
+          const snapshot = await sessionsRef
+            .where('date', '>=', cutoffDate)
+            .orderBy('date', 'desc')
+            .get();
+          
+          const sessions = [];
+          snapshot.forEach(doc => {
+            sessions.push({ id: doc.id, ...doc.data() });
+          });
+          
+          console.log(`✅ Loaded ${sessions.length} sessions`);
+          return sessions;
+        } catch (error) {
+          console.error('❌ Error loading sessions:', error);
+          return [];
+        }
+      }
+      
+      // ==================== AI PLAN GENERATION ====================
+      
+      async generateWeeklyPlan() {
+        try {
+          this.generatingPlan = true;
+          this.render();
+          
+          console.log('🤖 Generating weekly plan...');
+          
+          // Calculate current week info
+          const weekNumber = calculateWeekNumber(this.settings.week1StartDate || '2025-11-10');
+          const { mesocycleWeek, mesocycleType } = getMesocycleInfo(weekNumber);
+          const weekStartDate = getWeekStartDate(weekNumber, this.settings.week1StartDate || '2025-11-10');
+          
+          // Load recent sessions for context
+          const recentSessions = await this.loadRecentSessions(4);
+          
+          // Calculate current fitness metrics
+          const metrics = calculatePerformanceMetrics(recentSessions);
+          
+          console.log('📈 Current metrics:', metrics);
+          console.log(`📅 Week ${weekNumber} (Mesocycle ${mesocycleWeek}/4 - ${mesocycleType})`);
+          
+          // Build AI prompt
+          const prompt = this.buildPlanPrompt(weekNumber, mesocycleWeek, mesocycleType, metrics, recentSessions);
+          
+          // Call Anthropic API
+          const response = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'anthropic-version': '2023-06-01'
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 4096,
+              messages: [{
+                role: 'user',
+                content: prompt
+              }]
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API Error: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          const aiResponse = data.content[0].text;
+          
+          console.log('🤖 AI Response received');
+          
+          // Parse the plan from AI response
+          const plan = this.parsePlanResponse(aiResponse, weekNumber, weekStartDate);
+          
+          // Save plan to Firebase with DRAFT status
+          await this.savePlan(plan);
+          
+          showToast('Weekly plan generated!');
+          this.generatingPlan = false;
+          await this.loadCurrentPlan();
+          this.render();
+          
+        } catch (error) {
+          console.error('❌ Plan generation error:', error);
+          showToast('Error generating plan', 'error');
+          this.generatingPlan = false;
+          this.render();
+        }
+      }
+      
+      buildPlanPrompt(weekNumber, mesocycleWeek, mesocycleType, metrics, recentSessions) {
+        const s = this.settings;
+        
+        // Format recent sessions for context
+        const sessionsSummary = recentSessions.slice(0, 10).map(session => {
+          const paceStr = session.avgPace ? formatPace(session.avgPace) : 'N/A';
+          return `${session.date}: ${session.type} - ${session.distance}km, ${session.duration}min, Pace: ${paceStr}/km, TSS: ${session.tss || 0}`;
+        }).join('\n');
+        
+        // Build comprehensive prompt
+        return `You are an expert marathon running coach. Generate a detailed 7-day training plan for next week.
+
+ATHLETE PROFILE:
+- Goal: ${s.goalDistance} in ${s.targetTime}
+- Target Race Date: ${s.targetRaceDate || 'TBD'}
+- Current Phase: ${s.currentPhase}
+- Week ${weekNumber} (Mesocycle Week ${mesocycleWeek}/4 - ${mesocycleType} Week)
+
+CURRENT FITNESS:
+- CTL (Chronic Training Load): ${metrics.ctl}
+- ATL (Acute Training Load): ${metrics.atl}
+- TSB (Training Stress Balance): ${metrics.tsb}
+
+CONSTRAINTS:
+- Available Days: ${s.availableDays ? s.availableDays.join(', ') : 'Not specified'}
+- Fixed Activities:
+  ${Object.entries(s.fixedActivities || {}).map(([day, activity]) => 
+    `  ${day}: ${activity.type} (${activity.priority})`
+  ).join('\n  ')}
+- Preferred Long Run Day: ${s.preferredLongRunDay || 'Monday'}
+- Active Injury: ${s.activeInjuries && s.activeInjuries.length > 0 ? s.activeInjuries[0].notes : 'None'}
+
+RECENT TRAINING (Last 10 sessions):
+${sessionsSummary}
+
+PHYSIOLOGICAL DATA:
+- LTHR: ${s.lthr || 165} bpm
+- Max HR: ${s.maxHr || 188} bpm
+- Easy Pace: ${formatPace(s.easyPaceRange?.min || 380)} - ${formatPace(s.easyPaceRange?.max || 400)}/km
+
+INSTRUCTIONS:
+Generate a 7-day plan (Monday to Sunday) in STRICT JSON format. Each day must include:
+- day: Day name
+- type: Workout type (e.g., "Easy Run", "Long Run", "Interval Training", "Rest", "Futsal", "Pedicab", etc.)
+- distance: Distance in km (0 for rest days)
+- duration: Duration in minutes (0 for rest)
+- pace: Target pace in MM:SS format (or "Easy", "Moderate", "Hard")
+- targetTSS: Estimated Training Stress Score
+- notes: Detailed workout description and coaching cues
+
+Consider:
+1. This is a ${mesocycleType} week (${mesocycleType === 'Discharge' ? 'recovery week, reduce volume by 20-30%' : 'building week'})
+2. Respect fixed activities and available days
+3. Balance intensity based on current TSB
+4. Progress gradually from recent training load
+5. Include specific pacing zones and workout structure
+6. Account for any active injuries
+
+Respond with ONLY valid JSON in this exact format:
+{
+  "weeklyReview": "Brief analysis of recent training and this week's focus",
+  "workouts": [
+    {
+      "day": "Monday",
+      "type": "Long Run",
+      "distance": 20,
+      "duration": 120,
+      "pace": "6:00",
+      "targetTSS": 140,
+      "notes": "Progressive long run. Start at easy pace, finish at moderate pace. Focus on consistent rhythm."
+    }
+    // ... 6 more days
+  ],
+  "weeklyTarget": {
+    "totalDistance": 60,
+    "totalTSS": 450
+  }
+}`;
+      }
+      
+      parsePlanResponse(aiResponse, weekNumber, weekStartDate) {
+        try {
+          // Extract JSON from response (handle potential markdown formatting)
+          let jsonStr = aiResponse;
+          
+          // Remove markdown code blocks if present
+          if (jsonStr.includes('```json')) {
+            jsonStr = jsonStr.split('```json')[1].split('```')[0];
+          } else if (jsonStr.includes('```')) {
+            jsonStr = jsonStr.split('```')[1].split('```')[0];
+          }
+          
+          const parsed = JSON.parse(jsonStr.trim());
+          
+          // Build plan document
+          return {
+            weekNumber,
+            weekStartDate,
+            status: 'DRAFT',
+            generatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            weeklyReview: parsed.weeklyReview || '',
+            workouts: parsed.workouts || [],
+            weeklyTarget: parsed.weeklyTarget || { totalDistance: 0, totalTSS: 0 },
+            version: 1,
+            regenerations: []
+          };
+        } catch (error) {
+          console.error('❌ Parse error:', error);
+          console.log('Raw AI response:', aiResponse);
+          throw new Error('Failed to parse AI response');
+        }
+      }
+      
+      async savePlan(plan) {
+        try {
+          const plansRef = db.collection('users').doc(currentUser.uid).collection('plans');
+          await plansRef.doc(plan.weekStartDate).set(plan);
+          console.log('✅ Plan saved:', plan.weekStartDate);
+        } catch (error) {
+          console.error('❌ Error saving plan:', error);
+          throw error;
+        }
+      }
+      
+      async loadCurrentPlan() {
+        try {
+          const weekNumber = calculateWeekNumber(this.settings.week1StartDate || '2025-11-10');
+          const weekStartDate = getWeekStartDate(weekNumber, this.settings.week1StartDate || '2025-11-10');
+          
+          const plansRef = db.collection('users').doc(currentUser.uid).collection('plans');
+          const doc = await plansRef.doc(weekStartDate).get();
+          
+          if (doc.exists) {
+            this.currentPlan = { id: doc.id, ...doc.data() };
+            console.log('✅ Current plan loaded');
+          } else {
+            this.currentPlan = null;
+            console.log('⚠️ No plan for current week');
+          }
+          
+          this.render();
+        } catch (error) {
+          console.error('❌ Error loading plan:', error);
         }
       }
       
@@ -774,15 +1098,190 @@
               </div>
             </div>
             
-            <div class="card" style="padding: 48px; text-align: center;">
-              <i data-lucide="calendar-plus" style="width: 64px; height: 64px; margin: 0 auto 16px; color: #3b82f6;"></i>
-              <h2 style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">Ready to Generate Your Plan</h2>
-              <p style="color: #94a3b8; margin-bottom: 24px;">AI-powered weekly training plans coming in Sprint 2</p>
-              <button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">
-                <i data-lucide="sparkles"></i>
-                Generate Next Week's Plan
-                <span style="font-size: 12px; opacity: 0.7;">(Coming Soon)</span>
+            ${this.renderPlanSection()}
+          </div>
+        `;
+      }
+      
+      renderPlanSection() {
+        const s = this.settings;
+        const weekNumber = calculateWeekNumber(s.week1StartDate || '2025-11-10');
+        const { mesocycleWeek, mesocycleType } = getMesocycleInfo(weekNumber);
+        const weekStartDate = getWeekStartDate(weekNumber, s.week1StartDate || '2025-11-10');
+        
+        // Format week start date for display
+        const dateObj = new Date(weekStartDate);
+        const formattedDate = dateObj.toLocaleDateString('en-AU', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        
+        return `
+          <!-- Week Header -->
+          <div class="card fade-in" style="padding: 24px; margin-bottom: 24px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <h2 style="font-size: 28px; font-weight: bold; margin-bottom: 4px;">
+                  Week ${weekNumber}
+                  <span style="font-size: 18px; color: #94a3b8; font-weight: normal;">
+                    / Mesocycle Week ${mesocycleWeek}/4
+                  </span>
+                </h2>
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                  <span class="badge" style="${mesocycleType === 'Discharge' ? 'background: rgba(245, 158, 11, 0.2); color: var(--accent-amber);' : 'background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);'}">
+                    <i data-lucide="${mesocycleType === 'Discharge' ? 'trending-down' : 'trending-up'}" style="width: 14px; height: 14px;"></i>
+                    ${mesocycleType} Week
+                  </span>
+                </div>
+                <p style="color: #94a3b8; font-size: 14px;">
+                  <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                  Starting ${formattedDate}
+                </p>
+              </div>
+              
+              <button 
+                onclick="app.generateWeeklyPlan()" 
+                class="btn-primary"
+                ${this.generatingPlan ? 'disabled' : ''}
+                style="${this.generatingPlan ? 'opacity: 0.5; cursor: not-allowed;' : ''}"
+              >
+                ${this.generatingPlan ? '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px;"></div>' : '<i data-lucide="sparkles"></i>'}
+                ${this.generatingPlan ? 'Generating...' : 'Generate Next Week\'s Plan'}
               </button>
+            </div>
+          </div>
+          
+          ${this.currentPlan ? this.renderCurrentPlan() : this.renderNoPlan()}
+        `;
+      }
+      
+      renderNoPlan() {
+        return `
+          <div class="card fade-in" style="padding: 48px; text-align: center;">
+            <i data-lucide="calendar-x" style="width: 64px; height: 64px; margin: 0 auto 16px; color: #64748b;"></i>
+            <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #94a3b8;">No Plan Generated Yet</h3>
+            <p style="color: #64748b; margin-bottom: 24px;">
+              Click "Generate Next Week's Plan" to create your AI-powered training schedule
+            </p>
+          </div>
+        `;
+      }
+      
+      renderCurrentPlan() {
+        const plan = this.currentPlan;
+        const statusColors = {
+          'DRAFT': 'rgba(245, 158, 11, 0.2)',
+          'APPROVED': 'rgba(16, 185, 129, 0.2)',
+          'IN_PROGRESS': 'rgba(59, 130, 246, 0.2)',
+          'COMPLETED': 'rgba(148, 163, 184, 0.2)'
+        };
+        
+        const statusColor = statusColors[plan.status] || statusColors['DRAFT'];
+        
+        return `
+          <!-- Weekly Review -->
+          ${plan.weeklyReview ? `
+            <div class="card fade-in" style="padding: 24px; margin-bottom: 24px;">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="clipboard" style="width: 20px; height: 20px; color: #3b82f6;"></i>
+                Weekly Review
+              </h3>
+              <p style="color: #cbd5e1; line-height: 1.6;">${plan.weeklyReview}</p>
+            </div>
+          ` : ''}
+          
+          <!-- Plan Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-size: 20px; font-weight: 600;">Training Plan</h3>
+            <span class="badge" style="background: ${statusColor}; padding: 6px 12px;">
+              <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
+              ${plan.status}
+            </span>
+          </div>
+          
+          <!-- Week Target Summary -->
+          <div class="card fade-in" style="padding: 20px; margin-bottom: 24px; background: rgba(59, 130, 246, 0.05);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px;">
+              <div>
+                <div style="color: #94a3b8; font-size: 12px; margin-bottom: 4px;">Total Distance</div>
+                <div style="font-size: 24px; font-weight: bold; color: #3b82f6;">
+                  ${plan.weeklyTarget?.totalDistance || 0} <span style="font-size: 14px; color: #94a3b8;">km</span>
+                </div>
+              </div>
+              <div>
+                <div style="color: #94a3b8; font-size: 12px; margin-bottom: 4px;">Total TSS</div>
+                <div style="font-size: 24px; font-weight: bold; color: #10b981;">
+                  ${plan.weeklyTarget?.totalTSS || 0} <span style="font-size: 14px; color: #94a3b8;">points</span>
+                </div>
+              </div>
+              <div>
+                <div style="color: #94a3b8; font-size: 12px; margin-bottom: 4px;">Workouts</div>
+                <div style="font-size: 24px; font-weight: bold; color: #f59e0b;">
+                  ${plan.workouts?.length || 0} <span style="font-size: 14px; color: #94a3b8;">days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Workout Cards -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+            ${plan.workouts?.map((workout, index) => this.renderWorkoutCard(workout, index)).join('') || ''}
+          </div>
+        `;
+      }
+      
+      renderWorkoutCard(workout, index) {
+        const typeColors = {
+          'Long Run': '#3b82f6',
+          'Easy Run': '#10b981',
+          'Interval Training': '#f43f5e',
+          'Tempo Run': '#f59e0b',
+          'Rest': '#64748b',
+          'Futsal': '#8b5cf6',
+          'Pedicab': '#06b6d4'
+        };
+        
+        const color = typeColors[workout.type] || '#94a3b8';
+        
+        return `
+          <div class="card fade-in" style="padding: 20px; animation-delay: ${index * 0.05}s;">
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                <h4 style="font-size: 16px; font-weight: 600; color: ${color};">
+                  ${workout.day}
+                </h4>
+                <span style="font-size: 12px; padding: 4px 8px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; color: #3b82f6;">
+                  TSS ${workout.targetTSS || 0}
+                </span>
+              </div>
+              <div style="font-size: 18px; font-weight: bold; margin-bottom: 4px;">${workout.type}</div>
+              
+              ${workout.distance > 0 ? `
+                <div style="display: flex; gap: 16px; color: #94a3b8; font-size: 14px; margin-bottom: 8px;">
+                  <div>
+                    <i data-lucide="map" style="width: 14px; height: 14px;"></i>
+                    ${workout.distance} km
+                  </div>
+                  <div>
+                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                    ${workout.duration} min
+                  </div>
+                  ${workout.pace && workout.pace !== 'Rest' ? `
+                    <div>
+                      <i data-lucide="gauge" style="width: 14px; height: 14px;"></i>
+                      ${workout.pace}${workout.pace.includes(':') ? '/km' : ''}
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
+            </div>
+            
+            <div style="padding: 12px; background: rgba(255, 255, 255, 0.02); border-radius: 8px; border-left: 3px solid ${color};">
+              <p style="color: #cbd5e1; font-size: 13px; line-height: 1.5; margin: 0;">
+                ${workout.notes || 'No additional notes'}
+              </p>
             </div>
           </div>
         `;
