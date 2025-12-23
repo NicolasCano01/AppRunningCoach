@@ -390,30 +390,81 @@
       return parseInt(parts[0]) * 60 + parseInt(parts[1]);
     };
     
-    // ==================== CTL/ATL/TSB CALCULATION ====================
+    // ==================== TSS CALCULATION (FROM ANALYTICS) ====================
     
-    const calculateCTL = (sessions, currentCTL = 0) => {
-      const CTL_TIME_CONSTANT = 42;
-      let ctl = currentCTL;
+    const calculateTSS = (session) => {
+      // If session already has estimatedTSS, use it
+      if (session.estimatedTSS) {
+        return session.estimatedTSS;
+      }
       
-      sessions.forEach(session => {
-        const tss = session.tss || 0;
-        ctl = ctl + (tss - ctl) / CTL_TIME_CONSTANT;
-      });
+      const sessionType = session.sessionType;
+      const actual = session.actual || session;
       
-      return Math.round(ctl);
+      if (sessionType === "Futsal") {
+        return (actual.duration / 60) * 95 * (actual.rpe / 8);
+      }
+      if (sessionType === "Pedicab") {
+        const routeMultiplier = session.routeType === 'hilly' ? 1.3 : 1.0;
+        return (actual.duration / 60) * 12 * routeMultiplier;
+      }
+      if (sessionType?.includes("Run")) {
+        const intensityFactor = actual.rpe ? (actual.rpe / 6) : 1.0;
+        return actual.distance * 6.5 * intensityFactor;
+      }
+      if (sessionType === "Strength Training") {
+        return (actual.duration / 60) * 30;
+      }
+      return 50; // Default fallback
     };
     
-    const calculateATL = (sessions, currentATL = 0) => {
-      const ATL_TIME_CONSTANT = 7;
-      let atl = currentATL;
-      
-      sessions.forEach(session => {
-        const tss = session.tss || 0;
-        atl = atl + (tss - atl) / ATL_TIME_CONSTANT;
+    const parseSessionDate = (dateStr) => {
+      if (dateStr.includes('-')) {
+        return new Date(dateStr);
+      }
+      const [day, month] = dateStr.split(' ');
+      const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+      return new Date(new Date().getFullYear(), monthMap[month], parseInt(day));
+    };
+    
+    // ==================== CTL/ATL/TSB CALCULATION (PROPER PMC ALGORITHM) ====================
+    
+    const calculateCTL = (sessions, targetDate = new Date()) => {
+      const date = new Date(targetDate);
+      const relevantSessions = sessions.filter(s => {
+        const sessionDate = parseSessionDate(s.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        return daysDiff >= 0 && daysDiff < 42;
       });
       
-      return Math.round(atl);
+      let ctl = 0;
+      relevantSessions.forEach(session => {
+        const sessionDate = parseSessionDate(session.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        const weight = Math.exp(-daysDiff / 42);
+        ctl += calculateTSS(session) * weight;
+      });
+      
+      return Math.round(ctl / 42);
+    };
+    
+    const calculateATL = (sessions, targetDate = new Date()) => {
+      const date = new Date(targetDate);
+      const relevantSessions = sessions.filter(s => {
+        const sessionDate = parseSessionDate(s.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        return daysDiff >= 0 && daysDiff < 7;
+      });
+      
+      let atl = 0;
+      relevantSessions.forEach(session => {
+        const sessionDate = parseSessionDate(session.date);
+        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+        const weight = Math.exp(-daysDiff / 7);
+        atl += calculateTSS(session) * weight;
+      });
+      
+      return Math.round(atl / 7);
     };
     
     const calculateTSB = (ctl, atl) => {
@@ -610,34 +661,6 @@
       
       async generateWeeklyPlan() {
         try {
-        	// In generateWeeklyPlan(), before the API call:
-			const USE_MOCK = true; // Set to false when ready for real AI
-			
-			if (USE_MOCK) {
-			  // Return mock plan for testing
-			  const mockResponse = `{
-			    "weeklyReview": "MOCK MODE: Testing plan display without API costs.",
-			    "workouts": [
-			      {"day": "Monday", "type": "Long Run", "distance": 20, "duration": 120, "pace": "6:00", "targetTSS": 140, "notes": "Progressive run"},
-			      // ... 6 more days
-			    ],
-			    "weeklyTarget": {"totalDistance": 54, "totalTSS": 450}
-			  }`;
-			  
-			const plan = this.parsePlanResponse(mockResponse, weekNumber, weekStartDate);
-			  // Continue with save/display
-			}
-			
-			console.log('📋 Sessions being sent to AI:', JSON.stringify(recentSessions, null, 2));
-			console.log('📈 Metrics calculated:', metrics);
-
-
-          // Check if API key is configured
-          if (!this.settings.anthropicApiKey) {
-            showToast('Please add your Anthropic API Key in Settings first', 'error');
-            return;
-          }
-          
           this.generatingPlan = true;
           this.render();
           
@@ -657,10 +680,62 @@
           console.log('📈 Current metrics:', metrics);
           console.log(`📅 Week ${weekNumber} (Mesocycle ${mesocycleWeek}/4 - ${mesocycleType})`);
           
+          // OPTION C: Auto-detect if API key is missing → use mock mode
+          const USE_MOCK = !this.settings.anthropicApiKey;
+          
+          if (USE_MOCK) {
+            console.log('🧪 MOCK MODE: No API key found, using mock plan for testing');
+            
+            // Return mock plan for testing (no API costs)
+            const mockResponse = `{
+              "weeklyReview": "MOCK MODE: Testing plan display without API costs. Replace with real AI when ready.",
+              "workouts": [
+                {"day": "Monday", "type": "Long Run", "distance": 20, "duration": 120, "pace": "6:00", "targetTSS": 140, "notes": "Progressive long run. Start at easy pace, finish at moderate pace."},
+                {"day": "Tuesday", "type": "Futsal", "distance": 8, "duration": 60, "pace": "Variable", "targetTSS": 95, "notes": "Fixed Futsal session. High intensity intervals."},
+                {"day": "Wednesday", "type": "Tempo Run", "distance": 10, "duration": 60, "pace": "6:00", "targetTSS": 85, "notes": "Sustained tempo effort at marathon pace."},
+                {"day": "Thursday", "type": "Easy Run", "distance": 8, "duration": 50, "pace": "6:15", "targetTSS": 55, "notes": "Recovery run. Keep HR below 140."},
+                {"day": "Friday", "type": "Rest", "distance": 0, "duration": 0, "pace": "Rest", "targetTSS": 0, "notes": "Complete rest day. Focus on sleep and nutrition."},
+                {"day": "Saturday", "type": "Pedicab", "distance": 24, "duration": 480, "pace": "Variable", "targetTSS": 72, "notes": "Fixed Pedicab work. Cross-training endurance."},
+                {"day": "Sunday", "type": "Medium Run", "distance": 14, "duration": 85, "pace": "6:05", "targetTSS": 98, "notes": "Steady medium-long run. Build aerobic endurance."}
+              ],
+              "weeklyTarget": {"totalDistance": 84, "totalTSS": 545}
+            }`;
+            
+            const plan = this.parsePlanResponse(mockResponse, weekNumber, weekStartDate);
+            await this.savePlan(plan);
+            
+            showToast('Mock plan generated! (Add API key in Settings for real AI)', 'success');
+            this.generatingPlan = false;
+            await this.loadCurrentPlan();
+            this.render();
+            return;
+          }
+          
+          // ========== COMPREHENSIVE LOGGING FOR DEBUGGING ==========
+          console.log('📋 Sessions being sent to AI:', JSON.stringify(recentSessions.slice(0, 5).map(s => ({
+            date: s.date,
+            type: s.sessionType,
+            distance: s.distance,
+            duration: s.duration,
+            avgPace: formatPace(s.avgPace),
+            tss: calculateTSS(s),
+            rpe: s.rpe
+          })), null, 2));
+          
+          console.log('📊 Metrics calculated:', {
+            ctl: metrics.ctl,
+            atl: metrics.atl,
+            tsb: metrics.tsb,
+            sessionCount: recentSessions.length
+          });
+          
           // Build AI prompt
           const prompt = this.buildPlanPrompt(weekNumber, mesocycleWeek, mesocycleType, metrics, recentSessions);
           
-          // Call Anthropic API
+          console.log('💬 Prompt length:', prompt.length, 'characters');
+          // =========================================================
+          
+          // Call Anthropic API via Cloudflare Worker
 		 const response = await fetch('https://running-coach-api-proxy.nicoca17.workers.dev', {
 			  method: 'POST',
 			  headers: {
@@ -676,7 +751,6 @@
 			  })
 			});
           
-			          
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('API Error:', response.status, errorData);
@@ -720,7 +794,8 @@
         // Format recent sessions for context
         const sessionsSummary = recentSessions.slice(0, 10).map(session => {
           const paceStr = session.avgPace ? formatPace(session.avgPace) : 'N/A';
-          return `${session.date}: ${session.type} - ${session.distance}km, ${session.duration}min, Pace: ${paceStr}/km, TSS: ${session.tss || 0}`;
+          const tss = calculateTSS(session);
+          return `${session.date}: ${session.sessionType} - ${session.distance}km, ${session.duration}min, Pace: ${paceStr}/km, TSS: ${tss}`;
         }).join('\n');
         
         // Build comprehensive prompt
