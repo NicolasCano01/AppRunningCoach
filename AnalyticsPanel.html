@@ -691,14 +691,16 @@
         }));
       }, [filteredSessions]);
 
-      const avgZ2Pace = useMemo(() => {
-        const z2Sessions = filteredSessions.filter(s => {
-          const avgHr = s.actual?.avgHr;
-          return avgHr >= 124 && avgHr <= 140 && s.sessionType?.includes("Run");
-        });
-
-        if (z2Sessions.length === 0) return 0;
-        const totalPace = z2Sessions.reduce((sum, s) => sum + (s.actual?.avgPace || 0), 0);
+		const avgZ2Pace = useMemo(() => {
+		const z2Sessions = filteredSessions.filter(s => {
+		const avgHr = s.avgHr || s.actual?.avgHr;  // ✅ Check both locations
+		  return avgHr >= 124 && avgHr <= 140 && s.sessionType?.includes("Run");
+		});
+		
+		if (z2Sessions.length === 0) return 0;
+		const totalPace = z2Sessions.reduce((sum, s) => sum + (s.avgPace || s.actual?.avgPace || 0), 0);  // ✅ Check both
+		        
+        
         return totalPace / z2Sessions.length;
       }, [filteredSessions]);
 
