@@ -610,6 +610,28 @@
       
       async generateWeeklyPlan() {
         try {
+        	// In generateWeeklyPlan(), before the API call:
+			const USE_MOCK = true; // Set to false when ready for real AI
+			
+			if (USE_MOCK) {
+			  // Return mock plan for testing
+			  const mockResponse = `{
+			    "weeklyReview": "MOCK MODE: Testing plan display without API costs.",
+			    "workouts": [
+			      {"day": "Monday", "type": "Long Run", "distance": 20, "duration": 120, "pace": "6:00", "targetTSS": 140, "notes": "Progressive run"},
+			      // ... 6 more days
+			    ],
+			    "weeklyTarget": {"totalDistance": 54, "totalTSS": 450}
+			  }`;
+			  
+			const plan = this.parsePlanResponse(mockResponse, weekNumber, weekStartDate);
+			  // Continue with save/display
+			}
+			
+			console.log('📋 Sessions being sent to AI:', JSON.stringify(recentSessions, null, 2));
+			console.log('📈 Metrics calculated:', metrics);
+
+
           // Check if API key is configured
           if (!this.settings.anthropicApiKey) {
             showToast('Please add your Anthropic API Key in Settings first', 'error');
@@ -627,7 +649,7 @@
           const weekStartDate = getWeekStartDate(weekNumber, this.settings.week1StartDate || '2025-11-10');
           
           // Load recent sessions for context
-          const recentSessions = await this.loadRecentSessions(4);
+          const recentSessions = await this.loadRecentSessions(10);
           
           // Calculate current fitness metrics
           const metrics = calculatePerformanceMetrics(recentSessions);
@@ -654,6 +676,7 @@
 			  })
 			});
           
+			          
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
             console.error('API Error:', response.status, errorData);
