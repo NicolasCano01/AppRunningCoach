@@ -905,6 +905,11 @@
         if (sessionData.maxHr) sessionData.maxHr = parseFloat(sessionData.maxHr);
         if (sessionData.rpe) sessionData.rpe = parseFloat(sessionData.rpe);
         if (sessionData.estimatedTSS) sessionData.estimatedTSS = parseFloat(sessionData.estimatedTSS);
+        if (sessionData.avgCadence) sessionData.avgCadence = parseFloat(sessionData.avgCadence);
+        if (sessionData.vo2Max) sessionData.vo2Max = parseFloat(sessionData.vo2Max);
+        if (sessionData.elevationGain) sessionData.elevationGain = parseFloat(sessionData.elevationGain);
+        if (sessionData.elevationLoss) sessionData.elevationLoss = parseFloat(sessionData.elevationLoss);
+        
         
         // Convert pace to seconds if provided as string
         if (sessionData.avgPace && typeof sessionData.avgPace === 'string') {
@@ -913,6 +918,25 @@
         
         // Ensure avgPace is a number if it exists
         if (sessionData.avgPace) sessionData.avgPace = parseFloat(sessionData.avgPace);
+        
+        // Convert pace to seconds if provided as string
+        if (sessionData.avgPace && typeof sessionData.avgPace === 'string') {
+          sessionData.avgPace = paceToSeconds(sessionData.avgPace);
+        }
+        
+        // NEW: Convert Z2 pace to seconds if provided as string
+        if (sessionData.z2Pace && typeof sessionData.z2Pace === 'string') {
+          sessionData.z2Pace = paceToSeconds(sessionData.z2Pace);
+        }
+        
+        // Ensure avgPace is a number if it exists
+        if (sessionData.avgPace) sessionData.avgPace = parseFloat(sessionData.avgPace);
+        
+        // NEW: Ensure z2Pace is a number if it exists
+        if (sessionData.z2Pace) sessionData.z2Pace = parseFloat(sessionData.z2Pace);
+        
+        // NEW: Convert Z2 time to number
+        if (sessionData.z2Time) sessionData.z2Time = parseFloat(sessionData.z2Time);
         
         try {
           console.log('💾 Saving session...', sessionData);
@@ -1603,6 +1627,134 @@
                   </div>
                 `}
                 
+                </div>
+                  
+                  <!-- NEW SECTION: Zone & Performance Metrics -->
+                  <div class="bg-blue-900/10 border border-blue-700/30 rounded-lg p-4 space-y-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i data-lucide="activity" class="w-4 h-4 text-blue-400"></i>
+                      <span class="text-sm font-semibold text-blue-300">Zone & Performance Data (Optional)</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          Avg Z2 Pace (MM:SS)
+                        </label>
+                        <input 
+                          type="text" 
+                          id="modalZ2Pace"
+                          class="input-field"
+                          placeholder="6:30"
+                          pattern="[0-9]{1,2}:[0-9]{2}"
+                          value="${session.z2Pace ? secondsToPace(session.z2Pace) : ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          From watch zones screen
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          Time in Z2 (min)
+                        </label>
+                        <input 
+                          type="number" 
+                          id="modalZ2Time"
+                          class="input-field"
+                          placeholder="40"
+                          min="0"
+                          value="${session.z2Time || ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          Minutes in Z2 (124-140 bpm)
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div class="bg-blue-900/20 border border-blue-600/20 rounded p-3">
+                      <p class="text-xs text-blue-200">
+                        <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+                        <strong>Pro Tip:</strong> Check your Garmin watch zones screen after each run to track Z2 pace improvement over time.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          Avg Cadence (spm)
+                        </label>
+                        <input 
+                          type="number" 
+                          id="modalAvgCadence"
+                          class="input-field"
+                          placeholder="168"
+                          min="140"
+                          max="200"
+                          value="${session.avgCadence || ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          Target: 165-180 spm
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          VO2 Max Estimate
+                        </label>
+                        <input 
+                          type="number" 
+                          id="modalVO2Max"
+                          class="input-field"
+                          placeholder="52"
+                          min="30"
+                          max="80"
+                          value="${session.vo2Max || ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          From Garmin Connect
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          Elevation Gain (m)
+                        </label>
+                        <input 
+                          type="number" 
+                          id="modalElevationGain"
+                          class="input-field"
+                          placeholder="120"
+                          min="0"
+                          value="${session.elevationGain || ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          Total climb
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm text-slate-400 mb-1">
+                          Elevation Loss (m)
+                        </label>
+                        <input 
+                          type="number" 
+                          id="modalElevationLoss"
+                          class="input-field"
+                          placeholder="115"
+                          min="0"
+                          value="${session.elevationLoss || ''}"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">
+                          Total descent
+                        </p>
+                      </div>
+                    </div>
+                
+                
                 <!-- Notes (always show) -->
                 <div>
                   <label class="block text-sm text-slate-400 mb-2">Notes</label>
@@ -1704,10 +1856,12 @@
         
         // Modal other fields
         const modalFields = [
-          'modalPhase', 'modalDistance', 'modalDuration', 
-          'modalAvgPace', 'modalRpe', 'modalAvgHr', 'modalMaxHr',
-          'modalNotes', 'modalPedicabHours'
-        ];
+         'modalPhase', 'modalDistance', 'modalDuration', 
+         'modalAvgPace', 'modalRpe', 'modalAvgHr', 'modalMaxHr',
+         'modalZ2Pace', 'modalZ2Time',
+         'modalAvgCadence', 'modalVO2Max', 'modalElevationGain', 'modalElevationLoss',  // NEW
+         'modalNotes', 'modalPedicabHours'
+       ];
         
         modalFields.forEach(fieldId => {
           const field = document.getElementById(fieldId);
