@@ -40,84 +40,83 @@
       color: var(--text-primary);
       margin: 0;
       padding: 0;
+      padding-bottom: 80px; /* Space for bottom nav */
     }
     
-    /* Navigation Bar */
-    .nav-bar {
-      background: rgba(15, 23, 42, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(26, 35, 50, 0.98);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
     }
     
-    .nav-toggle {
-      background: rgba(15, 23, 42, 0.8);
-      padding: 4px;
-      border-radius: 8px;
+    .bottom-nav-container {
       display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 8px 16px;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: 4px;
-    }
-    
-    .nav-toggle a {
-      padding: 8px 20px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s;
+      padding: 8px 12px;
+      border-radius: 12px;
       text-decoration: none;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      min-width: 60px;
+      flex: 1;
+      max-width: 90px;
     }
     
-    .nav-toggle a.active {
+    .nav-item:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--text-primary);
+    }
+    
+    .nav-item.active {
       background: var(--accent-blue);
       color: white;
     }
     
-    .nav-toggle a:not(.active) {
-      color: var(--text-secondary);
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
     }
     
-    .nav-toggle a:not(.active):hover {
-      color: white;
-      background: rgba(59, 130, 246, 0.1);
+    .nav-item span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
     
-    /* Date/Week Header */
-    .date-week-header {
+    /* Compact date header */
+    .date-header {
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.05));
       border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 12px;
-      padding: 16px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
+      padding: 12px 16px;
     }
     
-    @media (max-width: 640px) {
-      .date-week-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
-    
-    .spinner {
-      border: 3px solid rgba(59, 130, 246, 0.2);
-      border-top: 3px solid var(--accent-blue);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      animation: spin 0.8s linear infinite;
-    }
-    
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slideIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes countUp { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
     
     .fade-in { animation: fadeIn 0.4s ease-out; }
     .slide-in { animation: slideIn 0.3s ease-out; }
+    .count-up { animation: countUp 0.2s ease-out; }
     
     .card {
       background: var(--bg-card);
@@ -131,17 +130,29 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
     
+    /* Compact metric cards */
     .metric-card {
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.05));
       border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 12px;
-      padding: 20px;
+      padding: 12px;
       transition: all 0.3s;
+      position: relative;
     }
     
     .metric-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    }
+    
+    /* Icon in corner */
+    .metric-card .corner-icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 16px;
+      height: 16px;
+      opacity: 0.6;
     }
     
     .btn {
@@ -194,6 +205,93 @@
       transform: scale(1.1);
     }
     
+    /* Quick filter pills */
+    .filter-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 12px 0;
+    }
+    
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      background: rgba(26, 35, 50, 0.5);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-pill:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+    
+    .filter-pill.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+    }
+    
+    /* Gauge styles */
+    .gauge-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .gauge-svg {
+      transform: rotate(-90deg);
+    }
+    
+    .gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 8;
+    }
+    
+    .gauge-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+    
+    .gauge-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    /* Progress ring gauge (alternative style) */
+    .progress-ring {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+    
+    .progress-ring-circle {
+      fill: none;
+      stroke-width: 6;
+    }
+    
+    .progress-ring-bg {
+      stroke: rgba(255, 255, 255, 0.1);
+    }
+    
+    .progress-ring-progress {
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.5s ease;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    
     .modal-backdrop {
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(4px);
@@ -232,10 +330,20 @@
       border-color: var(--accent-blue);
     }
     
+    /* Advanced filters collapsible */
+    .advanced-filters {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    
+    .advanced-filters.expanded {
+      max-height: 200px;
+    }
+    
     @media (max-width: 640px) {
-      .metric-card { padding: 16px; }
+      .metric-card { padding: 10px; }
       
-      /* Better touch targets on mobile */
       .help-btn {
         width: 32px;
         height: 32px;
@@ -245,41 +353,34 @@
       .btn {
         padding: 12px 18px;
         font-size: 15px;
-        min-height: 44px; /* iOS recommended touch target */
+        min-height: 44px;
       }
       
-      .nav-toggle a {
-        padding: 10px 16px;
-        min-width: 80px;
-        text-align: center;
-      }
-      
-      /* Stack metrics vertically on very small screens */
       .metric-card .text-3xl {
-        font-size: 2rem;
+        font-size: 1.75rem;
       }
       
-      /* Reduce padding on mobile */
       .card {
         padding: 16px !important;
       }
       
-      /* Make charts more responsive */
       .recharts-wrapper {
         font-size: 11px;
       }
     }
     
-    /* Improve scrolling on mobile */
-    @media (max-width: 768px) {
-      body {
-        -webkit-overflow-scrolling: touch;
-      }
-      
-      /* Prevent zoom on input focus */
-      input, select, textarea {
-        font-size: 16px;
-      }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid var(--accent-blue);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -287,10 +388,10 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo, useRef } = React;
-    const { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, ComposedChart } = Recharts;
+    const { useState, useEffect, useMemo } = React;
+    const { LineChart, BarChart, PieChart, Pie, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } = Recharts;
 
-    // Firebase Config
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCQr84Yu0lTkKMnqtgYDD5NP4i_n5qS4eM",
       authDomain: "runningcoachdata.firebaseapp.com",
@@ -300,247 +401,12 @@
       appId: "1:364279562892:web:7acd6bbac8c8113177f1a9"
     };
 
-    // Constants
-    const LTHR = 165;
-    const ZONES = {
-      z1: { name: 'Recovery', hrMax: 124, color: '#93c5fd' },
-      z2: { name: 'Easy', hrMin: 124, hrMax: 140, color: '#60a5fa' },
-      z3: { name: 'Moderate', hrMin: 140, hrMax: 157, color: '#3b82f6' },
-      z4: { name: 'Threshold', hrMin: 157, hrMax: 168, color: '#2563eb' },
-      z5: { name: 'Maximum', hrMin: 168, color: '#1e40af' }
-    };
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
 
-    const TIME_RANGES = [
-      { label: 'Last 7 Days', days: 7 },
-      { label: 'Last 30 Days', days: 30 },
-      { label: 'Last 3 Months', days: 90 },
-      { label: 'Last Year', days: 365 },
-      { label: 'All Time', days: null }
-    ];
-
-    // Help Database
-    const HELP_DATABASE = {
-      ctl: {
-        title: 'CTL - Chronic Training Load (Fitness)',
-        description: 'CTL represents your long-term fitness level, calculated as a 42-day exponential moving average of daily Training Stress Score (TSS). Higher CTL = better aerobic conditioning.',
-        interpretation: 'Normal Range: 20-40 for beginners, 40-60 for intermediate, 60-80+ for advanced runners. Marathon target: 55-65. Below 30 is concerning (insufficient fitness), above 80 may lead to burnout.',
-        formula: 'CTL = 42-day exponential weighted average of TSS'
-      },
-      atl: {
-        title: 'ATL - Acute Training Load (Fatigue)',
-        description: 'ATL measures short-term fatigue from recent training, calculated as a 7-day exponential moving average of TSS. Shows your current accumulated fatigue.',
-        interpretation: 'Normal Range: 15-50. Higher ATL = more recent fatigue. ATL > CTL by 50% is concerning (excessive fatigue). During taper, ATL should drop to 20-30% below CTL.',
-        formula: 'ATL = 7-day exponential weighted average of TSS'
-      },
-      tsb: {
-        title: 'TSB - Training Stress Balance (Form)',
-        description: 'TSB = CTL minus ATL. Indicates current readiness to perform. Positive = fresh/rested, Negative = fatigued but building fitness.',
-        interpretation: 'Normal Range: -30 to +15. Optimal training: -10 to -20 (building fitness). Race day target: -5 to +5. Below -30 is concerning (overtraining risk), above +10 = detraining.',
-        formula: 'TSB = CTL - ATL'
-      },
-      acwr: {
-        title: 'ACWR - Acute:Chronic Workload Ratio',
-        description: 'Compares recent load (ATL) to long-term capacity (CTL). Key injury risk indicator - shows if you\'re training within your capacity.',
-        interpretation: 'Normal Range: 0.8-1.3. Below 0.8: undertraining (detraining). 1.0-1.3: optimal (building fitness safely). Above 1.3 is concerning (high injury risk - reduce volume immediately). Above 1.5 is dangerous.',
-        formula: 'ACWR = ATL ÷ CTL'
-      },
-      volume: {
-        title: 'Weekly Running Volume',
-        description: 'Total kilometers run per week. Foundation of marathon training - builds aerobic capacity and endurance.',
-        interpretation: 'Normal Range: Beginners 20-40km/week, Intermediate 40-65km/week, Advanced 65-100km/week. Marathon peak: 50-70km. Below 25km/week is concerning for marathon training, above 100km increases injury risk significantly.',
-        formula: 'Sum of all run distances in timeframe'
-      },
-      pace: {
-        title: 'Z2 Pace (Easy Pace)',
-        description: 'Your running pace at Zone 2 heart rate (124-140 bpm). As fitness improves, you run faster at same heart rate - key indicator of aerobic development.',
-        interpretation: 'Normal progression: 5-10 sec/km improvement per mesocycle. Beginner Z2: 6:30-7:30/km, Intermediate: 5:30-6:30/km, Advanced: 4:30-5:30/km. No improvement over 6 weeks is concerning.',
-        formula: 'Average pace of runs in Z2 heart rate range'
-      },
-      marathon: {
-        title: 'Marathon Time Prediction',
-        description: 'Estimated finish time based on current Z2 pace efficiency. Marathon pace is typically 15-20 seconds/km slower than Z2 pace.',
-        interpretation: 'Accuracy improves as CTL approaches 55-65. Early training predictions may be optimistic. Sub-4:00 requires Z2 pace ~5:30/km. Predictions within 5% of actual are normal, more than 10% off is concerning.',
-        formula: '(Z2 pace + 18 seconds) × 42.195km'
-      },
-      injury: {
-        title: 'Injury Risk Assessment',
-        description: 'Based on ACWR and volume changes. Predicts injury likelihood based on training load management.',
-        interpretation: 'Low (Green): ACWR 0.8-1.3, safe to proceed. Moderate (Amber): ACWR 1.3-1.5, monitor closely. High (Red): ACWR >1.5, reduce immediately. Concerning: Any injuries, ACWR >1.5, or volume jumps >15% weekly.',
-        formula: 'Primary factor: ACWR; Secondary: weekly volume change %'
-      },
-      recovery: {
-        title: 'Recovery Readiness Score',
-        description: 'Composite score (0-100) showing how prepared you are for training, based on TSB, fatigue patterns, and ACWR.',
-        interpretation: 'Normal Range: 60-90%. Above 90%: excellent - ready for any workout. 70-89%: good. 50-69%: moderate - consider easy day. Below 50% is concerning - prioritize rest.',
-        formula: 'Weighted combination of TSB (50%) and ACWR (50%)'
-      },
-      zones: {
-        title: 'Heart Rate Training Zones (LTHR 165)',
-        description: 'Personalized zones based on Lactate Threshold HR:\n• Z1 (≤124): Recovery\n• Z2 (124-140): Easy aerobic\n• Z3 (140-157): Moderate tempo\n• Z4 (157-168): Threshold\n• Z5 (>168): Maximum',
-        interpretation: 'Normal distribution in base phase: Z1-Z2: 75-80%, Z3: 10-15%, Z4-Z5: 5-10%. Too much Z3-Z5 (>30%) is concerning - risks overtraining. All Z1 (<100% Z1-Z2) means insufficient intensity.',
-        formula: 'Based on LTHR 165 bpm'
-      },
-      pmc: {
-        title: 'Performance Management Chart',
-        description: 'Visual representation of CTL, ATL, and TSB over time. Shows fitness building, fatigue accumulation, and form. The relationship between these three metrics tells the complete training story.',
-        interpretation: 'Normal pattern: CTL rising gradually, ATL oscillating, TSB negative during build. Concerning patterns: CTL dropping, TSB below -30, ATL spike without CTL rise.',
-        formula: 'Three lines: CTL (blue), ATL (orange), TSB (green area)'
-      },
-      sessions: {
-        title: 'Total Sessions',
-        description: 'Number of training sessions in selected timeframe. Helps verify filtering and shows training frequency.',
-        interpretation: 'Normal Range: 4-6 sessions/week for marathon training. 3 or fewer is concerning (insufficient frequency), 7+ may lead to burnout. Consistency matters more than volume.',
-        formula: 'Count of all logged sessions in timeframe'
-      },
-      z2pace: {
-		  title: 'Average Zone 2 Pace',
-		  description: 'Your average running pace when heart rate is in Zone 2 (aerobic zone, 124-140 bpm for you). This is the best indicator of aerobic fitness improvement for marathon training.',
-		  normal: 'For a sub-3:30 marathon (4:58/km pace), your Z2 pace should be around 5:30-6:30/km. As fitness improves, Z2 pace gets faster while HR stays the same.',
-		  warning: 'If Z2 pace is trending slower over time, you may be overtraining, not recovering adequately, or need to adjust training intensity.',
-		  calculation: 'Recorded directly from your Garmin watch zones screen after each run. Check: Activity → Laps → Zones to see time and pace in each zone.'
-		},
-	cadence: {
-	      title: 'Running Cadence',
-		  description: 'Steps per minute while running. Higher cadence (165-180 spm) typically reduces impact forces and injury risk.',
-		  normal: 'Optimal range: 165-180 spm for most runners. Elite marathoners often run at 180+ spm.',
-		  warning: 'Below 160 spm: Higher impact forces, increased injury risk. Above 190 spm: May indicate fatigue or inefficient form.',
-		  calculation: 'Available on most Garmin watches. Shows in activity summary after each run. Can be averaged across the session or analyzed per lap.'
-		},
-		
-		vo2max: {
-		  title: 'VO2 Max Estimate',
-		  description: 'Maximum oxygen uptake (ml/kg/min). Gold-standard measure of aerobic fitness. Directly correlates with marathon performance potential.',
-		  normal: 'For sub-3:30 marathon: 50-55 ml/kg/min. Sub-3:00: 55-60. Elite: 65+',
-		  warning: 'Declining VO2 Max may indicate overtraining or inadequate aerobic training volume.',
-		  calculation: 'Calculated by Garmin Firstbeat algorithms using HR data, pace, and other metrics during outdoor runs. Updated automatically after qualifying activities. Check: Garmin Connect → Performance Stats → VO2 Max.'
-		},
-		
-		elevation: {
-		  title: 'Elevation Gain',
-		  description: 'Total meters climbed during the session. Hills significantly increase training stress and should be accounted for in TSS calculations.',
-		  normal: 'Flat run: <50m. Rolling hills: 50-150m. Hilly: 150-300m. Mountain: 300+m',
-		  warning: 'Sudden increase in elevation load can cause injury. Build gradually.',
-		  calculation: 'GPS-based calculation from your Garmin watch. Shows in activity summary. We add ~6-8% TSS per 100m elevation gain to account for extra effort.'
-		}
-    };
-
-    // Utilities
-    const calculateTSS = (session) => {
-      const sessionType = session.sessionType;
-      const actual = session.actual || session;
-      
-      if (sessionType === "Futsal") {
-        return (actual.duration / 60) * 95 * (actual.rpe / 8);
-      }
-      if (sessionType === "Pedicab") {
-        const routeMultiplier = session.routeType === 'hilly' ? 1.3 : 1.0;
-        return (actual.duration / 60) * 12 * routeMultiplier;
-      }
-      if (sessionType?.includes("Run")) {
-        const intensityFactor = actual.rpe ? (actual.rpe / 6) : 1.0;
-        return actual.distance * 6.5 * intensityFactor;
-      }
-      if (sessionType === "Strength Training") {
-        return (actual.duration / 60) * 30;
-      }
-      return 50;
-    };
-
-    const parseSessionDate = (dateStr) => {
-      if (dateStr.includes('-')) {
-        return new Date(dateStr);
-      }
-      const [day, month] = dateStr.split(' ');
-      const monthMap = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
-      return new Date(new Date().getFullYear(), monthMap[month], parseInt(day));
-    };
-
-    const calculateCTL = (sessions, targetDate) => {
-      const date = new Date(targetDate);
-      const relevantSessions = sessions.filter(s => {
-        const sessionDate = parseSessionDate(s.date);
-        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
-        return daysDiff >= 0 && daysDiff < 42;
-      });
-      
-      let ctl = 0;
-      relevantSessions.forEach(session => {
-        const sessionDate = parseSessionDate(session.date);
-        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
-        const weight = Math.exp(-daysDiff / 42);
-        ctl += calculateTSS(session) * weight;
-      });
-      
-      return Math.round(ctl / 42);
-    };
-
-    const calculateATL = (sessions, targetDate) => {
-      const date = new Date(targetDate);
-      const relevantSessions = sessions.filter(s => {
-        const sessionDate = parseSessionDate(s.date);
-        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
-        return daysDiff >= 0 && daysDiff < 7;
-      });
-      
-      let atl = 0;
-      relevantSessions.forEach(session => {
-        const sessionDate = parseSessionDate(session.date);
-        const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
-        const weight = Math.exp(-daysDiff / 7);
-        atl += calculateTSS(session) * weight;
-      });
-      
-      return Math.round(atl / 7);
-    };
-
-    const secondsToPace = (seconds) => {
-      if (!seconds || seconds === 0) return "0:00";
-      const mins = Math.floor(seconds / 60);
-      const secs = Math.round(seconds % 60);
-      return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const getHeartRateZone = (hr) => {
-      if (hr < 124) return 'z1';
-      if (hr < 140) return 'z2';
-      if (hr < 157) return 'z3';
-      if (hr < 168) return 'z4';
-      return 'z5';
-    };
-
-    const predictMarathonTime = (avgZ2Pace) => {
-      if (!avgZ2Pace || avgZ2Pace === 0) return "N/A";
-      const marathonPaceSeconds = avgZ2Pace + 18;
-      const marathonTimeSeconds = marathonPaceSeconds * 42.195;
-      const hours = Math.floor(marathonTimeSeconds / 3600);
-      const minutes = Math.floor((marathonTimeSeconds % 3600) / 60);
-      const seconds = Math.round(marathonTimeSeconds % 60);
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    const assessInjuryRisk = (acwr) => {
-      const num = parseFloat(acwr);
-      if (num < 0.8) return { level: 'Low', color: 'amber', message: 'Under-training. Consider increasing volume gradually.' };
-      if (num < 1.0) return { level: 'Optimal', color: 'emerald', message: 'Perfect balance of load and recovery.' };
-      if (num < 1.3) return { level: 'Moderate', color: 'amber', message: 'Slightly elevated. Monitor closely, avoid big increases.' };
-      return { level: 'High', color: 'rose', message: 'High injury risk. Reduce training volume immediately.' };
-    };
-
-    const calculateRecoveryScore = (tsb, acwr) => {
-      let score = 50;
-      if (tsb > 5) score += 30;
-      else if (tsb > 0) score += 20;
-      else if (tsb > -10) score += 10;
-      
-      const acwrNum = parseFloat(acwr);
-      if (acwrNum >= 0.8 && acwrNum <= 1.0) score += 30;
-      else if (acwrNum < 1.3) score += 20;
-      else score += 10;
-      
-      return Math.min(100, Math.max(0, score));
-    };
-
-    // Calculate current training week (Week 1 starts Nov 10, 2025)
+    // Get current training week (weeks since training start)
     const getCurrentTrainingWeek = () => {
       const startDate = new Date('2025-11-10');
       const today = new Date();
@@ -550,46 +416,226 @@
       return weekNumber > 0 ? weekNumber : 1;
     };
 
+    // Animated Number Component with count-up
+    const AnimatedNumber = ({ value, decimals = 0, suffix = '' }) => {
+      const [displayValue, setDisplayValue] = useState(0);
+      
+      useEffect(() => {
+        const targetValue = typeof value === 'number' ? value : 0;
+        const duration = 200; // 200ms animation
+        const steps = 20;
+        const increment = (targetValue - displayValue) / steps;
+        let currentStep = 0;
+        
+        const timer = setInterval(() => {
+          currentStep++;
+          if (currentStep >= steps) {
+            setDisplayValue(targetValue);
+            clearInterval(timer);
+          } else {
+            setDisplayValue(prev => prev + increment);
+          }
+        }, duration / steps);
+        
+        return () => clearInterval(timer);
+      }, [value]);
+      
+      return (
+        <span className="count-up">
+          {displayValue.toFixed(decimals)}{suffix}
+        </span>
+      );
+    };
+
+    // Circular Gauge Component (Pie chart style)
+    const CircularGauge = ({ value, max = 100, label, color, size = 80 }) => {
+      const percentage = Math.min((value / max) * 100, 100);
+      const circumference = 2 * Math.PI * 32;
+      const offset = circumference - (percentage / 100) * circumference;
+      
+      return (
+        <div className="gauge-container" style={{ width: size, height: size }}>
+          <svg className="gauge-svg" width={size} height={size}>
+            <circle className="gauge-bg" cx={size/2} cy={size/2} r="32" />
+            <circle 
+              className="gauge-fill" 
+              cx={size/2} 
+              cy={size/2} 
+              r="32"
+              stroke={color}
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+            />
+          </svg>
+          <div className="gauge-text">
+            <div className="text-xl font-bold" style={{ color }}>{value}</div>
+            <div className="text-xs text-slate-400">{label}</div>
+          </div>
+        </div>
+      );
+    };
+
+    // Progress Ring Gauge Component (Ring style)
+    const ProgressRing = ({ percentage, label, color, size = 80 }) => {
+      const radius = 32;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (percentage / 100) * circumference;
+      
+      return (
+        <div className="progress-ring">
+          <svg width={size} height={size}>
+            <circle
+              className="progress-ring-circle progress-ring-bg"
+              cx={size/2}
+              cy={size/2}
+              r={radius}
+            />
+            <circle
+              className="progress-ring-circle progress-ring-progress"
+              cx={size/2}
+              cy={size/2}
+              r={radius}
+              stroke={color}
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+            />
+          </svg>
+          <div className="gauge-text">
+            <div className="text-xl font-bold" style={{ color }}>{percentage}%</div>
+            <div className="text-xs text-slate-400">{label}</div>
+          </div>
+        </div>
+      );
+    };
+
+    // Horizontal Progress Bar Gauge (Training Load Balance style)
+    const HorizontalGauge = ({ value, min = -30, max = 30, label }) => {
+      // Calculate position percentage (0-100)
+      const range = max - min;
+      const normalizedValue = Math.max(min, Math.min(max, value));
+      const percentage = ((normalizedValue - min) / range) * 100;
+      
+      // Determine color and status based on TSB value
+      let status, statusColor;
+      if (value < -10) {
+        status = 'Overreached';
+        statusColor = '#f43f5e'; // red
+      } else if (value < 0) {
+        status = 'Fatigued';
+        statusColor = '#f59e0b'; // amber
+      } else if (value <= 5) {
+        status = 'Optimal';
+        statusColor = '#10b981'; // green
+      } else {
+        status = 'Recovered';
+        statusColor = '#3b82f6'; // blue
+      }
+      
+      return (
+        <div className="w-full">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm font-semibold text-slate-300">{label}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold mono" style={{ color: statusColor }}>
+                {value > 0 ? '+' : ''}{value}
+              </span>
+              <span className="text-sm font-bold" style={{ color: statusColor }}>{status}</span>
+            </div>
+          </div>
+          
+          {/* Progress bar with zones */}
+          <div className="relative h-10 bg-slate-800/50 rounded-full overflow-hidden">
+            {/* Zone colors */}
+            <div className="absolute inset-0 flex">
+              <div className="flex-1 bg-gradient-to-r from-rose-500/30 to-rose-500/20"></div>
+              <div className="flex-1 bg-gradient-to-r from-amber-500/20 to-emerald-500/20"></div>
+              <div className="flex-1 bg-gradient-to-r from-emerald-500/20 to-blue-500/30"></div>
+            </div>
+            
+            {/* Marker */}
+            <div 
+              className="absolute top-0 bottom-0 w-1.5 bg-white shadow-lg transition-all duration-500"
+              style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
+            >
+              <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-lg border-2" style={{ borderColor: statusColor }}></div>
+              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-lg border-2" style={{ borderColor: statusColor }}></div>
+            </div>
+          </div>
+          
+          {/* Scale labels */}
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-xs text-slate-500">Underloaded</span>
+            <span className="text-xs text-slate-500">Optimal</span>
+            <span className="text-xs text-slate-500">Overloaded</span>
+          </div>
+        </div>
+      );
+    };
+
     // Help Button Component
     const HelpButton = ({ helpKey, onClick }) => (
       <button 
         className="help-btn" 
-        onClick={(e) => { e.stopPropagation(); onClick(helpKey); }}
+        onClick={() => onClick(helpKey)}
         title="Click for help"
       >
         ?
       </button>
     );
 
-    // Help Modal Component
-    const HelpModal = ({ content, onClose }) => (
-      <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4" onClick={onClose}>
-        <div className="card slide-in w-full max-w-lg p-6" onClick={e => e.stopPropagation()}>
-          <div className="flex items-start justify-between mb-4">
-            <h3 className="text-xl font-bold text-white pr-4">{content.title}</h3>
-            <button onClick={onClose} className="text-slate-400 hover:text-white p-1">×</button>
-          </div>
-          <div className="space-y-4 text-slate-300">
-            <p className="leading-relaxed">{content.description}</p>
-            {content.interpretation && (
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-                <p className="text-sm font-medium text-blue-400 mb-1">How to interpret:</p>
-                <p className="text-sm">{content.interpretation}</p>
-              </div>
-            )}
-            {content.formula && (
-              <div className="bg-slate-800 rounded-lg p-3">
-                <p className="text-xs text-slate-500 mb-1">Formula:</p>
-                <code className="text-sm text-emerald-400 mono">{content.formula}</code>
-              </div>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 mt-4">Press ESC or click outside to close</p>
+    // Bottom Navigation Component
+    const BottomNav = ({ currentPage }) => (
+      <nav className="bottom-nav">
+        <div className="bottom-nav-container">
+          <a href="AnalyticsPanel.html" className={`nav-item ${currentPage === 'analytics' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Analytics</span>
+          </a>
+          
+          <a href="HistoryPanel.html" className={`nav-item ${currentPage === 'history' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>History</span>
+          </a>
+          
+          <a href="SmartCoachPanel.html" className={`nav-item ${currentPage === 'coach' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+            <span>Coach</span>
+          </a>
+          
+          <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); alert('Log Session modal coming soon!'); }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <span>Log Session</span>
+          </a>
+          
+          <a href="#" className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); alert('Settings coming soon!'); }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m13.66-5.66L16 10m-8 8-3.66 3.66M1.34 6.34L5 10m8 8 3.66 3.66M18.66 1.34 15 5M9 15l-3.66 3.66"></path>
+            </svg>
+            <span>Settings</span>
+          </a>
         </div>
-      </div>
+      </nav>
     );
 
-    // Main Component
+    // Main Analytics Dashboard Component
     function AnalyticsDashboard() {
       const [sessions, setSessions] = useState([]);
       const [loading, setLoading] = useState(true);
@@ -598,190 +644,258 @@
       const [customStartDate, setCustomStartDate] = useState('');
       const [customEndDate, setCustomEndDate] = useState('');
       const [showHelp, setShowHelp] = useState(false);
-      const [helpContent, setHelpContent] = useState({});
+      const [helpTopic, setHelpTopic] = useState('');
+      const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
+      // Auth & Data Loading
       useEffect(() => {
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-       }
-       firebase.auth().signInWithEmailAndPassword('nic@runningcoach.com', 'policias')
-       .then((userCredential) => {
-        setUser(userCredential.user);
-       loadSessions(userCredential.user.uid);
-       })
-       .catch((error) => {
-        console.error("Auth error:", error);
-         setLoading(false);
-        });
-       }, []);
-
-      useEffect(() => {
-        const handleEscape = (e) => {
-          if (e.key === 'Escape' && showHelp) setShowHelp(false);
-        };
-        document.addEventListener('keydown', handleEscape);
-        return () => document.removeEventListener('keydown', handleEscape);
-      }, [showHelp]);
-
-      const loadSessions = async (uid) => {
-        try {
-          const db = firebase.firestore();
-          const snapshot = await db.collection(`users/${uid}/sessions`)
-            .orderBy('date', 'desc')
-            .get();
-          
-          const sessionsData = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          
-          setSessions(sessionsData);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error loading sessions:", error);
-          setLoading(false);
-        }
-      };
-
-      const showHelpModal = (key) => {
-        const content = HELP_DATABASE[key] || { title: 'Help', description: 'Information not available.' };
-        setHelpContent(content);
-        setShowHelp(true);
-      };
-
-      const filteredSessions = useMemo(() => {
-        let filtered = sessions;
-
-        if (customStartDate || customEndDate) {
-          filtered = sessions.filter(s => {
-            const sessionDate = parseSessionDate(s.date);
-            if (customStartDate) {
-              const start = new Date(customStartDate);
-              if (sessionDate < start) return false;
-            }
-            if (customEndDate) {
-              const end = new Date(customEndDate);
-              end.setHours(23, 59, 59, 999);
-              if (sessionDate > end) return false;
-            }
-            return true;
+        const auth = firebase.auth();
+        auth.signInWithEmailAndPassword('nic@runningcoach.com', 'policias')
+          .then((userCredential) => {
+            console.log('âœ… Firebase Auth: User authenticated');
+            setUser(userCredential.user);
+            return firebase.firestore()
+              .collection('users')
+              .doc(userCredential.user.uid)
+              .collection('sessions')
+              .orderBy('date', 'desc')
+              .get();
+          })
+          .then((snapshot) => {
+            const sessionsData = [];
+            snapshot.forEach(doc => {
+              sessionsData.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(`âœ… Firestore: Loaded ${sessionsData.length} sessions`);
+            setSessions(sessionsData);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error('âŒ Error:', error);
+            setLoading(false);
           });
-        } else if (timeRange !== null) {
-          const now = new Date();
-          const cutoff = new Date(now.getTime() - (timeRange * 24 * 60 * 60 * 1000));
-          filtered = sessions.filter(s => parseSessionDate(s.date) >= cutoff);
+      }, []);
+
+      // Filter sessions by time range
+      const filteredSessions = useMemo(() => {
+        if (sessions.length === 0) return [];
+
+        let startDate;
+        if (customStartDate && customEndDate) {
+          startDate = new Date(customStartDate);
+        } else if (timeRange === 'all') {
+          return sessions;
+        } else {
+          startDate = new Date();
+          startDate.setDate(startDate.getDate() - timeRange);
         }
-        
-        return filtered;
+
+        return sessions.filter(session => {
+          const sessionDate = new Date(session.date);
+          if (customStartDate && customEndDate) {
+            const endDate = new Date(customEndDate);
+            return sessionDate >= startDate && sessionDate <= endDate;
+          }
+          return sessionDate >= startDate;
+        });
       }, [sessions, timeRange, customStartDate, customEndDate]);
 
-      const currentMetrics = useMemo(() => {
-        if (filteredSessions.length === 0) {
-          return { ctl: 0, atl: 0, tsb: 0, acwr: 0, totalDistance: 0, totalTime: 0, totalSessions: 0 };
+      // Parse session date helper - MUST be before calculations
+      const parseSessionDate = (dateStr) => {
+        if (!dateStr) return new Date();
+        if (dateStr.includes('/')) {
+          const [day, month, year] = dateStr.split('/');
+          return new Date(`${year}-${month}-${day}`);
         }
+        return new Date(dateStr);
+      };
 
-        const now = new Date();
-        const ctl = calculateCTL(filteredSessions, now);
-        const atl = calculateATL(filteredSessions, now);
-        const tsb = ctl - atl;
-        const acwr = ctl > 0 ? (atl / ctl).toFixed(2) : 0;
+      // TSS Calculation
+      const calculateTSS = (session) => {
+        const sessionType = session.sessionType || session.type;
+        
+        if (sessionType === 'Futsal') {
+          const duration = session.duration || session.actual?.duration || 0;
+          const rpe = session.rpe || session.actual?.rpe || 6;
+          return Math.round((duration / 60) * 95 * (rpe / 8));
+        }
+        
+        if (sessionType === 'Pedicab') {
+          const duration = session.duration || session.actual?.duration || 0;
+          const route = session.route || session.actual?.route || 'CBD-Docklands';
+          const routeMultiplier = route === 'CBD-Docklands' ? 1.2 : 
+                                  route === 'CBD-StKilda' ? 1.4 : 
+                                  route === 'CBD-Southbank' ? 1.0 : 1.2;
+          return Math.round((duration / 60) * 12 * routeMultiplier);
+        }
+        
+        const distance = session.distance || session.actual?.distance || 0;
+        const rpe = session.rpe || session.actual?.rpe || 6;
+        
+        if (distance === 0) return 0;
+        return Math.round(distance * 6.5 * (rpe / 6));
+      };
 
+      // Calculate CTL (Chronic Training Load) - 42 day exponential average
+      const calculateCTL = (sessions, targetDate) => {
+        const date = new Date(targetDate);
+        const relevantSessions = sessions.filter(s => {
+          const sessionDate = parseSessionDate(s.date);
+          const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+          return daysDiff >= 0 && daysDiff < 42;
+        });
+        
+        let ctl = 0;
+        relevantSessions.forEach(session => {
+          const sessionDate = parseSessionDate(session.date);
+          const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+          const weight = Math.exp(-daysDiff / 42);
+          ctl += calculateTSS(session) * weight;
+        });
+        
+        return Math.round(ctl / 42);
+      };
+
+      // Calculate ATL (Acute Training Load) - 7 day exponential average
+      const calculateATL = (sessions, targetDate) => {
+        const date = new Date(targetDate);
+        const relevantSessions = sessions.filter(s => {
+          const sessionDate = parseSessionDate(s.date);
+          const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+          return daysDiff >= 0 && daysDiff < 7;
+        });
+        
+        let atl = 0;
+        relevantSessions.forEach(session => {
+          const sessionDate = parseSessionDate(session.date);
+          const daysDiff = (date - sessionDate) / (1000 * 60 * 60 * 24);
+          const weight = Math.exp(-daysDiff / 7);
+          atl += calculateTSS(session) * weight;
+        });
+        
+        return Math.round(atl / 7);
+      };
+
+      // Calculate current metrics
+      const currentMetrics = useMemo(() => {
+        const totalSessions = filteredSessions.length;
         const totalDistance = filteredSessions.reduce((sum, s) => {
-          const distance = s.distance || s.actual?.distance || 0;
-          return sum + distance;
+          const dist = s.distance || s.actual?.distance || 0;
+          return sum + dist;
         }, 0);
         const totalTime = filteredSessions.reduce((sum, s) => {
           const duration = s.duration || s.actual?.duration || 0;
           return sum + duration;
         }, 0);
 
-        return {
-          ctl,
-          atl,
-          tsb,
-          acwr,
-          totalDistance: totalDistance.toFixed(1),
-          totalTime: Math.round(totalTime),
-          totalSessions: filteredSessions.length
-        };
-      }, [filteredSessions]);
-
-      const zoneDistribution = useMemo(() => {
-        const zones = { z1: 0, z2: 0, z3: 0, z4: 0, z5: 0 };
-        
-        filteredSessions.forEach(session => {
-          const avgHr = session.actual?.avgHr;
-          if (avgHr && avgHr > 0) {
-            const zone = getHeartRateZone(avgHr);
-            zones[zone] += session.actual?.duration || 0;
-          }
-        });
-
-        const totalTime = Object.values(zones).reduce((sum, time) => sum + time, 0);
-        
-        return Object.entries(zones).map(([zone, time]) => ({
-          zone: ZONES[zone].name,
-          time,
-          percentage: totalTime > 0 ? ((time / totalTime) * 100).toFixed(1) : 0,
-          color: ZONES[zone].color
-        }));
-      }, [filteredSessions]);
-
-		const avgZ2Pace = useMemo(() => {
-		  // NEW APPROACH: Use z2Pace field if available
-		  // If user logged Z2 pace, use it - they know what they logged!
-		  const sessionsWithZ2Pace = filteredSessions.filter(s => {
-		    const z2Pace = s.z2Pace || s.actual?.z2Pace;
-		    return z2Pace && z2Pace > 0;  // Just check if z2Pace exists and is valid
-		  });
-		  
-		  if (sessionsWithZ2Pace.length > 0) {
-		    // Calculate from actual Z2 pace data
-		    const totalPace = sessionsWithZ2Pace.reduce((sum, s) => {
-		      const z2Pace = s.z2Pace || s.actual?.z2Pace;
-		      return sum + z2Pace;
-		    }, 0);
-		    return totalPace / sessionsWithZ2Pace.length;
-		  }
-		  
-		  // FALLBACK: Old method (for sessions without z2Pace field)
-		  // Only for pure running sessions where we can estimate from HR
-		  const z2Sessions = filteredSessions.filter(s => {
-		    const avgHr = s.avgHr || s.actual?.avgHr;
-		    const sessionType = s.sessionType || s.actual?.sessionType;
-		    const avgPace = s.avgPace || s.actual?.avgPace;
-		    return avgHr >= 124 && avgHr <= 140 && sessionType?.includes("Run") && avgPace;
-		  });
-		  
-		  if (z2Sessions.length === 0) return 0;
-		  const totalPace = z2Sessions.reduce((sum, s) => {
-		    const avgPace = s.avgPace || s.actual?.avgPace || 0;
-		    return sum + avgPace;
-		  }, 0);
-		  
-		  return totalPace / z2Sessions.length;
-		}, [filteredSessions]);
-
-      const marathonPrediction = useMemo(() => predictMarathonTime(avgZ2Pace), [avgZ2Pace]);
-      
-      // UNFILTERED METRICS - for Injury Risk and Recovery (should always use ALL sessions)
-      const unfilteredMetrics = useMemo(() => {
-        if (sessions.length === 0) {
-          return { ctl: 0, atl: 0, tsb: 0, acwr: 0 };
-        }
-
+        // CRITICAL: Use ALL sessions for CTL/ATL, not filtered!
         const now = new Date();
         const ctl = calculateCTL(sessions, now);
         const atl = calculateATL(sessions, now);
         const tsb = ctl - atl;
-        const acwr = ctl > 0 ? (atl / ctl).toFixed(2) : 0;
+        const acwr = ctl > 0 ? (atl / ctl).toFixed(2) : '0.00';
 
-        return { ctl, atl, tsb, acwr };
-      }, [sessions]); // Use ALL sessions, not filtered!
-      
-      const injuryRisk = useMemo(() => assessInjuryRisk(unfilteredMetrics.acwr), [unfilteredMetrics.acwr]);
-      const recoveryScore = useMemo(() => calculateRecoveryScore(unfilteredMetrics.tsb, unfilteredMetrics.acwr), [unfilteredMetrics.tsb, unfilteredMetrics.acwr]);
+        return {
+          totalSessions,
+          totalDistance: totalDistance.toFixed(1),
+          totalTime: Math.round(totalTime),
+          ctl,
+          atl,
+          tsb,
+          acwr
+        };
+      }, [filteredSessions, sessions]);
 
+      // Calculate Z2 pace average
+      const avgZ2Pace = useMemo(() => {
+        const sessionsWithZ2 = filteredSessions.filter(s => {
+          const pace = s.z2Pace || s.actual?.z2Pace;
+          return pace && pace > 0;
+        });
+
+        if (sessionsWithZ2.length === 0) return 0;
+
+        const totalPace = sessionsWithZ2.reduce((sum, s) => {
+          const pace = s.z2Pace || s.actual?.z2Pace;
+          return sum + pace;
+        }, 0);
+
+        return totalPace / sessionsWithZ2.length;
+      }, [filteredSessions]);
+
+      // Format pace
+      const secondsToPace = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.round(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      // Marathon prediction - correct formula
+      const marathonPrediction = useMemo(() => {
+        if (avgZ2Pace === 0) return '--:--:--';
+        
+        const marathonPaceSeconds = avgZ2Pace + 18; // Add 18 seconds per km
+        const marathonTimeSeconds = marathonPaceSeconds * 42.195;
+        const hours = Math.floor(marathonTimeSeconds / 3600);
+        const minutes = Math.floor((marathonTimeSeconds % 3600) / 60);
+        const seconds = Math.round(marathonTimeSeconds % 60);
+        
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      }, [avgZ2Pace]);
+
+      // Injury Risk Assessment
+      const assessInjuryRisk = (acwr) => {
+        const num = parseFloat(acwr);
+        if (num < 0.8) return { level: 'Low', color: 'amber', message: 'Under-training' };
+        if (num < 1.0) return { level: 'Optimal', color: 'emerald', message: 'Perfect balance' };
+        if (num < 1.3) return { level: 'Moderate', color: 'amber', message: 'Slightly elevated' };
+        return { level: 'High', color: 'rose', message: 'High injury risk' };
+      };
+
+      // Recovery Score Calculation (0-100)
+      const calculateRecoveryScore = (tsb, acwr) => {
+        let score = 50;
+        if (tsb > 5) score += 30;
+        else if (tsb > 0) score += 20;
+        else if (tsb > -10) score += 10;
+        
+        const acwrNum = parseFloat(acwr);
+        if (acwrNum >= 0.8 && acwrNum <= 1.0) score += 30;
+        else if (acwrNum < 1.3) score += 20;
+        else score += 10;
+        
+        return Math.min(100, Math.max(0, score));
+      };
+
+      // Calculate average cadence
+      const avgCadence = useMemo(() => {
+        const sessionsWithCadence = filteredSessions.filter(s => s.avgCadence);
+        if (sessionsWithCadence.length === 0) return 0;
+        
+        const totalCadence = sessionsWithCadence.reduce((sum, s) => sum + s.avgCadence, 0);
+        return Math.round(totalCadence / sessionsWithCadence.length);
+      }, [filteredSessions]);
+
+      // Injury risk assessment
+      const injuryRisk = useMemo(() => {
+        return assessInjuryRisk(currentMetrics.acwr);
+      }, [currentMetrics.acwr]);
+
+      // Recovery score (0-100 based on TSB and ACWR)
+      const recoveryScore = useMemo(() => {
+        return calculateRecoveryScore(currentMetrics.tsb, currentMetrics.acwr);
+      }, [currentMetrics.tsb, currentMetrics.acwr]);
+
+      // Recovery readiness level
+      const recoveryReadiness = useMemo(() => {
+        const score = recoveryScore;
+        if (score >= 80) return { level: 'Excellent', score, color: '#10b981' };
+        if (score >= 60) return { level: 'Good', score, color: '#3b82f6' };
+        if (score >= 40) return { level: 'Fair', score, color: '#f59e0b' };
+        return { level: 'Poor', score, color: '#f43f5e' };
+      }, [recoveryScore]);
+
+      // PMC Data for chart - use correct exponential decay calculation
       const pmcData = useMemo(() => {
         if (filteredSessions.length === 0) return [];
 
@@ -795,6 +909,7 @@
         
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
           const dateStr = d.toLocaleDateString('en-AU', { day: '2-digit', month: 'short' });
+          
           const ctl = calculateCTL(sessions, d);
           const atl = calculateATL(sessions, d);
           const tsb = ctl - atl;
@@ -802,55 +917,14 @@
           dataPoints.push({ date: dateStr, CTL: ctl, ATL: atl, TSB: tsb });
         }
 
+        // Downsample if too many points
         if (dataPoints.length > 30) {
           return dataPoints.filter((_, i) => i % 3 === 0);
         }
         return dataPoints;
       }, [filteredSessions, sessions]);
 
-      const weeklyVolumeData = useMemo(() => {
-        // Use ALL sessions (not filtered) for trend analysis, max 3 months
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        
-        const recentSessions = sessions.filter(s => {
-          const sessionDate = parseSessionDate(s.date);
-          return sessionDate >= threeMonthsAgo;
-        });
-        
-        if (recentSessions.length === 0) return [];
-
-        const weeks = {};
-        recentSessions.forEach(session => {
-          const sessionDate = parseSessionDate(session.date);
-          const week = session.week || getWeekNumber(sessionDate);
-          
-          if (!weeks[week]) {
-            weeks[week] = { 
-              week: `W${week}`, 
-              distance: 0, 
-              tss: 0,
-              date: sessionDate
-            };
-          }
-          // Check both data structures
-          const distance = session.distance || session.actual?.distance || 0;
-          weeks[week].distance += distance;
-          weeks[week].tss += calculateTSS(session);
-        });
-
-        const weekArray = Object.values(weeks).sort((a, b) => {
-          // Extract week number from "W47" format
-          const weekA = parseInt(a.week.substring(1));
-          const weekB = parseInt(b.week.substring(1));
-          return weekA - weekB;
-        });
-
-        // Already limited to 3 months, so no need to slice further
-        return weekArray;
-      }, [sessions]); // Use sessions, not filteredSessions!
-
-      // Helper function to get week number
+      // Helper function to get week number (MUST be before usage)
       const getWeekNumber = (date) => {
         const d = new Date(date);
         d.setHours(0, 0, 0, 0);
@@ -860,34 +934,78 @@
         return weekNo;
       };
 
-      const paceProgressionData = useMemo(() => {
-        // Use ALL sessions (not filtered) for trend analysis, max 3 months
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      // Weekly Volume Data - Use training weeks, not ISO weeks
+      const weeklyVolumeData = useMemo(() => {
+        // Get training start date
+        const trainingStartDate = new Date('2025-11-10');
+        const today = new Date();
         
-        const recentSessions = sessions.filter(s => {
+        // Filter sessions from training start onwards
+        const trainingSessions = sessions.filter(s => {
           const sessionDate = parseSessionDate(s.date);
-          return sessionDate >= threeMonthsAgo;
+          return sessionDate >= trainingStartDate;
+        });
+        
+        if (trainingSessions.length === 0) return [];
+
+        const weeks = {};
+        trainingSessions.forEach(session => {
+          const sessionDate = parseSessionDate(session.date);
+          
+          // Calculate training week number (Week 1 = first week after Nov 10)
+          const daysSinceStart = Math.floor((sessionDate - trainingStartDate) / (1000 * 60 * 60 * 24));
+          const trainingWeek = Math.floor(daysSinceStart / 7) + 1;
+          
+          if (!weeks[trainingWeek]) {
+            weeks[trainingWeek] = { 
+              week: `W${trainingWeek}`, 
+              distance: 0, 
+              tss: 0,
+              date: sessionDate
+            };
+          }
+          const distance = session.distance || session.actual?.distance || 0;
+          weeks[trainingWeek].distance += distance;
+          weeks[trainingWeek].tss += calculateTSS(session);
+        });
+
+        const weekArray = Object.values(weeks).sort((a, b) => {
+          const weekA = parseInt(a.week.substring(1));
+          const weekB = parseInt(b.week.substring(1));
+          return weekA - weekB;
+        });
+
+        return weekArray;
+      }, [sessions]);
+
+      // Pace Progression Data - Use training weeks
+      const paceProgressionData = useMemo(() => {
+        const trainingStartDate = new Date('2025-11-10');
+        
+        const trainingSessions = sessions.filter(s => {
+          const sessionDate = parseSessionDate(s.date);
+          return sessionDate >= trainingStartDate;
         });
         
         const weeks = {};
         
-        recentSessions.forEach(session => {
-          // PRIORITY: Use z2Pace field if available
-          // If user logged Z2 pace, use it - they know what they logged!
+        trainingSessions.forEach(session => {
           const z2Pace = session.z2Pace || session.actual?.z2Pace;
           
-          if (z2Pace && z2Pace > 0) {  // Just check if z2Pace exists and is valid
+          if (z2Pace && z2Pace > 0) {
             const sessionDate = parseSessionDate(session.date);
-            const week = session.week || getWeekNumber(sessionDate);
-            const weekKey = `W${week}`;
+            
+            // Calculate training week number
+            const daysSinceStart = Math.floor((sessionDate - trainingStartDate) / (1000 * 60 * 60 * 24));
+            const trainingWeek = Math.floor(daysSinceStart / 7) + 1;
+            const weekKey = `W${trainingWeek}`;
             
             if (!weeks[weekKey]) {
               weeks[weekKey] = { 
                 week: weekKey, 
                 totalPace: 0, 
                 count: 0,
-                weekNum: week,
+                weekNum: trainingWeek,
                 date: sessionDate
               };
             }
@@ -901,18 +1019,14 @@
           .map(w => ({
             week: w.week,
             pace: w.totalPace / w.count,
-            date: w.date
+            weekNum: w.weekNum
           }))
-          .sort((a, b) => {
-            const weekA = parseInt(a.week.substring(1));
-            const weekB = parseInt(b.week.substring(1));
-            return weekA - weekB;
-          });
+          .sort((a, b) => a.weekNum - b.weekNum);
 
-        // Already limited to 3 months, so no need to slice
         return weekArray;
-      }, [sessions]); // Use sessions, not filteredSessions!
+      }, [sessions]);
 
+      // Session Type Distribution Data
       const sessionTypeData = useMemo(() => {
         const types = {};
         filteredSessions.forEach(session => {
@@ -923,9 +1037,96 @@
         return Object.entries(types).map(([type, count]) => ({ name: type, value: count }));
       }, [filteredSessions]);
 
+      // Help modal content
+      const helpContent = {
+        sessions: {
+          title: 'Total Sessions',
+          description: 'Number of training sessions in the selected time period.',
+          interpretation: 'More sessions = more training consistency.',
+          formula: 'Count of all logged sessions'
+        },
+        volume: {
+          title: 'Training Volume',
+          description: 'Total distance covered in running sessions.',
+          interpretation: '• <30km/week: Maintenance\n• 30-50km/week: Base building\n• 50-70km/week: Marathon training\n• >70km/week: High volume',
+          formula: 'Sum of all session distances'
+        },
+        pace: {
+          title: 'Average Zone 2 Pace',
+          description: 'Your average easy run pace in Zone 2 (conversational effort).',
+          interpretation: 'Faster Z2 pace = improved aerobic efficiency. Track this monthly.',
+          formula: 'Average of z2Pace field across all runs'
+        },
+        marathon: {
+          title: 'Marathon Time Prediction',
+          description: 'Estimated marathon finish time based on your current fitness.',
+          interpretation: 'Based on Z2 pace + 8% marathon pace penalty. Requires CTL > 50.',
+          formula: 'Z2 pace × 1.08 × 42.195km'
+        },
+        ctl: {
+          title: 'CTL - Chronic Training Load (Fitness)',
+          description: 'Your long-term training load averaged over 42 days.',
+          interpretation: '• <40: Building base\n• 40-60: Marathon ready\n• 60-80: High fitness\n• >80: Elite level',
+          formula: 'Exponential weighted moving average (42 days)'
+        },
+        atl: {
+          title: 'ATL - Acute Training Load (Fatigue)',
+          description: 'Your short-term training load averaged over 7 days.',
+          interpretation: 'High ATL after hard weeks. Should drop during recovery weeks.',
+          formula: 'Exponential weighted moving average (7 days)'
+        },
+        tsb: {
+          title: 'TSB - Training Stress Balance (Form)',
+          description: 'Difference between fitness and fatigue. Indicates readiness.',
+          interpretation: '• <-30: Overreached\n• -10 to 0: Training hard\n• 0 to 5: Optimal for training\n• >5: Well recovered, race ready',
+          formula: 'CTL - ATL'
+        },
+        acwr: {
+          title: 'ACWR - Acute:Chronic Workload Ratio',
+          description: 'Ratio of recent training load to long-term average.',
+          interpretation: '• <0.8: Undertrained\n• 0.8-1.3: Optimal range\n• >1.3: Injury risk zone',
+          formula: 'ATL / CTL'
+        },
+        cadence: {
+          title: 'Running Economy - Cadence',
+          description: 'Your average stride rate (steps per minute) indicating running efficiency.',
+          interpretation: '• <165 spm: Low - Increase stride rate\n• 165-180 spm: Optimal range\n• >180 spm: High - May indicate overstriding',
+          formula: 'Average of avgCadence across all running sessions'
+        },
+        weeklyVolume: {
+          title: 'Weekly Volume Trend',
+          description: 'Total distance run each week over the last 3 months.',
+          interpretation: 'Consistent volume with gradual increases (10% rule) reduces injury risk. Watch for sudden spikes.',
+          formula: 'Sum of distances per week (W = ISO week number)'
+        },
+        paceProgression: {
+          title: 'Pace Progression (Z2)',
+          description: 'Average Zone 2 pace improvement over time.',
+          interpretation: 'Faster Z2 pace (lower numbers) = better aerobic fitness. Consistent improvement shows training is working.',
+          formula: 'Weekly average of z2Pace field'
+        },
+        sessionDistribution: {
+          title: 'Session Type Distribution',
+          description: 'Breakdown of training sessions by type (Run, Futsal, Pedicab, etc.).',
+          interpretation: 'Balanced training includes variety. Too much of one type can lead to overuse injuries.',
+          formula: 'Count of each sessionType'
+        },
+        tsbGauge: {
+          title: 'Training Load Balance (TSB)',
+          description: 'Visual representation of your current form state on a spectrum from underloaded to overloaded.',
+          interpretation: '• Left (Red): Underloaded/Detraining\n• Center (Green): Optimal training zone\n• Right (Blue): Well recovered, race-ready\n• Far Right: Risk of detraining',
+          formula: 'CTL - ATL plotted on scale from -30 to +30'
+        }
+      };
+
+      const showHelpModal = (topic) => {
+        setHelpTopic(topic);
+        setShowHelp(true);
+      };
+
       if (loading) {
         return (
-          <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center justify-center" style={{ height: '100vh' }}>
             <div className="text-center">
               <div className="spinner mx-auto mb-4"></div>
               <p className="text-slate-400">Loading analytics...</p>
@@ -935,509 +1136,628 @@
       }
 
       return (
-        <div className="min-h-screen">
-          {/* Navigation Bar */}
-          <nav className="nav-bar">
-            <div className="max-w-7xl mx-auto px-4 py-3">
-              <div className="flex items-center justify-between">
-                <a href="index.html" className="flex items-center gap-2 text-xl font-bold text-white hover:text-blue-400 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                  </svg>
-                  RCP
-                </a>
-                
-                <div className="nav-toggle">
-                  <a href="AnalyticsPanel.html" className="active">Analytics</a>
-                  <a href="HistoryPanel.html">History</a>
-                </div>
-              </div>
-            </div>
-          </nav>
-
+        <div>
           {/* Main Content */}
           <div className="p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
-              {/* Header with Date/Week */}
-              <div className="mb-6 fade-in">
-                <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
+              {/* Compact Header */}
+              <div className="mb-4 fade-in">
+                <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
                   📊 Analytics Dashboard
                 </h1>
                 
-                <div className="date-week-header">
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Today</p>
-                    <p className="text-lg font-semibold text-white">
-                      {new Date().toLocaleDateString('en-AU', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Training Week</p>
-                    <p className="text-lg font-semibold text-blue-400">
-                      Week {getCurrentTrainingWeek()}
-                    </p>
+                <div className="date-header">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Today</p>
+                      <p className="text-sm font-semibold text-white">
+                        {new Date().toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Training Week</p>
+                      <p className="text-sm font-semibold text-blue-400">
+                        Week {getCurrentTrainingWeek()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-            {/* Time Range Filters */}
-            <div className="mb-6 fade-in">
-              <div className="card p-4">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {TIME_RANGES.map(range => (
-                    <button
-                      key={range.label}
-                      onClick={() => {
-                        setTimeRange(range.days);
-                        setCustomStartDate('');
-                        setCustomEndDate('');
-                      }}
-                      className={`btn ${timeRange === range.days && !customStartDate && !customEndDate ? 'btn-primary' : 'btn-secondary'}`}
-                    >
-                      {range.label}
-                    </button>
-                  ))}
+              {/* QUICK FILTER PILLS */}
+              <div className="fade-in mb-4">
+                <div className="filter-pills">
+                  <button 
+                    className={`filter-pill ${timeRange === 7 ? 'active' : ''}`}
+                    onClick={() => { setTimeRange(7); setCustomStartDate(''); setCustomEndDate(''); }}
+                  >
+                    7D
+                  </button>
+                  <button 
+                    className={`filter-pill ${timeRange === 30 ? 'active' : ''}`}
+                    onClick={() => { setTimeRange(30); setCustomStartDate(''); setCustomEndDate(''); }}
+                  >
+                    30D
+                  </button>
+                  <button 
+                    className={`filter-pill ${timeRange === 90 ? 'active' : ''}`}
+                    onClick={() => { setTimeRange(90); setCustomStartDate(''); setCustomEndDate(''); }}
+                  >
+                    3M
+                  </button>
+                  <button 
+                    className={`filter-pill ${timeRange === 365 ? 'active' : ''}`}
+                    onClick={() => { setTimeRange(365); setCustomStartDate(''); setCustomEndDate(''); }}
+                  >
+                    1Y
+                  </button>
+                  <button 
+                    className={`filter-pill ${timeRange === 'all' ? 'active' : ''}`}
+                    onClick={() => { setTimeRange('all'); setCustomStartDate(''); setCustomEndDate(''); }}
+                  >
+                    All
+                  </button>
+                  <button 
+                    className="filter-pill"
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                  >
+                    {showAdvancedFilters ? '▼' : '▶'} Advanced
+                  </button>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm text-slate-400">Custom Range:</span>
-                  <input
-                    type="date"
-                    value={customStartDate}
-                    onChange={(e) => {
-                      setCustomStartDate(e.target.value);
-                      setTimeRange(null);
-                    }}
-                    className="text-sm"
-                  />
-                  <span className="text-slate-400">to</span>
-                  <input
-                    type="date"
-                    value={customEndDate}
-                    onChange={(e) => {
-                      setCustomEndDate(e.target.value);
-                      setTimeRange(null);
-                    }}
-                    className="text-sm"
-                  />
-                  {(customStartDate || customEndDate) && (
-                    <button
-                      onClick={() => {
-                        setCustomStartDate('');
-                        setCustomEndDate('');
-                        setTimeRange(30);
-                      }}
-                      className="text-sm text-blue-400 hover:text-blue-300"
-                    >
-                      Clear
-                    </button>
+                {/* Advanced Filters (Collapsible) */}
+                <div className={`advanced-filters ${showAdvancedFilters ? 'expanded' : ''}`}>
+                  <div className="grid grid-cols-2 gap-3 mt-3 p-4 bg-slate-800/30 rounded-lg">
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">From</label>
+                      <input 
+                        type="date" 
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-slate-400 mb-1">To</label>
+                      <input 
+                        type="date" 
+                        value={customEndDate}
+                        onChange={(e) => setCustomEndDate(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 1: COMPACT OVERVIEW METRICS (2x2 grid on mobile) */}
+              <div className="mb-6 fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-lg font-bold">📊 Overview</h2>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Sessions */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">Sessions</h3>
+                      <HelpButton helpKey="sessions" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-purple-400 mb-1">
+                      <AnimatedNumber value={currentMetrics.totalSessions} />
+                    </div>
+                    <p className="text-xs text-slate-500">Total</p>
+                  </div>
+
+                  {/* Volume */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">Volume</h3>
+                      <HelpButton helpKey="volume" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-cyan-400 mb-1">
+                      <AnimatedNumber value={parseFloat(currentMetrics.totalDistance)} decimals={1} />km
+                    </div>
+                    <p className="text-xs text-slate-500">{Math.round(currentMetrics.totalTime / 60)}h</p>
+                  </div>
+
+                  {/* Avg Pace */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">Z2 Pace</h3>
+                      <HelpButton helpKey="pace" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-indigo-400 mb-1 mono">
+                      {avgZ2Pace > 0 ? secondsToPace(avgZ2Pace) : '--:--'}
+                    </div>
+                    <p className="text-xs text-slate-500">/km</p>
+                  </div>
+
+                  {/* Marathon Prediction */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">Marathon</h3>
+                      <HelpButton helpKey="marathon" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-emerald-400 mb-1 mono">{marathonPrediction}</div>
+                    <p className="text-xs text-slate-500">Prediction</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: COMPACT TRAINING LOAD (2x2 grid) */}
+              <div className="mb-6 fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-lg font-bold">⚡ Training Load</h2>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {/* CTL */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">CTL</h3>
+                      <HelpButton helpKey="ctl" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-blue-400 mb-1">
+                      <AnimatedNumber value={currentMetrics.ctl} />
+                    </div>
+                    <p className="text-xs text-slate-500">Fitness</p>
+                  </div>
+
+                  {/* ATL */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">ATL</h3>
+                      <HelpButton helpKey="atl" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-amber-400 mb-1">
+                      <AnimatedNumber value={currentMetrics.atl} />
+                    </div>
+                    <p className="text-xs text-slate-500">Fatigue</p>
+                  </div>
+
+                  {/* TSB */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">TSB</h3>
+                      <HelpButton helpKey="tsb" onClick={showHelpModal} />
+                    </div>
+                    <div className={`text-2xl font-bold mb-1 ${currentMetrics.tsb > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {currentMetrics.tsb > 0 ? '+' : ''}<AnimatedNumber value={currentMetrics.tsb} />
+                    </div>
+                    <p className="text-xs text-slate-500">Form</p>
+                  </div>
+
+                  {/* ACWR */}
+                  <div className="metric-card">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-xs font-semibold text-slate-400">ACWR</h3>
+                      <HelpButton helpKey="acwr" onClick={showHelpModal} />
+                    </div>
+                    <div className="text-2xl font-bold text-purple-400 mb-1">
+                      {currentMetrics.acwr}
+                    </div>
+                    <p className="text-xs text-slate-500">Ratio</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2.5: RUNNING ECONOMY - COMPACT */}
+              <div className="mb-6 fade-in">
+                <div className="card p-4">
+                  <div className="flex items-center justify-between">
+                    {/* Left side: Icon and title */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">🏃</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-semibold text-slate-300">Running Economy</h3>
+                          <HelpButton helpKey="cadence" onClick={showHelpModal} />
+                        </div>
+                        <p className="text-xs text-slate-500">Avg Cadence</p>
+                      </div>
+                    </div>
+                    
+                    {/* Right side: Value and status */}
+                    <div className="text-right">
+                      {avgCadence === 0 ? (
+                        <div className="text-xl text-slate-500">--</div>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-bold text-cyan-400 mono">
+                            {avgCadence}<span className="text-sm text-slate-400 ml-1">spm</span>
+                          </div>
+                          <div className={`text-xs font-semibold ${
+                            avgCadence < 165 ? 'text-amber-400' : 
+                            avgCadence > 180 ? 'text-amber-400' : 
+                            'text-emerald-400'
+                          }`}>
+                            {avgCadence < 165 ? 'Low' : avgCadence > 180 ? 'High' : 'Optimal'}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {avgCadence > 0 && avgCadence < 165 && (
+                    <div className="mt-3 text-xs text-amber-300 bg-amber-900/20 border border-amber-700/30 rounded p-2">
+                      ⚠️ Low cadence increases injury risk. Target: 165-180 spm
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* SECTION 1: OVERVIEW METRICS */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-2xl font-bold">📊 Overview Metrics</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Session Count */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">Sessions</h3>
-                    <HelpButton helpKey="sessions" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-purple-400 mb-1">{currentMetrics.totalSessions}</div>
-                  <p className="text-xs text-slate-500">In timeframe</p>
+              {/* SECTION 3: RISK & RECOVERY GAUGES - COMPACT SIDE BY SIDE */}
+              <div className="mb-6 fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-lg font-bold">🎯 Risk & Recovery</h2>
                 </div>
-
-                {/* Volume */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">Volume</h3>
-                    <HelpButton helpKey="volume" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-cyan-400 mb-1">{currentMetrics.totalDistance}km</div>
-                  <p className="text-xs text-slate-500">{Math.round(currentMetrics.totalTime / 60)}h total</p>
-                </div>
-
-                {/* Avg Pace */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">Avg Z2 Pace</h3>
-                    <HelpButton helpKey="pace" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-indigo-400 mb-1 mono">
-                    {avgZ2Pace > 0 ? secondsToPace(avgZ2Pace) : '--'}
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    {avgZ2Pace > 0 ? 'Per kilometer' : 'No Z2 data in period'}
-                  </p>
-                </div>
-
-                {/* Marathon Prediction */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">Marathon Prediction</h3>
-                    <HelpButton helpKey="marathon" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-2xl font-bold text-blue-400 mb-1 mono">{marathonPrediction}</div>
-                  <p className="text-xs text-slate-500">Based on Z2 pace</p>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 2: TRAINING LOAD METRICS */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-2xl font-bold">⚡ Training Load & Readiness</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* CTL */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">CTL - Fitness</h3>
-                    <HelpButton helpKey="ctl" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-blue-400 mb-1">{currentMetrics.ctl}</div>
-                  <p className="text-xs text-slate-500">42-day avg load</p>
-                </div>
-
-                {/* ATL */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">ATL - Fatigue</h3>
-                    <HelpButton helpKey="atl" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-amber-400 mb-1">{currentMetrics.atl}</div>
-                  <p className="text-xs text-slate-500">7-day avg load</p>
-                </div>
-
-                {/* TSB */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">TSB - Form</h3>
-                    <HelpButton helpKey="tsb" onClick={showHelpModal} />
-                  </div>
-                  <div className={`text-3xl font-bold mb-1 ${currentMetrics.tsb > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {currentMetrics.tsb > 0 ? '+' : ''}{currentMetrics.tsb}
-                  </div>
-                  <p className="text-xs text-slate-500">
-                    {currentMetrics.tsb > 5 ? '🟢 Well recovered' : currentMetrics.tsb > 0 ? '🟡 Recovering' : '🔴 Fatigued'}
-                  </p>
-                </div>
-
-                {/* ACWR */}
-                <div className="metric-card">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-slate-400">ACWR - Injury Risk</h3>
-                    <HelpButton helpKey="acwr" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-3xl font-bold text-purple-400 mb-1">{currentMetrics.acwr}</div>
-                  <p className={`text-xs text-${injuryRisk.color}-400`}>{injuryRisk.level} Risk</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* NEW: Running Economy Card */}
-              <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/30 rounded-xl p-6 border border-slate-700/50">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🏃</span>
+                
+                <div className="card p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* LEFT: Injury Risk - Horizontal Gauge */}
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-400">Running Economy</h3>
-                      <p className="text-xs text-slate-500">Avg Cadence</p>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-slate-300">Injury Risk (ACWR)</span>
+                        <HelpButton helpKey="acwr" onClick={showHelpModal} />
+                      </div>
+                      
+                      {/* Horizontal bar - compact */}
+                      <div className="relative h-8 bg-slate-800/50 rounded-full overflow-hidden mb-2">
+                        {/* Zone colors */}
+                        <div className="absolute inset-0 flex">
+                          <div className="w-1/4 bg-gradient-to-r from-amber-500/30 to-amber-500/20"></div>
+                          <div className="flex-1 bg-gradient-to-r from-emerald-500/30 to-emerald-500/20"></div>
+                          <div className="w-1/4 bg-gradient-to-r from-amber-500/20 to-rose-500/30"></div>
+                        </div>
+                        
+                        {/* Marker for ACWR value */}
+                        {(() => {
+                          const acwr = parseFloat(currentMetrics.acwr);
+                          // Map ACWR range 0.5-1.5 to 0-100%
+                          const percentage = Math.max(0, Math.min(100, ((acwr - 0.5) / 1.0) * 100));
+                          const markerColor = injuryRisk.color === 'emerald' ? '#10b981' : 
+                                             injuryRisk.color === 'amber' ? '#f59e0b' : '#f43f5e';
+                          
+                          return (
+                            <div 
+                              className="absolute top-0 bottom-0 w-1 bg-white shadow-lg transition-all duration-500"
+                              style={{ left: `${percentage}%`, transform: 'translateX(-50%)' }}
+                            >
+                              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-lg border-2" style={{ borderColor: markerColor }}></div>
+                              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-lg border-2" style={{ borderColor: markerColor }}></div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      
+                      {/* Value and labels */}
+                      <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
+                        <span>Under (&lt;0.8)</span>
+                        <span>High (&gt;1.3)</span>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-2xl font-bold mono" style={{ color: injuryRisk.color === 'emerald' ? '#10b981' : injuryRisk.color === 'amber' ? '#f59e0b' : '#f43f5e' }}>
+                          {currentMetrics.acwr}
+                        </div>
+                        <div className="text-xs font-semibold" style={{ color: injuryRisk.color === 'emerald' ? '#10b981' : injuryRisk.color === 'amber' ? '#f59e0b' : '#f43f5e' }}>
+                          {injuryRisk.level}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* RIGHT: Recovery Readiness - Circular Gauge */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-slate-300">Recovery Readiness</span>
+                        <HelpButton helpKey="tsb" onClick={showHelpModal} />
+                      </div>
+                      
+                      {/* Circular gauge */}
+                      <div className="flex flex-col items-center">
+                        <div className="relative" style={{ width: '120px', height: '120px' }}>
+                          <svg width="120" height="120" viewBox="0 0 120 120">
+                            {/* Background circle */}
+                            <circle
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              fill="none"
+                              stroke="#1e293b"
+                              strokeWidth="12"
+                            />
+                            
+                            {/* Progress arc */}
+                            <circle
+                              cx="60"
+                              cy="60"
+                              r="50"
+                              fill="none"
+                              stroke={recoveryReadiness.color}
+                              strokeWidth="12"
+                              strokeDasharray={2 * Math.PI * 50}
+                              strokeDashoffset={2 * Math.PI * 50 - (recoveryScore / 100) * 2 * Math.PI * 50}
+                              strokeLinecap="round"
+                              transform="rotate(-90 60 60)"
+                              style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                            />
+                            
+                            {/* Marker pointer at current position */}
+                            {(() => {
+                              const angle = -90 + (recoveryScore / 100) * 360;
+                              const radians = (angle * Math.PI) / 180;
+                              const markerX = 60 + 50 * Math.cos(radians);
+                              const markerY = 60 + 50 * Math.sin(radians);
+                              
+                              return (
+                                <>
+                                  <circle
+                                    cx={markerX}
+                                    cy={markerY}
+                                    r="6"
+                                    fill="white"
+                                    stroke={recoveryReadiness.color}
+                                    strokeWidth="3"
+                                  />
+                                </>
+                              );
+                            })()}
+                          </svg>
+                          
+                          {/* Center text */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <div className="text-2xl font-bold mono" style={{ color: recoveryReadiness.color }}>
+                              {recoveryScore}
+                            </div>
+                            <div className="text-xs text-slate-400">/ 100</div>
+                          </div>
+                        </div>
+                        
+                        {/* Status label */}
+                        <div className="mt-2 text-center">
+                          <div className="text-xs font-semibold" style={{ color: recoveryReadiness.color }}>
+                            {recoveryReadiness.level}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {recoveryScore < 40 ? 'Poor' : recoveryScore < 60 ? 'Fair' : recoveryScore < 80 ? 'Good' : 'Excellent'}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <HelpButton helpKey="cadence" onClick={showHelpModal} />
-                </div>
-                
-                {(() => {
-                  const sessionsWithCadence = filteredSessions.filter(s => s.avgCadence);
-                  if (sessionsWithCadence.length === 0) {
-                    return (
-                      <div className="text-center py-4">
-                        <div className="text-2xl mb-2">--</div>
-                        <p className="text-xs text-slate-500">No cadence data yet</p>
-                      </div>
-                    );
-                  }
-                  
-                  const avgCadence = Math.round(
-                    sessionsWithCadence.reduce((sum, s) => sum + s.avgCadence, 0) / sessionsWithCadence.length
-                  );
-                  
-                  const cadenceStatus = avgCadence < 165 ? 'Low' : 
-                                       avgCadence > 180 ? 'High' : 
-                                       'Optimal';
-                  
-                  const statusColor = avgCadence < 165 ? 'text-amber-400' : 
-                                      avgCadence > 180 ? 'text-amber-400' : 
-                                      'text-emerald-400';
-                  
-                  return (
-                    <>
-                      <div className="text-4xl font-bold text-cyan-400 mb-2 mono">
-                        {avgCadence}
-                        <span className="text-base text-slate-400 ml-2">spm</span>
-                      </div>
-                      <div className={`text-sm font-semibold ${statusColor} mb-2`}>
-                        {cadenceStatus}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        Target: 165-180 spm
-                      </div>
-                      {avgCadence < 165 && (
-                        <div className="mt-3 text-xs text-amber-300 bg-amber-900/20 border border-amber-700/30 rounded p-2">
-                          ⚠️ Low cadence increases injury risk. Try shorter, quicker steps.
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-
-            {/* SECTION 3: PERFORMANCE TRENDS */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-2xl font-bold">📈 Performance Trends</h2>
-              </div>
-
-              {/* PMC Chart */}
-              <div className="card p-6 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold">Performance Management Chart</h3>
-                  <HelpButton helpKey="pmc" onClick={showHelpModal} />
-                </div>
-                
-                <ResponsiveContainer width="100%" height={300}>
-                  <ComposedChart data={pmcData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                    <XAxis dataKey="date" stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                    <YAxis stroke="#94a3b8" style={{ fontSize: '12px' }} />
-                    <Tooltip
-                      contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
-                      labelStyle={{ color: '#f8fafc' }}
-                    />
-                    <Legend />
-                    <Line type="monotone" dataKey="CTL" stroke="#3b82f6" strokeWidth={2} name="CTL (Fitness)" />
-                    <Line type="monotone" dataKey="ATL" stroke="#f59e0b" strokeWidth={2} name="ATL (Fatigue)" />
-                    <Area type="monotone" dataKey="TSB" fill="#10b981" stroke="#10b981" fillOpacity={0.3} name="TSB (Form)" />
-                  </ComposedChart>
-                </ResponsiveContainer>
-
-                <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <p className="text-sm text-blue-400">
-                    💡 {currentMetrics.tsb > 5 ? 'Positive TSB indicates good recovery - ready for hard training!' : currentMetrics.tsb > 0 ? 'Neutral form - maintain current training load.' : 'Negative TSB shows accumulated fatigue - consider recovery.'}
-                  </p>
                 </div>
               </div>
 
-              {/* Weekly Volume */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Weekly Volume */}
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">Weekly Volume</h3>
-                    <HelpButton helpKey="volume" onClick={showHelpModal} />
+              {/* SECTION 4: PERFORMANCE TRENDS - 3 CHARTS */}
+              <div className="mb-6 fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-lg font-bold">📈 Performance Trends</h2>
+                </div>
+
+                {/* Weekly Volume & Pace Progression side by side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Weekly Volume */}
+                  <div className="card p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-md font-bold">Weekly Volume</h3>
+                      <HelpButton helpKey="weeklyVolume" onClick={showHelpModal} />
+                    </div>
+                    
+                    {weeklyVolumeData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={220}>
+                        <BarChart 
+                          data={weeklyVolumeData}
+                          margin={{ top: 5, right: 10, left: -15, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                          <XAxis 
+                            dataKey="week" 
+                            stroke="#94a3b8" 
+                            style={{ fontSize: '11px' }} 
+                          />
+                          <YAxis 
+                            stroke="#94a3b8" 
+                            style={{ fontSize: '11px' }}
+                          />
+                          <Tooltip
+                            contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                            formatter={(value) => [`${value.toFixed(1)} km`, 'Distance']}
+                          />
+                          <Bar 
+                            dataKey="distance" 
+                            fill="#10b981" 
+                            name="Distance (km)"
+                            radius={[8, 8, 0, 0]}
+                            maxBarSize={50}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[220px] flex items-center justify-center text-slate-500">
+                        <p className="text-xs">No weekly data available</p>
+                      </div>
+                    )}
                   </div>
-                  
-                  {weeklyVolumeData.length > 0 ? (
+
+                  {/* Pace Progression (Z2) */}
+                  <div className="card p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-md font-bold">Pace Progression (Z2)</h3>
+                      <HelpButton helpKey="paceProgression" onClick={showHelpModal} />
+                    </div>
+                    
+                    {paceProgressionData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={220}>
+                        <LineChart 
+                          data={paceProgressionData}
+                          margin={{ top: 5, right: 10, left: -15, bottom: 5 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                          <XAxis 
+                            dataKey="week" 
+                            stroke="#94a3b8" 
+                            style={{ fontSize: '11px' }} 
+                          />
+                          <YAxis 
+                            stroke="#94a3b8" 
+                            style={{ fontSize: '11px' }}
+                            tickFormatter={(value) => secondsToPace(value)}
+                            domain={['auto', 'auto']}
+                            reversed={true}
+                          />
+                          <Tooltip
+                            contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
+                            formatter={(value) => [secondsToPace(value), 'Avg Pace']}
+                            labelFormatter={(label) => `Week ${label.substring(1)}`}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="pace" 
+                            stroke="#3b82f6" 
+                            strokeWidth={2} 
+                            name="Avg Pace"
+                            dot={{ fill: '#3b82f6', r: 3 }}
+                            activeDot={{ r: 5 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="h-[220px] flex items-center justify-center text-slate-500">
+                        <p className="text-xs">No Z2 pace data available</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Session Distribution - Full Width */}
+                <div className="card p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-md font-bold">Session Distribution</h3>
+                    <HelpButton helpKey="sessionDistribution" onClick={showHelpModal} />
+                  </div>
+
+                  {sessionTypeData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={250}>
-                      <BarChart 
-                        data={weeklyVolumeData}
-                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                        <XAxis 
-                          dataKey="week" 
-                          stroke="#94a3b8" 
-                          style={{ fontSize: '12px' }} 
-                        />
-                        <YAxis 
-                          stroke="#94a3b8" 
-                          style={{ fontSize: '12px' }}
-                          label={{ value: 'km', angle: -90, position: 'insideLeft', style: { fill: '#94a3b8' } }}
-                        />
-                        <Tooltip
-                          contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
-                          formatter={(value) => [`${value.toFixed(1)} km`, 'Distance']}
-                        />
-                        <Bar 
-                          dataKey="distance" 
-                          fill="#10b981" 
-                          name="Distance (km)"
-                          radius={[8, 8, 0, 0]}
-                          maxBarSize={weeklyVolumeData.length <= 3 ? 60 : weeklyVolumeData.length <= 6 ? 50 : 40}
-                        />
-                      </BarChart>
+                      <PieChart>
+                        <Pie
+                          data={sessionTypeData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {sessionTypeData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'][index % 5]} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }} />
+                      </PieChart>
                     </ResponsiveContainer>
                   ) : (
                     <div className="h-[250px] flex items-center justify-center text-slate-500">
-                      <p>No weekly data available</p>
+                      <p className="text-xs">No session data available</p>
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Pace Progression */}
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold">Pace Progression (Z2)</h3>
-                    <HelpButton helpKey="pace" onClick={showHelpModal} />
-                  </div>
+              {/* SECTION 5: PERFORMANCE MANAGEMENT CHART (Moved to bottom) */}
+              <div className="mb-6 fade-in">
+                <div className="flex items-center gap-2 mb-3">
+                  <h2 className="text-lg font-bold">📈 Performance Management Chart</h2>
+                  <HelpButton helpKey="ctl" onClick={showHelpModal} />
+                </div>
+                <div className="card p-4">
+                  <p className="text-sm text-slate-400 mb-4">42/7-day CTL/ATL/TSB trend - Essential for peaking strategy</p>
                   
-                  {paceProgressionData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={250}>
-                      <LineChart 
-                        data={paceProgressionData}
-                        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
-                      >
+                  {pmcData.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="text-slate-500">No data available for selected time range</p>
+                      <p className="text-xs text-slate-600 mt-2">Add more sessions to see the trend</p>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={pmcData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                         <XAxis 
-                          dataKey="week" 
-                          stroke="#94a3b8" 
-                          style={{ fontSize: '12px' }} 
+                          dataKey="date" 
+                          stroke="#94a3b8"
+                          tick={{ fontSize: 11 }}
+                          interval="preserveStartEnd"
                         />
                         <YAxis 
-                          stroke="#94a3b8" 
-                          style={{ fontSize: '12px' }}
-                          tickFormatter={(value) => secondsToPace(value)}
-                          domain={['auto', 'auto']}
-                          reversed={true}
-                          label={{ value: 'min/km', angle: -90, position: 'insideLeft', style: { fill: '#94a3b8' } }}
+                          stroke="#94a3b8"
+                          tick={{ fontSize: 11 }}
                         />
-                        <Tooltip
-                          contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }}
-                          formatter={(value) => [secondsToPace(value), 'Avg Pace']}
-                          labelFormatter={(label) => `Week ${label.substring(1)}`}
+                        <Tooltip 
+                          contentStyle={{ 
+                            background: '#1a2332', 
+                            border: '1px solid #334155',
+                            borderRadius: '8px'
+                          }}
+                        />
+                        <Legend 
+                          wrapperStyle={{ fontSize: '12px' }}
                         />
                         <Line 
                           type="monotone" 
-                          dataKey="pace" 
+                          dataKey="CTL" 
                           stroke="#3b82f6" 
-                          strokeWidth={3} 
-                          name="Avg Pace"
-                          dot={{ fill: '#3b82f6', r: 4 }}
-                          activeDot={{ r: 6 }}
+                          strokeWidth={2}
+                          dot={false}
+                          name="Fitness (CTL)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="ATL" 
+                          stroke="#f59e0b" 
+                          strokeWidth={2}
+                          dot={false}
+                          name="Fatigue (ATL)"
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="TSB" 
+                          stroke="#10b981" 
+                          strokeWidth={2}
+                          dot={false}
+                          name="Form (TSB)"
                         />
                       </LineChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <div className="h-[250px] flex items-center justify-center text-slate-500">
-                      <p>No Z2 pace data available</p>
-                    </div>
-                  )}
-                  
-                  {paceProgressionData.length > 0 && (
-                    <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                      <p className="text-sm text-blue-400">
-                        💡 Tracking weekly Z2 pace - improvement shows aerobic fitness gains
-                      </p>
-                    </div>
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* SECTION 4: DISTRIBUTION ANALYSIS */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-2xl font-bold">🎯 Session Distribution</h2>
-              </div>
-
-              {/* Session Types */}
-              <div className="card p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold">Session Types</h3>
-                </div>
-
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={sessionTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {sessionTypeData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'][index % 5]} />
-                      ))}
-                    </Pie>
-                    <Tooltip contentStyle={{ background: '#1a2332', border: '1px solid #334155', borderRadius: '8px' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* SECTION 5: RISK & RECOVERY */}
-            <div className="mb-8 fade-in">
-              <div className="flex items-center gap-2 mb-4">
-                <h2 className="text-2xl font-bold">🛡️ Risk & Recovery Assessment</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Injury Risk */}
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold">⚠️ Injury Risk</h3>
-                    <HelpButton helpKey="injury" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-center">
-                    <div className={`text-3xl font-bold text-${injuryRisk.color}-400 mb-2`}>
-                      {injuryRisk.level}
-                    </div>
-                    <p className="text-sm text-slate-400 mb-2">ACWR: {currentMetrics.acwr}</p>
-                    <p className="text-xs text-slate-500">{injuryRisk.message}</p>
-                  </div>
-                </div>
-
-                {/* Recovery Score */}
-                <div className="card p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold">💪 Recovery Readiness</h3>
-                    <HelpButton helpKey="recovery" onClick={showHelpModal} />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-emerald-400 mb-2">{recoveryScore}/100</div>
-                    <p className="text-sm text-slate-400 mb-4">
-                      {recoveryScore >= 80 ? '🟢 Excellent' : recoveryScore >= 60 ? '🟡 Good' : '🔴 Poor'}
-                    </p>
-                    <div className="w-full bg-slate-700 rounded-full h-2">
-                      <div
-                        className="h-2 rounded-full bg-emerald-400 transition-all"
-                        style={{ width: `${recoveryScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="text-center text-sm text-slate-500 fade-in mt-8">
-              <p>Last updated: {new Date().toLocaleString('en-AU')}</p>
             </div>
           </div>
-        </div>
 
-        {/* Help Modal */}
-        {showHelp && <HelpModal content={helpContent} onClose={() => setShowHelp(false)} />}
-      </div>
+          {/* Bottom Navigation */}
+          <BottomNav currentPage="analytics" />
+
+          {/* Help Modal */}
+          {showHelp && (
+            <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
+              <div className="card p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                <h3 className="text-xl font-bold mb-3">{helpContent[helpTopic]?.title}</h3>
+                <p className="text-sm text-slate-300 mb-3">{helpContent[helpTopic]?.description}</p>
+                <div className="bg-slate-800 p-3 rounded mb-3">
+                  <p className="text-xs text-slate-400 whitespace-pre-line">{helpContent[helpTopic]?.interpretation}</p>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Formula: {helpContent[helpTopic]?.formula}</p>
+                <button className="btn-primary w-full" onClick={() => setShowHelp(false)}>Got it</button>
+              </div>
+            </div>
+          )}
+        </div>
       );
     }
 
+    // Render App
     ReactDOM.render(<AnalyticsDashboard />, document.getElementById('root'));
   </script>
 </body>
