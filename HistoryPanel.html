@@ -20,9 +20,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
   <style>
     :root {
       --bg-primary: #0a0f1a;
@@ -53,247 +50,266 @@
       min-height: 100vh;
       color: var(--text-primary);
       margin: 0;
-      padding: 0;
+      padding: 0 0 80px 0;
     }
-    
-    /* Top Navigation Bar */
-    .top-nav {
-      background: rgba(26, 35, 50, 0.95);
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(26, 35, 50, 0.98);
       backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
     }
     
-    .nav-link {
-      padding: 12px 20px;
+    .bottom-nav-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 8px 16px;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
       border-radius: 12px;
-      transition: all 0.2s ease;
-      font-weight: 500;
       text-decoration: none;
-      display: inline-block;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      min-width: 60px;
+      flex: 1;
+      max-width: 90px;
+    }
+    
+    .nav-item:hover {
+      background: rgba(59, 130, 246, 0.1);
       color: var(--text-primary);
     }
     
-    .nav-link:hover {
-      background: rgba(59, 130, 246, 0.2);
-    }
-    
-    .nav-link.active {
+    .nav-item.active {
       background: var(--accent-emerald);
       color: white;
     }
     
-    /* Main content padding */
-    .main-content {
-      padding: 20px;
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
     }
     
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
-    
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+    .nav-item span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
-    
-    @keyframes slideIn {
-      from { opacity: 0; transform: scale(0.95) translateY(-10px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-    .slide-in { animation: slideIn 0.3s ease-out forwards; }
-    
-    /* Loading spinner */
-    .spinner {
-      border: 3px solid rgba(59, 130, 246, 0.2);
-      border-top: 3px solid var(--accent-blue);
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    }
-    
-    /* Glass morphism */
-    .glass {
-      background: rgba(26, 35, 50, 0.85);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    
-    /* Card styles */
+
+    /* Card Styles */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    
-    .card:hover {
-      border-color: rgba(59, 130, 246, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Input styles */
-    .input-field {
-      background: var(--bg-secondary);
+
+    .metric-card {
+      background: var(--bg-card);
       border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-    
-    .input-field:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-    
-    .input-field::placeholder {
-      color: var(--text-muted);
-    }
-    
-    /* Date input with calendar icon */
-    .date-input-wrapper {
+      border-radius: 12px;
+      padding: 12px;
       position: relative;
-      display: flex;
-      align-items: center;
+      transition: all 0.2s;
     }
-    
-    .date-input-wrapper input[type="date"] {
-      padding-right: 40px;
+
+    .metric-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
-    
-    .date-input-wrapper .calendar-icon {
-      position: absolute;
-      right: 12px;
-      pointer-events: none;
-      color: var(--text-muted);
-    }
-    
-    /* Make date input show calendar icon consistently */
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      opacity: 0;
-      position: absolute;
-      right: 0;
-      width: 100%;
-      height: 100%;
+
+    .session-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      transition: all 0.2s;
       cursor: pointer;
     }
-    
-    input[type="date"] {
-      color-scheme: dark;
+
+    .session-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      transform: translateY(-1px);
     }
-    
-    /* Button styles */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
-      color: white;
-      font-weight: 600;
-      padding: 12px 24px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
+
+    .session-card.selected {
+      border-color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    /* Badge styles */
+    .badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      gap: 4px;
+    }
+
+    .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+    .badge-cyan { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
+    .badge-emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .badge-purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
+    .badge-rose { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+
+    .filter-pill {
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+
+    .filter-pill.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
     }
-    
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+
+    .btn-primary {
+      background: var(--accent-blue);
+      color: white;
     }
-    
-    .btn-primary:disabled {
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .action-btn-edit {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+
+    .action-btn-edit:hover {
+      background: rgba(245, 158, 11, 0.3);
+      transform: scale(1.05);
+    }
+
+    .action-btn-delete {
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+    }
+
+    .action-btn-delete:hover {
+      background: rgba(244, 63, 94, 0.3);
+      transform: scale(1.05);
+    }
+
+    .pagination-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+
+    .pagination-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      transform: none;
     }
-    
-    .btn-secondary {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      font-weight: 500;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .btn-secondary:hover {
-      background: #2d3a4f;
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+
+    .pagination-btn.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
       color: white;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
     }
-    
-    .btn-success {
-      background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
-      color: white;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-edit {
-      background: linear-gradient(135deg, var(--accent-amber) 0%, #d97706 100%);
-      color: white;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    /* Modal styles */
+
+    /* Modal Styles */
     .modal-backdrop {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(8px);
+      z-index: 2000;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
       padding: 20px;
+      animation: fadeIn 0.2s ease;
     }
-    
+
     .modal-content {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -303,119 +319,106 @@
       max-height: 90vh;
       overflow-y: auto;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.3s ease;
     }
-    
-    /* Toast notification */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      padding: 14px 20px;
-      border-radius: 12px;
-      font-weight: 500;
-      z-index: 9999;
-      animation: slideIn 0.3s ease-out;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.2s;
     }
-    
-    .toast-success {
-      background: linear-gradient(135deg, var(--accent-emerald) 0%, #059669 100%);
-      color: white;
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-    
-    .toast-error {
-      background: linear-gradient(135deg, var(--accent-rose) 0%, #dc2626 100%);
-      color: white;
+
+    .input-field::placeholder {
+      color: var(--text-muted);
     }
-    
-    /* Badge styles */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
+
+    textarea.input-field {
+      resize: vertical;
+      min-height: 80px;
     }
-    
-    .badge-futsal {
-      background: rgba(139, 92, 246, 0.2);
-      color: var(--accent-purple);
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
-    
-    .badge-pedicab {
-      background: rgba(245, 158, 11, 0.2);
-      color: var(--accent-amber);
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    
-    .badge-running {
-      background: rgba(59, 130, 246, 0.2);
-      color: var(--accent-blue);
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
-    
-    /* Gradient text */
-    .gradient-text {
-      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
     }
-    
-    /* Session type indicator */
-    .session-indicator {
-      width: 4px;
-      height: 100%;
-      position: absolute;
-      left: 0;
-      top: 0;
-      border-radius: 16px 0 0 16px;
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
     }
-    
-    .indicator-futsal { background: var(--accent-purple); }
-    .indicator-pedicab { background: var(--accent-amber); }
-    .indicator-running { background: var(--accent-blue); }
-    .indicator-strength { background: var(--accent-emerald); }
-    .indicator-cross { background: var(--accent-cyan); }
-    
-    /* Responsive */
+
+    .collapsible-content.expanded {
+      max-height: 500px;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
     @media (max-width: 768px) {
-      body { padding: 10px; }
-      .modal-content { max-width: 100%; }
+      .metric-card { padding: 10px; }
+      .session-card { padding: 10px; }
+      .session-card .flex { flex-wrap: wrap; }
+      .modal-content { 
+        max-width: 100%; 
+        border-radius: 20px 20px 0 0;
+        max-height: 95vh;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Top Navigation Bar -->
-  <nav class="top-nav">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
-      <a href="index.html" class="flex items-center gap-2 text-xl font-bold">
-        <i data-lucide="activity" class="w-6 h-6 text-emerald-400"></i>
-        <span class="hidden sm:inline">RCP</span>
-      </a>
-      
-      <!-- Panel Toggle -->
-      <div class="flex items-center gap-2">
-        <a href="AnalyticsPanel.html" class="nav-link">
-          Analytics
-        </a>
-        <a href="HistoryPanel.html" class="nav-link active">
-          History
-        </a>
-      </div>
-    </div>
-  </nav>
+  <div id="root"></div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <div id="app"></div>
-  </div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <script>
-    // ==================== FIREBASE CONFIGURATION ====================
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCQr84Yu0lTkKMnqtgYDD5NP4i_n5qS4eM",
       authDomain: "runningcoachdata.firebaseapp.com",
@@ -425,1459 +428,1044 @@
       appId: "1:364279562892:web:7acd6bbac8c8113177f1a9"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
     const auth = firebase.auth();
-    
-    // Current user and sessions reference
-    let currentUser = null;
-    let authReady = false;
-    let sessionsRef = null;
-    
-    // Setup auth state listener
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        authReady = true;
-        // Create user-specific sessions reference
-        sessionsRef = db.collection(`users/${user.uid}/sessions`);
-        console.log('✅ Firebase Auth: User authenticated', user.uid);
-        console.log('📂 Sessions path:', `users/${user.uid}/sessions`);
-        
-        // If app is waiting to load, load now
-        if (window.app && !window.app.sessions.length) {
-          window.app.loadSessions();
-        }
-      
-      } else {
-        console.log('⏳ Firebase Auth: Signing in...');
-        // Use a fixed email for your personal use
-        auth.signInWithEmailAndPassword('nic@runningcoach.com', 'policias')
-          .catch((error) => {
-            console.error('❌ Firebase Auth Error:', error);
-            // If user doesn't exist, create it
-            if (error.code === 'auth/user-not-found') {
-              auth.createUserWithEmailAndPassword('nic@runningcoach.com', 'policias')
-                .then(() => console.log('✅ User created'))
-                .catch(err => console.error('❌ Create user error:', err));
-            }
-          });
-      }
-      
-    });
-    
-    // Wait for auth helper
-    function waitForAuth() {
-      return new Promise((resolve) => {
-        if (authReady && currentUser) {
-          resolve(currentUser);
-        } else {
-          const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (user) {
-              currentUser = user;
-              authReady = true;
-              unsubscribe();
-              resolve(user);
-            }
-          });
-        }
-      });
-    }
 
-    // ==================== HELPER FUNCTIONS ====================
-    
-    // Format date to DD/MM/YYYY
-    function formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    }
-    
-    // Parse DD/MM/YYYY to YYYY-MM-DD for input
-    function parseDateInput(dateString) {
-      if (!dateString) return '';
-      const parts = dateString.split('/');
-      if (parts.length === 3) {
-        const [day, month, year] = parts;
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      }
-      return dateString;
-    }
-    
-    // Get day name from date
-    function getDayName(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-AU', { weekday: 'long' });
-    }
-    
-    // Get week number relative to training start (10/11/2025)
-    function getWeekNumber(dateString) {
-      const sessionDate = new Date(dateString);
-      const trainingStart = new Date('2025-11-10'); // Week 1 starts here
-      
-      // Calculate days difference
-      const diffTime = sessionDate - trainingStart;
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      
-      // Calculate week number (1-based)
-      const weekNumber = Math.floor(diffDays / 7) + 1;
-      
-      return Math.max(1, weekNumber); // Never less than week 1
-    }
-    
-    // Convert pace string (MM:SS) to seconds
-    function paceToSeconds(paceString) {
-      if (!paceString) return null;
-      const parts = paceString.split(':');
-      if (parts.length === 2) {
-        const minutes = parseInt(parts[0]);
-        const seconds = parseInt(parts[1]);
-        return minutes * 60 + seconds;
-      }
-      return null;
-    }
-    
-    // Convert seconds to pace string (MM:SS)
-    function secondsToPace(seconds) {
-      if (!seconds) return '';
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${minutes}:${String(secs).padStart(2, '0')}`;
-    }
-    
-    // Show toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.innerHTML = `
-        <i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}"></i>
-        ${message}
-      `;
-      document.body.appendChild(toast);
-      lucide.createIcons();
-      setTimeout(() => toast.remove(), 3000);
-    }
-    
-    // Auto-fill Futsal session
-    function createFutsalDefaults(phase) {
-      return {
-        sessionType: 'Futsal',
-        phase: phase,
-        duration: 60, // minutes
-        distance: 8, // km - estimated movement distance in futsal
-        avgPace: 450, // 7:30 min/km - equivalent running pace for training load
-        avgHr: 165,
-        maxHr: 185,
-        rpe: 8,
-        estimatedTSS: 95, // (60/60) * 95 * (8/8)
-        notes: 'Futsal session - auto-logged (distance & pace are estimates for training load)'
-      };
-    }
-    
-    // Auto-fill Pedicab session
-    function createPedicabDefaults(phase, hours) {
-      return {
-        sessionType: 'Pedicab',
-        phase: phase,
-        duration: hours * 60, // convert to minutes
-        distance: hours * 3, // km - 3 km per hour (conservative estimate)
-        avgPace: 390, // 6:30 min/km - Z2 equivalent pace
-        avgHr: 120,
-        maxHr: 145,
-        rpe: 5,
-        estimatedTSS: hours * 12,
-        legFatigue: 6,
-        shiftType: 'mixed',
-        routeType: 'mixed',
-        notes: 'Pedicab shift - auto-logged (distance & pace are Z2 equivalents for training load)'
-      };
-    }
-    
-    // ==================== MAIN APP ====================
-    
-    class HistoryPanel {
-      constructor() {
-        this.sessions = [];
-        this.filteredSessions = [];
-        this.filters = {
-          search: '',
-          type: 'All',
-          phase: 'All',
-          dateFrom: '',
-          dateTo: ''
-        };
-        this.sortBy = 'date';
-        this.sortOrder = 'desc';
-        this.editingSession = null;
-        this.showModal = false;
-        this.modalType = 'add';
-        this.loading = true;
-        
-        // Pagination
-        this.currentPage = 1;
-        this.sessionsPerPage = 30;
-        this.paginatedSessions = [];
-        
-        this.init();
-      }
-      
-      async init() {
-        console.log('🚀 Initializing History Panel...');
-        this.render(); // Show loading state
-        
-        try {
-          // Wait for Firebase auth to complete
-          await waitForAuth();
-          console.log('✅ Auth ready, loading sessions...');
-          await this.loadSessions();
-        } catch (error) {
-          console.error('❌ Initialization error:', error);
-          showToast('Error initializing app', 'error');
-          this.loading = false;
-          this.render();
-        }
-        
-        lucide.createIcons();
-      }
-      
-      async loadSessions() {
-        this.loading = true;
-        this.render();
-        
-        try {
-          if (!sessionsRef) {
-            console.log('⏳ Sessions ref not ready, waiting...');
-            await waitForAuth();
-          }
+    // Bottom Navigation Component
+    const BottomNav = ({ currentPage }) => (
+      <nav className="bottom-nav">
+        <div className="bottom-nav-container">
+          <a href="AnalyticsPanel.html" className={`nav-item ${currentPage === 'analytics' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Analytics</span>
+          </a>
           
-          console.log('📥 Loading sessions from Firebase...');
-          const snapshot = await sessionsRef.orderBy('date', 'desc').get();
-          this.sessions = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          console.log(`✅ Loaded ${this.sessions.length} sessions`);
-          this.applyFilters();
-          this.loading = false;
-          this.render();
-        } catch (error) {
-          console.error('❌ Error loading sessions:', error);
-          showToast('Error loading sessions: ' + error.message, 'error');
-          this.loading = false;
-          this.render();
-        }
-      }
+          <a href="HistoryPanel.html" className={`nav-item ${currentPage === 'history' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>History</span>
+          </a>
+          
+          <a href="SmartCoachPanel.html" className={`nav-item ${currentPage === 'coach' ? 'active' : ''}`}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
+            <span>Coach</span>
+          </a>
+          
+          <a href="#" className="nav-item" onClick={(e) => { e.preventDefault(); window.openAddModal && window.openAddModal(); }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+              <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+              <line x1="12" y1="12" x2="12" y2="12.01"></line>
+              <line x1="12" y1="16" x2="12" y2="16.01"></line>
+            </svg>
+            <span>Log</span>
+          </a>
+          
+          <a href="#" className={`nav-item ${currentPage === 'settings' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); alert('Settings coming soon!'); }}>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m0-6h6m-6 0H6m13.66-5.66L16 10m-8 8-3.66 3.66M1.34 6.34L5 10m8 8 3.66 3.66M18.66 1.34 15 5M9 15l-3.66 3.66"></path>
+            </svg>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    );
+
+    // Main Training History Component
+    function TrainingHistory() {
+      const [sessions, setSessions] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [searchTerm, setSearchTerm] = useState('');
+      const [sessionTypeFilter, setSessionTypeFilter] = useState('All Types');
+      const [phaseFilter, setPhaseFilter] = useState('All Phases');
+      const [quickFilter, setQuickFilter] = useState('All');
+      const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+      const [fromDate, setFromDate] = useState('');
+      const [toDate, setToDate] = useState('');
+      const [currentPage, setCurrentPage] = useState(1);
+      const [selectedSessions, setSelectedSessions] = useState([]);
       
-      applyFilters() {
-        let filtered = [...this.sessions];
-        
-        // Search filter
-        if (this.filters.search) {
-          const search = this.filters.search.toLowerCase();
+      // Modal state
+      const [showModal, setShowModal] = useState(false);
+      const [modalType, setModalType] = useState('view'); // 'view', 'add', 'edit'
+      const [selectedSession, setSelectedSession] = useState(null);
+      const [editingSession, setEditingSession] = useState(null);
+      
+      const sessionsPerPage = 20;
+
+      // Helper functions
+      const parseSessionDate = (dateStr) => {
+        if (!dateStr) return new Date();
+        if (dateStr.includes('/')) {
+          const [day, month, year] = dateStr.split('/');
+          return new Date(`${year}-${month}-${day}`);
+        }
+        return new Date(dateStr);
+      };
+
+      const formatPace = (seconds) => {
+        if (!seconds || seconds === 0) return '--:--';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.round(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      const paceToSeconds = (mmss) => {
+        if (!mmss || !mmss.includes(':')) return 0;
+        const [mins, secs] = mmss.split(':').map(Number);
+        return mins * 60 + secs;
+      };
+
+      const formatDate = (dateStr) => {
+        const date = parseSessionDate(dateStr);
+        return date.toLocaleDateString('en-AU', { day: '2-digit', month: 'short', year: 'numeric' });
+      };
+
+      const getSessionIcon = (type) => {
+        const icons = {
+          'Pedicab': '🚴',
+          'Futsal': '⚽',
+          'Easy Run': '🏃',
+          'Long Run': '🏃‍♂️',
+          'Speed Intervals': '⚡',
+          'Tempo Run': '🔥',
+          'Cross-Training': '🏋️',
+          'Recovery Run': '💤',
+          'Strength Training': '💪'
+        };
+        return icons[type] || '🏃';
+      };
+
+      // Load sessions from Firebase
+      const loadSessions = async () => {
+        try {
+          await auth.signInWithEmailAndPassword('nic@runningcoach.com', 'policias');
+          
+          const user = auth.currentUser;
+          if (!user) throw new Error('Not authenticated');
+
+          const sessionsRef = db.collection('users').doc(user.uid).collection('sessions');
+          const snapshot = await sessionsRef.orderBy('date', 'desc').get();
+          
+          const trainingStartDate = new Date('2025-11-10');
+          const loadedSessions = snapshot.docs.map(doc => {
+            const sessionData = doc.data();
+            const sessionDate = parseSessionDate(sessionData.date);
+            const daysSinceStart = Math.floor((sessionDate - trainingStartDate) / (1000 * 60 * 60 * 24));
+            const weekNumber = Math.floor(daysSinceStart / 7) + 1;
+            
+            return {
+              id: doc.id,
+              ...sessionData,
+              weekNumber: weekNumber > 0 ? weekNumber : 1
+            };
+          });
+
+          setSessions(loadedSessions);
+          console.log(`✅ Firestore: Loaded ${loadedSessions.length} sessions`);
+          setLoading(false);
+        } catch (error) {
+          console.error('❌ Error:', error);
+          setLoading(false);
+        }
+      };
+
+      useEffect(() => {
+        loadSessions();
+      }, []);
+
+      // Apply filters
+      const filteredSessions = useMemo(() => {
+        let filtered = [...sessions];
+
+        const now = new Date();
+        if (quickFilter === 'Last 7 Days') {
+          const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter(s => parseSessionDate(s.date) >= sevenDaysAgo);
+        } else if (quickFilter === 'Last 30') {
+          const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          filtered = filtered.filter(s => parseSessionDate(s.date) >= thirtyDaysAgo);
+        }
+
+        if (searchTerm) {
+          const term = searchTerm.toLowerCase();
           filtered = filtered.filter(s => 
-            s.notes?.toLowerCase().includes(search) ||
-            s.sessionType?.toLowerCase().includes(search) ||
-            s.route?.toLowerCase().includes(search)
+            (s.sessionType || '').toLowerCase().includes(term) ||
+            (s.notes || '').toLowerCase().includes(term) ||
+            (s.route || '').toLowerCase().includes(term)
           );
         }
-        
-        // Type filter
-        if (this.filters.type !== 'All') {
-          filtered = filtered.filter(s => s.sessionType === this.filters.type);
+
+        if (sessionTypeFilter !== 'All Types') {
+          filtered = filtered.filter(s => s.sessionType === sessionTypeFilter);
         }
-        
-        // Phase filter
-        if (this.filters.phase !== 'All') {
-          filtered = filtered.filter(s => s.phase === this.filters.phase);
+
+        if (phaseFilter !== 'All Phases') {
+          filtered = filtered.filter(s => s.phase === phaseFilter);
         }
-        
-        // Date range filter
-        if (this.filters.dateFrom) {
-          filtered = filtered.filter(s => s.date >= this.filters.dateFrom);
+
+        if (fromDate) {
+          const from = new Date(fromDate);
+          filtered = filtered.filter(s => parseSessionDate(s.date) >= from);
         }
-        if (this.filters.dateTo) {
-          filtered = filtered.filter(s => s.date <= this.filters.dateTo);
+        if (toDate) {
+          const to = new Date(toDate);
+          filtered = filtered.filter(s => parseSessionDate(s.date) <= to);
         }
-        
-        // Sort
-        filtered.sort((a, b) => {
-          let aVal = a[this.sortBy];
-          let bVal = b[this.sortBy];
-          
-          if (this.sortBy === 'date') {
-            aVal = new Date(aVal);
-            bVal = new Date(bVal);
-          }
-          
-          if (this.sortOrder === 'asc') {
-            return aVal > bVal ? 1 : -1;
-          } else {
-            return aVal < bVal ? 1 : -1;
-          }
+
+        return filtered;
+      }, [sessions, searchTerm, sessionTypeFilter, phaseFilter, quickFilter, fromDate, toDate]);
+
+      // Calculate summary stats (with avgHr fix - lowercase 'r')
+      const summaryStats = useMemo(() => {
+        const totalDistance = filteredSessions.reduce((sum, s) => {
+          const dist = s.distance || 0;
+          return sum + dist;
+        }, 0);
+
+        const totalTime = filteredSessions.reduce((sum, s) => {
+          const duration = s.duration || 0;
+          return sum + duration;
+        }, 0);
+
+        const sessionsWithHr = filteredSessions.filter(s => s.avgHr);
+        const avgHR = sessionsWithHr.length > 0
+          ? Math.round(sessionsWithHr.reduce((sum, s) => sum + s.avgHr, 0) / sessionsWithHr.length)
+          : 0;
+
+        const sessionsWithRPE = filteredSessions.filter(s => s.rpe);
+        const avgRPE = sessionsWithRPE.length > 0
+          ? (sessionsWithRPE.reduce((sum, s) => sum + s.rpe, 0) / sessionsWithRPE.length).toFixed(1)
+          : 0;
+
+        return {
+          totalSessions: filteredSessions.length,
+          totalDistance: totalDistance.toFixed(1),
+          totalTime: Math.round(totalTime),
+          avgHR,
+          avgRPE
+        };
+      }, [filteredSessions]);
+
+      // Session type breakdown
+      const sessionTypeBreakdown = useMemo(() => {
+        const breakdown = {};
+        filteredSessions.forEach(s => {
+          const type = s.sessionType || 'Unknown';
+          breakdown[type] = (breakdown[type] || 0) + 1;
         });
-        
-        this.filteredSessions = filtered;
-        
-        // Apply pagination
-        this.applyPagination();
-      }
+        return Object.entries(breakdown)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8);
+      }, [filteredSessions]);
+
+      // Pagination
+      const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
+      const paginatedSessions = useMemo(() => {
+        const startIndex = (currentPage - 1) * sessionsPerPage;
+        return filteredSessions.slice(startIndex, startIndex + sessionsPerPage);
+      }, [filteredSessions, currentPage]);
+
+      const sessionTypes = useMemo(() => {
+        const types = new Set(sessions.map(s => s.sessionType).filter(Boolean));
+        return ['All Types', ...Array.from(types)];
+      }, [sessions]);
+
+      const phases = useMemo(() => {
+        const phaseSet = new Set(sessions.map(s => s.phase).filter(Boolean));
+        return ['All Phases', ...Array.from(phaseSet)];
+      }, [sessions]);
+
+      // Modal handlers
+      const openViewModal = (session) => {
+        setSelectedSession(session);
+        setModalType('view');
+        setShowModal(true);
+      };
+
+      const openAddModal = () => {
+        setEditingSession({
+          sessionType: 'Easy Run',
+          phase: 'Base',
+          date: new Date().toISOString().split('T')[0]
+        });
+        setModalType('add');
+        setShowModal(true);
+      };
       
-      applyPagination() {
-        const startIndex = (this.currentPage - 1) * this.sessionsPerPage;
-        const endIndex = startIndex + this.sessionsPerPage;
-        this.paginatedSessions = this.filteredSessions.slice(startIndex, endIndex);
-      }
-      
-      getTotalPages() {
-        return Math.ceil(this.filteredSessions.length / this.sessionsPerPage);
-      }
-      
-      goToPage(page) {
-        const totalPages = this.getTotalPages();
-        if (page < 1 || page > totalPages) return;
-        
-        this.currentPage = page;
-        this.applyPagination();
-        this.render();
-        lucide.createIcons();
-        
-        // Scroll to top of session list
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      
-      nextPage() {
-        this.goToPage(this.currentPage + 1);
-      }
-      
-      previousPage() {
-        this.goToPage(this.currentPage - 1);
-      }
-      
-      getSessionTypeIcon(type) {
-        const icons = {
-          'Futsal': 'dribbble',
-          'Pedicab': 'bike',
-          'Easy Run': 'activity',
-          'Long Run': 'flag',
-          'Tempo Run': 'zap',
-          'Speed Intervals': 'gauge',
-          'Recovery Run': 'heart-pulse',
-          'Strength Training': 'dumbbell',
-          'Cross-Training': 'layers',
-          'Rest': 'bed'
-        };
-        return icons[type] || 'activity';
-      }
-      
-      getSessionTypeColor(type) {
-        if (type === 'Futsal') return 'indicator-futsal';
-        if (type === 'Pedicab') return 'indicator-pedicab';
-        if (type === 'Strength Training') return 'indicator-strength';
-        if (type === 'Cross-Training') return 'indicator-cross';
-        return 'indicator-running';
-      }
-      
-      openAddModal(preselectedType = null) {
-        const date = new Date();
-        const dayOfWeek = date.getDay(); // 0 = Sunday, 2 = Tuesday, 6 = Saturday
-        
-        // Auto-select type based on day
-        let sessionType = preselectedType;
-        if (!sessionType) {
-          if (dayOfWeek === 2) sessionType = 'Futsal'; // Tuesday
-          else if (dayOfWeek === 6) sessionType = 'Pedicab'; // Saturday
-          else sessionType = 'Easy Run';
-        }
-        
-        // Get most recent phase
-        const recentPhase = this.sessions.length > 0 ? this.sessions[0].phase : 'Base';
-        
-        // Create base session
-        const baseSession = {
-          date: date.toISOString().split('T')[0],
-          sessionType: sessionType,
-          phase: recentPhase,
-          notes: ''
-        };
-        
-        // Apply auto-fill based on session type
-        if (sessionType === 'Futsal') {
-          const defaults = createFutsalDefaults(recentPhase);
-          this.editingSession = { ...defaults, ...baseSession };
-        } else if (sessionType === 'Pedicab') {
-          // For pedicab, we need hours input, so just set up the form
-          this.editingSession = {
-            ...baseSession,
-            pedicabHours: 6 // Default 6 hours
-          };
-        } else {
-          // Regular session - empty fields
-          this.editingSession = {
-            ...baseSession,
-            duration: null,
-            distance: null,
-            avgPace: null,
-            avgHr: null,
-            maxHr: null,
-            rpe: null
-          };
-        }
-        
-        this.modalType = 'add';
-        this.showModal = true;
-        this.render();
-        lucide.createIcons();
-      }
-      
-      openEditModal(session) {
-        this.editingSession = { ...session };
-        this.modalType = 'edit';
-        this.showModal = true;
-        this.render();
-        lucide.createIcons();
-      }
-      
-      closeModal() {
-        this.showModal = false;
-        this.editingSession = null;
-        this.render();
-      }
-      
-      async saveSession() {
-        if (!this.editingSession.date || !this.editingSession.phase) {
-          showToast('Please fill in required fields (Date & Phase)', 'error');
-          return;
-        }
-        
-        // Ensure auth is ready and sessionsRef is initialized
-        if (!authReady || !currentUser || !sessionsRef) {
-          console.log('⏳ Waiting for auth and sessions ref...');
-          showToast('Waiting for authentication...', 'error');
-          await waitForAuth();
-        }
-        
-        // Calculate auto-fill based on session type
-        let sessionData = { ...this.editingSession };
-        
-        // Add day and week
-        sessionData.day = getDayName(sessionData.date);
-        sessionData.week = getWeekNumber(sessionData.date);
-        
-        // Auto-fill for Futsal (if not already filled)
-        if (sessionData.sessionType === 'Futsal') {
-          // Apply defaults if not manually entered
-          if (!sessionData.duration) sessionData.duration = 60;
-          if (!sessionData.distance) sessionData.distance = 8;
-          if (!sessionData.avgPace) sessionData.avgPace = 450; // 7:30
-          if (!sessionData.avgHr) sessionData.avgHr = 165;
-          if (!sessionData.maxHr) sessionData.maxHr = 185;
-          if (!sessionData.rpe) sessionData.rpe = 8;
-          if (!sessionData.estimatedTSS) sessionData.estimatedTSS = 95;
-          if (!sessionData.notes) sessionData.notes = 'Futsal session - auto-logged (distance & pace are estimates for training load)';
-        }
-        
-        // Auto-fill for Pedicab
-        if (sessionData.sessionType === 'Pedicab') {
-          const hours = parseFloat(sessionData.pedicabHours || sessionData.duration / 60 || 6);
-          
-          // Apply defaults based on hours
-          sessionData.duration = hours * 60;
-          sessionData.distance = hours * 3;
-          sessionData.avgPace = 390; // 6:30 Z2 pace
-          if (!sessionData.avgHr) sessionData.avgHr = 120;
-          if (!sessionData.maxHr) sessionData.maxHr = 145;
-          if (!sessionData.rpe) sessionData.rpe = 5;
-          if (!sessionData.estimatedTSS) sessionData.estimatedTSS = hours * 12;
-          if (!sessionData.legFatigue) sessionData.legFatigue = 6;
-          if (!sessionData.notes) sessionData.notes = 'Pedicab shift - auto-logged (distance & pace are Z2 equivalents for training load)';
-          
-          delete sessionData.pedicabHours; // Remove helper field
-        }
-        
-        // Convert string numbers to actual numbers
-        if (sessionData.distance) sessionData.distance = parseFloat(sessionData.distance);
-        if (sessionData.duration) sessionData.duration = parseFloat(sessionData.duration);
-        if (sessionData.avgHr) sessionData.avgHr = parseFloat(sessionData.avgHr);
-        if (sessionData.maxHr) sessionData.maxHr = parseFloat(sessionData.maxHr);
-        if (sessionData.rpe) sessionData.rpe = parseFloat(sessionData.rpe);
-        if (sessionData.estimatedTSS) sessionData.estimatedTSS = parseFloat(sessionData.estimatedTSS);
-        if (sessionData.avgCadence) sessionData.avgCadence = parseFloat(sessionData.avgCadence);
-        if (sessionData.vo2Max) sessionData.vo2Max = parseFloat(sessionData.vo2Max);
-        if (sessionData.elevationGain) sessionData.elevationGain = parseFloat(sessionData.elevationGain);
-        if (sessionData.elevationLoss) sessionData.elevationLoss = parseFloat(sessionData.elevationLoss);
-        
-        
-        // Convert pace to seconds if provided as string
-        if (sessionData.avgPace && typeof sessionData.avgPace === 'string') {
-          sessionData.avgPace = paceToSeconds(sessionData.avgPace);
-        }
-        
-        // Ensure avgPace is a number if it exists
-        if (sessionData.avgPace) sessionData.avgPace = parseFloat(sessionData.avgPace);
-        
-        // Convert pace to seconds if provided as string
-        if (sessionData.avgPace && typeof sessionData.avgPace === 'string') {
-          sessionData.avgPace = paceToSeconds(sessionData.avgPace);
-        }
-        
-        // NEW: Convert Z2 pace to seconds if provided as string
-        if (sessionData.z2Pace && typeof sessionData.z2Pace === 'string') {
-          sessionData.z2Pace = paceToSeconds(sessionData.z2Pace);
-        }
-        
-        // Ensure avgPace is a number if it exists
-        if (sessionData.avgPace) sessionData.avgPace = parseFloat(sessionData.avgPace);
-        
-        // NEW: Ensure z2Pace is a number if it exists
-        if (sessionData.z2Pace) sessionData.z2Pace = parseFloat(sessionData.z2Pace);
-        
-        // NEW: Convert Z2 time to number
-        if (sessionData.z2Time) sessionData.z2Time = parseFloat(sessionData.z2Time);
-        
+      // Make openAddModal available globally for bottom nav
+	    window.openAddModal = openAddModal;
+
+      const openEditModal = (session) => {
+        setEditingSession(session);
+        setModalType('edit');
+        setShowModal(true);
+      };
+
+      const closeModal = () => {
+        setShowModal(false);
+        setSelectedSession(null);
+        setEditingSession(null);
+      };
+
+      // Save session
+      const handleSaveSession = async () => {
         try {
-          console.log('💾 Saving session...', sessionData);
-          
-          if (this.modalType === 'add') {
-            sessionData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-            sessionData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-            const docRef = await sessionsRef.add(sessionData);
-            console.log('✅ Session added:', docRef.id);
-            showToast('Session added successfully!');
+          const user = auth.currentUser;
+          if (!user) throw new Error('Not authenticated');
+
+          const sessionData = {
+            sessionType: document.getElementById('modalSessionType').value,
+            date: document.getElementById('modalDate').value,
+            phase: document.getElementById('modalPhase').value,
+            notes: document.getElementById('modalNotes')?.value || ''
+          };
+
+          // Pedicab-specific
+          if (sessionData.sessionType === 'Pedicab') {
+            const hours = parseFloat(document.getElementById('modalPedicabHours').value) || 6;
+            sessionData.duration = hours * 60;
+            sessionData.distance = hours * 3;
+            sessionData.avgPace = 390; // 6:30
+            sessionData.avgHr = 120;
+            sessionData.maxHr = 145;
+            sessionData.rpe = 5;
+          } 
+          // Futsal-specific
+          else if (sessionData.sessionType === 'Futsal') {
+            sessionData.duration = 60;
+            sessionData.distance = 8;
+            sessionData.avgPace = 450; // 7:30
+            sessionData.avgHr = 165;
+            sessionData.maxHr = 185;
+            sessionData.rpe = 8;
+          }
+          // Running sessions
+          else {
+            const distanceVal = document.getElementById('modalDistance').value;
+            const durationVal = document.getElementById('modalDuration').value;
+            const paceVal = document.getElementById('modalAvgPace').value;
+            const rpeVal = document.getElementById('modalRpe').value;
+            const avgHrVal = document.getElementById('modalAvgHr').value;
+            const maxHrVal = document.getElementById('modalMaxHr').value;
+            const z2PaceVal = document.getElementById('modalZ2Pace')?.value;
+            const z2TimeVal = document.getElementById('modalZ2Time')?.value;
+            const cadenceVal = document.getElementById('modalAvgCadence')?.value;
+
+            if (distanceVal) sessionData.distance = parseFloat(distanceVal);
+            if (durationVal) sessionData.duration = parseFloat(durationVal);
+            if (paceVal) sessionData.avgPace = paceToSeconds(paceVal);
+            if (rpeVal) sessionData.rpe = parseInt(rpeVal);
+            if (avgHrVal) sessionData.avgHr = parseInt(avgHrVal);
+            if (maxHrVal) sessionData.maxHr = parseInt(maxHrVal);
+            if (z2PaceVal) sessionData.z2Pace = paceToSeconds(z2PaceVal);
+            if (z2TimeVal) sessionData.z2Time = parseFloat(z2TimeVal);
+            if (cadenceVal) sessionData.avgCadence = parseInt(cadenceVal);
+          }
+		   
+		  // Calculate week number from training start date
+			const trainingStartDate = new Date('2025-11-10');
+			const sessionDate = new Date(sessionData.date);
+			const daysSinceStart = Math.floor((sessionDate - trainingStartDate) / (1000 * 60 * 60 * 24));
+			const weekNumber = Math.floor(daysSinceStart / 7) + 1;
+			sessionData.weekNumber = weekNumber > 0 ? weekNumber : 1; 
+		  
+          if (modalType === 'add') {
+            await db.collection('users').doc(user.uid).collection('sessions').add(sessionData);
+            console.log('✅ Session added');
           } else {
-            sessionData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-            const { id, ...updateData } = sessionData;
-            await sessionsRef.doc(id).update(updateData);
-            console.log('✅ Session updated:', id);
-            showToast('Session updated successfully!');
+            await db.collection('users').doc(user.uid).collection('sessions')
+              .doc(editingSession.id).update(sessionData);
+            console.log('✅ Session updated');
           }
-          
-          this.closeModal();
-          await this.loadSessions();
+
+          loadSessions();
+          closeModal();
         } catch (error) {
-          console.error('❌ Error saving session:', error);
-          console.error('Session data:', sessionData);
-          showToast('Error saving session: ' + error.message, 'error');
+          console.error('❌ Save error:', error);
+          alert('Failed to save session');
         }
-      }
-      
-      async deleteSession(sessionId) {
-        if (!confirm('Are you sure you want to delete this session? This cannot be undone.')) {
-          return;
-        }
+      };
+
+      // Delete session
+      const deleteSession = async (sessionId) => {
+        if (!confirm('Are you sure you want to delete this session?')) return;
         
         try {
-          if (!sessionsRef) {
-            await waitForAuth();
-          }
-          
-          console.log('🗑️ Deleting session:', sessionId);
-          await sessionsRef.doc(sessionId).delete();
+          const user = auth.currentUser;
+          await db.collection('users').doc(user.uid).collection('sessions').doc(sessionId).delete();
+          setSessions(prev => prev.filter(s => s.id !== sessionId));
           console.log('✅ Session deleted');
-          showToast('Session deleted successfully!');
-          await this.loadSessions();
         } catch (error) {
-          console.error('❌ Error deleting session:', error);
-          showToast('Error deleting session: ' + error.message, 'error');
+          console.error('❌ Delete error:', error);
+          alert('Failed to delete session');
         }
+      };
+
+      if (loading) {
+        return (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div className="spinner mx-auto mb-4"></div>
+              <p className="text-slate-400">Loading sessions...</p>
+            </div>
+          </div>
+        );
       }
-      
-      exportCSV() {
-        const headers = ['Date', 'Day', 'Week', 'Type', 'Phase', 'Distance (km)', 'Duration (min)', 'Avg Pace', 'Avg HR', 'Max HR', 'RPE', 'TSS', 'Notes'];
-        const rows = this.filteredSessions.map(s => [
-          formatDate(s.date),
-          s.day || '',
-          s.week || '',
-          s.sessionType || '',
-          s.phase || '',
-          s.distance ? parseFloat(s.distance).toFixed(1) : '',
-          s.duration ? Math.round(parseFloat(s.duration)) : '',
-          s.avgPace ? secondsToPace(s.avgPace) : '',
-          s.avgHr ? Math.round(parseFloat(s.avgHr)) : '',
-          s.maxHr ? Math.round(parseFloat(s.maxHr)) : '',
-          s.rpe ? parseFloat(s.rpe).toFixed(1) : '',
-          s.estimatedTSS ? Math.round(parseFloat(s.estimatedTSS)) : '',
-          s.notes || ''
-        ]);
-        
-        const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `training-history-${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        showToast('CSV exported successfully!');
-      }
-      
-      exportJSON() {
-        const json = JSON.stringify(this.filteredSessions, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `training-history-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        showToast('JSON exported successfully!');
-      }
-      
-      updateFilter(key, value) {
-        this.filters[key] = value;
-        this.currentPage = 1; // Reset to first page when filter changes
-        this.applyFilters();
-        this.render();
-        lucide.createIcons();
-      }
-      
-      setQuickFilter(type) {
-        const today = new Date();
-        let dateFrom = null;
-        
-        switch(type) {
-          case 'week':
-            dateFrom = new Date(today.setDate(today.getDate() - 7));
-            break;
-          case 'month':
-            dateFrom = new Date(today.setDate(today.getDate() - 30));
-            break;
-          case 'thisWeek':
-            const firstDay = today.getDate() - today.getDay();
-            dateFrom = new Date(today.setDate(firstDay));
-            break;
-          case 'thisMonth':
-            dateFrom = new Date(today.getFullYear(), today.getMonth(), 1);
-            break;
-        }
-        
-        if (dateFrom) {
-          this.filters.dateFrom = dateFrom.toISOString().split('T')[0];
-          this.filters.dateTo = new Date().toISOString().split('T')[0];
-          this.currentPage = 1; // Reset to first page
-          this.applyFilters();
-          this.render();
-          lucide.createIcons();
-        }
-      }
-      
-      clearFilters() {
-        this.filters = {
-          search: '',
-          type: 'All',
-          phase: 'All',
-          dateFrom: '',
-          dateTo: ''
-        };
-        this.currentPage = 1; // Reset to first page
-        this.applyFilters();
-        this.render();
-        lucide.createIcons();
-      }
-      
-      render() {
-        const app = document.getElementById('app');
-        
-        app.innerHTML = `
-          <!-- Header -->
-          <div class="max-w-7xl mx-auto mb-8">
-            <div class="flex items-center justify-between mb-2">
-              <h1 class="text-4xl font-bold gradient-text flex items-center gap-3">
-                <i data-lucide="calendar-days"></i>
-                Training History
+
+      return (
+        <div className="min-h-screen">
+          {/* Header */}
+          <div className="p-4 md:p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
+                📅 Training History
               </h1>
             </div>
-            <p class="text-slate-400">Manage and track all your training sessions</p>
+            <p className="text-sm text-slate-400">Manage and track all your training sessions</p>
           </div>
-          
-          ${this.loading ? this.renderLoading() : this.renderContent()}
-          
-          ${this.showModal ? this.renderModal() : ''}
-        `;
-        
-        // Re-attach event listeners
-        this.attachEventListeners();
-        lucide.createIcons();
-      }
-      
-      renderLoading() {
-        return `
-          <div class="flex items-center justify-center" style="height: 60vh;">
-            <div class="text-center">
-              <div class="spinner mx-auto mb-4"></div>
-              <p class="text-slate-400">Loading sessions...</p>
-            </div>
-          </div>
-        `;
-      }
-      
-      renderContent() {
-        return `
-          <div class="max-w-7xl mx-auto space-y-6">
-            <!-- Filters -->
-            ${this.renderFilters()}
+
+          {/* Main Content */}
+          <div className="px-4 md:px-6 pb-6 space-y-4">
             
-            <!-- Summary Stats -->
-            ${this.renderStats()}
-            
-            <!-- Actions -->
-            ${this.renderActions()}
-            
-            <!-- Session List -->
-            ${this.renderSessionList()}
-          </div>
-        `;
-      }
-      
-      renderFilters() {
-        return `
-          <div class="card p-6 fade-in">
-            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-              <i data-lucide="filter" class="w-5 h-5"></i>
-              Filters & Search
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">Search</label>
-                <input 
-                  type="text" 
-                  id="searchInput"
-                  class="input-field" 
-                  placeholder="Search notes, routes..."
-                  value="${this.filters.search}"
+            {/* Quick Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {['Last 7 Days', 'Last 30', 'All'].map(filter => (
+                <button
+                  key={filter}
+                  className={`filter-pill ${quickFilter === filter ? 'active' : ''}`}
+                  onClick={() => { setQuickFilter(filter); setCurrentPage(1); }}
                 >
-              </div>
-              
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">Session Type</label>
-                <select id="typeFilter" class="input-field">
-                  <option value="All">All Types</option>
-                  <option value="Easy Run">Easy Run</option>
-                  <option value="Long Run">Long Run</option>
-                  <option value="Tempo Run">Tempo Run</option>
-                  <option value="Speed Intervals">Speed Intervals</option>
-                  <option value="Recovery Run">Recovery Run</option>
-                  <option value="Futsal">Futsal</option>
-                  <option value="Pedicab">Pedicab</option>
-                  <option value="Strength Training">Strength Training</option>
-                  <option value="Cross-Training">Cross-Training</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">Phase</label>
-                <select id="phaseFilter" class="input-field">
-                  <option value="All">All Phases</option>
-                  <option value="Base">Base</option>
-                  <option value="Build">Build</option>
-                  <option value="Specialty">Specialty</option>
-                  <option value="Taper">Taper</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">Quick Filters</label>
-                <div class="flex gap-2">
-                  <button onclick="app.setQuickFilter('week')" class="btn-secondary flex-1 text-xs">Last 7 Days</button>
-                  <button onclick="app.setQuickFilter('month')" class="btn-secondary flex-1 text-xs">Last 30</button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">From Date</label>
-                <div class="date-input-wrapper">
-                  <input 
-                    type="date" 
-                    id="dateFromFilter"
-                    class="input-field"
-                    value="${this.filters.dateFrom}"
-                  >
-                  <i data-lucide="calendar" class="calendar-icon w-5 h-5"></i>
-                </div>
-              </div>
-              
-              <div>
-                <label class="block text-sm text-slate-400 mb-2">To Date</label>
-                <div class="date-input-wrapper">
-                  <input 
-                    type="date" 
-                    id="dateToFilter"
-                    class="input-field"
-                    value="${this.filters.dateTo}"
-                  >
-                  <i data-lucide="calendar" class="calendar-icon w-5 h-5"></i>
-                </div>
-              </div>
-              
-              <div class="flex items-end">
-                <button onclick="app.clearFilters()" class="btn-secondary w-full">
-                  <i data-lucide="x"></i>
-                  Clear Filters
+                  {filter}
                 </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-      
-      renderStats() {
-        const totalDistance = this.filteredSessions
-          .filter(s => s.distance != null && !isNaN(s.distance))
-          .reduce((sum, s) => sum + parseFloat(s.distance || 0), 0);
-        
-        const totalDuration = this.filteredSessions
-          .filter(s => s.duration != null && !isNaN(s.duration))
-          .reduce((sum, s) => sum + parseFloat(s.duration || 0), 0);
-        
-        const sessionsWithHr = this.filteredSessions.filter(s => s.avgHr != null && !isNaN(s.avgHr));
-        const avgHr = sessionsWithHr.length > 0
-          ? sessionsWithHr.reduce((sum, s) => sum + parseFloat(s.avgHr || 0), 0) / sessionsWithHr.length
-          : 0;
-        
-        const sessionsWithRpe = this.filteredSessions.filter(s => s.rpe != null && !isNaN(s.rpe));
-        const avgRpe = sessionsWithRpe.length > 0
-          ? sessionsWithRpe.reduce((sum, s) => sum + parseFloat(s.rpe || 0), 0) / sessionsWithRpe.length
-          : 0;
-        
-        const typeCounts = {};
-        this.filteredSessions.forEach(s => {
-          typeCounts[s.sessionType] = (typeCounts[s.sessionType] || 0) + 1;
-        });
-        
-        return `
-          <div class="card p-6 fade-in">
-            <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-              <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
-              Summary Stats (${this.filteredSessions.length} sessions)
-            </h3>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-slate-400 text-sm mb-1">Total Distance</div>
-                <div class="text-2xl font-bold text-blue-400">${totalDistance.toFixed(1)} km</div>
-              </div>
-              
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-slate-400 text-sm mb-1">Total Time</div>
-                <div class="text-2xl font-bold text-emerald-400">${(totalDuration / 60).toFixed(1)} hrs</div>
-              </div>
-              
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-slate-400 text-sm mb-1">Avg Heart Rate</div>
-                <div class="text-2xl font-bold text-rose-400">${Math.round(avgHr) || '--'} bpm</div>
-              </div>
-              
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-slate-400 text-sm mb-1">Avg RPE</div>
-                <div class="text-2xl font-bold text-purple-400">${avgRpe > 0 ? avgRpe.toFixed(1) : '--'}/10</div>
-              </div>
-            </div>
-            
-            <div class="mt-4 flex flex-wrap gap-2">
-              ${Object.entries(typeCounts).map(([type, count]) => `
-                <span class="badge badge-running">${type}: ${count}</span>
-              `).join('')}
-            </div>
-          </div>
-        `;
-      }
-      
-      renderActions() {
-        return `
-          <div class="card p-6 fade-in">
-            <div class="flex flex-wrap gap-3">
-              <button onclick="app.openAddModal()" class="btn-primary">
-                <i data-lucide="plus"></i>
-                Add Session
-              </button>
-              
-              <button onclick="app.openAddModal('Futsal')" class="btn-secondary">
-                <i data-lucide="dribbble"></i>
-                Log Futsal
-              </button>
-              
-              <button onclick="app.openAddModal('Pedicab')" class="btn-secondary">
-                <i data-lucide="bike"></i>
-                Log Pedicab
-              </button>
-              
-              <div class="flex-1"></div>
-              
-              <button onclick="app.exportCSV()" class="btn-secondary">
-                <i data-lucide="download"></i>
-                Export CSV
-              </button>
-              
-              <button onclick="app.exportJSON()" class="btn-secondary">
-                <i data-lucide="file-json"></i>
-                Export JSON
+              ))}
+              <button
+                className="filter-pill"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              >
+                {showAdvancedFilters ? '▲' : '▼'} Advanced
               </button>
             </div>
-          </div>
-        `;
-      }
-      
-      renderSessionList() {
-        if (this.filteredSessions.length === 0) {
-          return `
-            <div class="card p-12 text-center fade-in">
-              <i data-lucide="calendar-x" class="w-16 h-16 mx-auto mb-4 text-slate-600"></i>
-              <h3 class="text-xl font-semibold mb-2">No sessions found</h3>
-              <p class="text-slate-400 mb-6">Start by adding your first training session</p>
-              <button onclick="app.openAddModal()" class="btn-primary">
-                <i data-lucide="plus"></i>
-                Add First Session
-              </button>
-            </div>
-          `;
-        }
-        
-        const totalPages = this.getTotalPages();
-        const startIndex = (this.currentPage - 1) * this.sessionsPerPage + 1;
-        const endIndex = Math.min(this.currentPage * this.sessionsPerPage, this.filteredSessions.length);
-        
-        return `
-          <div class="space-y-4">
-            <!-- Session count info -->
-            <div class="text-sm text-slate-400">
-              Showing ${startIndex}-${endIndex} of ${this.filteredSessions.length} sessions
-            </div>
-            
-            <!-- Session cards -->
-            ${this.paginatedSessions.map(session => this.renderSessionCard(session)).join('')}
-            
-            <!-- Pagination controls -->
-            ${totalPages > 1 ? `
-              <div class="card p-4 flex items-center justify-between">
-                <button 
-                  onclick="app.previousPage()" 
-                  class="btn-secondary ${this.currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                  ${this.currentPage === 1 ? 'disabled' : ''}
-                >
-                  <i data-lucide="chevron-left"></i>
-                  Previous
-                </button>
-                
-                <div class="flex items-center gap-2">
-                  <span class="text-slate-400">Page</span>
-                  <span class="font-semibold text-lg">${this.currentPage}</span>
-                  <span class="text-slate-400">of</span>
-                  <span class="font-semibold text-lg">${totalPages}</span>
-                </div>
-                
-                <button 
-                  onclick="app.nextPage()" 
-                  class="btn-secondary ${this.currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}"
-                  ${this.currentPage === totalPages ? 'disabled' : ''}
-                >
-                  Next
-                  <i data-lucide="chevron-right"></i>
-                </button>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      }
-      
-      renderSessionCard(session) {
-        const icon = this.getSessionTypeIcon(session.sessionType);
-        const colorClass = this.getSessionTypeColor(session.sessionType);
-        
-        // Safely parse numeric values
-        const distance = session.distance ? parseFloat(session.distance) : null;
-        const duration = session.duration ? parseFloat(session.duration) : null;
-        const avgPace = session.avgPace ? parseFloat(session.avgPace) : null;
-        
-        return `
-          <div class="card p-4 relative fade-in flex items-center gap-4" style="padding-left: 20px;">
-            <div class="session-indicator ${colorClass}"></div>
-            
-            <!-- Icon & Type -->
-            <div class="flex items-center gap-2 min-w-[140px]">
-              <i data-lucide="${icon}" class="w-5 h-5 text-blue-400"></i>
-              <div>
-                <div class="font-semibold">${session.sessionType}</div>
-                <div class="text-xs text-slate-400">${session.phase}</div>
-              </div>
-            </div>
-            
-            <!-- Date & Week -->
-            <div class="min-w-[140px]">
-              <div class="text-sm font-medium">${formatDate(session.date)}</div>
-              <div class="text-xs text-slate-400">${session.day} • Week ${session.week}</div>
-            </div>
-            
-            <!-- Distance -->
-            ${distance ? `
-              <div class="min-w-[80px]">
-                <div class="text-xs text-slate-400">Distance</div>
-                <div class="font-semibold">${distance.toFixed(1)} km</div>
-              </div>
-            ` : '<div class="min-w-[80px]"></div>'}
-            
-            <!-- Duration -->
-            ${duration ? `
-              <div class="min-w-[70px]">
-                <div class="text-xs text-slate-400">Duration</div>
-                <div class="font-semibold">${Math.round(duration)} min</div>
-              </div>
-            ` : '<div class="min-w-[70px]"></div>'}
-            
-            <!-- Pace -->
-            ${avgPace ? `
-              <div class="min-w-[80px]">
-                <div class="text-xs text-slate-400">Pace</div>
-                <div class="font-semibold">${secondsToPace(avgPace)}</div>
-              </div>
-            ` : '<div class="min-w-[80px]"></div>'}
-            
-            <!-- Spacer -->
-            <div class="flex-1"></div>
-            
-            <!-- Actions -->
-            <div class="flex gap-2">
-              <button onclick="app.openEditModal(${JSON.stringify(session).replace(/"/g, '&quot;')})" class="btn-edit text-sm px-3 py-2">
-                <i data-lucide="pencil" class="w-4 h-4"></i>
-              </button>
-              <button onclick="app.deleteSession('${session.id}')" class="btn-danger text-sm px-3 py-2">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      }
-      
-      renderModal() {
-        const isAdd = this.modalType === 'add';
-        const session = this.editingSession || {};
-        const isFutsal = session.sessionType === 'Futsal';
-        const isPedicab = session.sessionType === 'Pedicab';
-        
-        return `
-          <div class="modal-backdrop" onclick="if(event.target === this) app.closeModal()">
-            <div class="modal-content slide-in">
-              <div class="p-6 border-b border-slate-700">
-                <div class="flex items-center justify-between">
-                  <h2 class="text-2xl font-bold flex items-center gap-2">
-                    <i data-lucide="${isAdd ? 'plus' : 'pencil'}"></i>
-                    ${isAdd ? 'Add' : 'Edit'} Session
-                  </h2>
-                  <button onclick="app.closeModal()" class="text-slate-400 hover:text-white transition">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                  </button>
-                </div>
-              </div>
-              
-              <div class="p-6 space-y-4">
-                <!-- Session Type -->
+
+            {/* Advanced Filters */}
+            <div className={`collapsible-content ${showAdvancedFilters ? 'expanded' : ''}`}>
+              <div className="card p-4 space-y-3">
                 <div>
-                  <label class="block text-sm text-slate-400 mb-2">Session Type *</label>
-                  <select id="modalSessionType" class="input-field">
-                    <option value="Easy Run" ${session.sessionType === 'Easy Run' ? 'selected' : ''}>Easy Run</option>
-                    <option value="Long Run" ${session.sessionType === 'Long Run' ? 'selected' : ''}>Long Run</option>
-                    <option value="Tempo Run" ${session.sessionType === 'Tempo Run' ? 'selected' : ''}>Tempo Run</option>
-                    <option value="Speed Intervals" ${session.sessionType === 'Speed Intervals' ? 'selected' : ''}>Speed Intervals</option>
-                    <option value="Recovery Run" ${session.sessionType === 'Recovery Run' ? 'selected' : ''}>Recovery Run</option>
-                    <option value="Futsal" ${session.sessionType === 'Futsal' ? 'selected' : ''}>Futsal</option>
-                    <option value="Pedicab" ${session.sessionType === 'Pedicab' ? 'selected' : ''}>Pedicab</option>
-                    <option value="Strength Training" ${session.sessionType === 'Strength Training' ? 'selected' : ''}>Strength Training</option>
-                    <option value="Cross-Training" ${session.sessionType === 'Cross-Training' ? 'selected' : ''}>Cross-Training</option>
-                    <option value="Rest" ${session.sessionType === 'Rest' ? 'selected' : ''}>Rest</option>
-                  </select>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Search</label>
+                  <input
+                    type="text"
+                    placeholder="Search notes, routes..."
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                  <!-- Date -->
+
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-sm text-slate-400 mb-2">Date * (DD/MM/YYYY)</label>
-                    <div class="date-input-wrapper">
-                      <input 
-                        type="date" 
-                        id="modalDate"
-                        class="input-field"
-                        value="${session.date || ''}"
-                      >
-                      <i data-lucide="calendar" class="calendar-icon w-5 h-5"></i>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-1">Click calendar icon or type DD/MM/YYYY</p>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Session Type</label>
+                    <select
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none"
+                      value={sessionTypeFilter}
+                      onChange={(e) => setSessionTypeFilter(e.target.value)}
+                    >
+                      {sessionTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
                   </div>
-                  
-                  <!-- Phase -->
+
                   <div>
-                    <label class="block text-sm text-slate-400 mb-2">Training Phase *</label>
-                    <select id="modalPhase" class="input-field">
-                      <option value="Base" ${session.phase === 'Base' ? 'selected' : ''}>Base</option>
-                      <option value="Build" ${session.phase === 'Build' ? 'selected' : ''}>Build</option>
-                      <option value="Specialty" ${session.phase === 'Specialty' ? 'selected' : ''}>Specialty</option>
-                      <option value="Taper" ${session.phase === 'Taper' ? 'selected' : ''}>Taper</option>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Phase</label>
+                    <select
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none"
+                      value={phaseFilter}
+                      onChange={(e) => setPhaseFilter(e.target.value)}
+                    >
+                      {phases.map(phase => (
+                        <option key={phase} value={phase}>{phase}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
-                
-                ${isPedicab ? `
-                  <!-- Pedicab Hours -->
+
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-sm text-slate-400 mb-2">Hours Worked *</label>
-                    <input 
-                      type="number" 
-                      id="modalPedicabHours"
-                      class="input-field"
-                      placeholder="6"
-                      step="0.5"
-                      min="0"
-                      value="${session.pedicabHours || (session.duration ? (session.duration / 60).toFixed(1) : '6')}"
-                    >
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">From Date</label>
+                    <input
+                      type="date"
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                    />
                   </div>
-                  <div class="bg-amber-900/20 border border-amber-700/30 rounded-lg p-4">
-                    <p class="text-sm text-amber-300">
-                      <i data-lucide="info" class="w-4 h-4 inline mr-2"></i>
-                      Pedicab auto-fill: Distance = hours × 3 km, Pace = 6:30 (Z2), HR 120/145, RPE 5, TSS = hours × 12
-                    </p>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">To Date</label>
+                    <input
+                      type="date"
+                      className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                    />
                   </div>
-                ` : isFutsal ? `
-                  <div class="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
-                    <p class="text-sm text-purple-300">
-                      <i data-lucide="info" class="w-4 h-4 inline mr-2"></i>
-                      Futsal auto-fill: 60 min, 8 km (est.), 7:30 pace (est.), HR 165/185, RPE 8, TSS 95
-                    </p>
-                  </div>
-                ` : `
-                  <!-- Running Session Fields -->
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">Distance (km)</label>
-                      <input 
-                        type="number" 
-                        id="modalDistance"
-                        class="input-field"
-                        placeholder="10.5"
-                        step="0.1"
-                        min="0"
-                        value="${session.distance || ''}"
-                      >
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">Duration (min)</label>
-                      <input 
-                        type="number" 
-                        id="modalDuration"
-                        class="input-field"
-                        placeholder="66"
-                        min="0"
-                        value="${session.duration || ''}"
-                      >
-                    </div>
-                  </div>
-                  
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">Avg Pace (MM:SS)</label>
-                      <input 
-                        type="text" 
-                        id="modalAvgPace"
-                        class="input-field"
-                        placeholder="6:30"
-                        value="${session.avgPace ? secondsToPace(session.avgPace) : ''}"
-                      >
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">RPE (1-10)</label>
-                      <input 
-                        type="number" 
-                        id="modalRpe"
-                        class="input-field"
-                        placeholder="7"
-                        min="1"
-                        max="10"
-                        value="${session.rpe || ''}"
-                      >
-                    </div>
-                  </div>
-                  
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">Avg Heart Rate (bpm)</label>
-                      <input 
-                        type="number" 
-                        id="modalAvgHr"
-                        class="input-field"
-                        placeholder="142"
-                        min="0"
-                        value="${session.avgHr || ''}"
-                      >
-                    </div>
-                    
-                    <div>
-                      <label class="block text-sm text-slate-400 mb-2">Max Heart Rate (bpm)</label>
-                      <input 
-                        type="number" 
-                        id="modalMaxHr"
-                        class="input-field"
-                        placeholder="165"
-                        min="0"
-                        value="${session.maxHr || ''}"
-                      >
-                    </div>
-                  </div>
-                `}
-                
                 </div>
-                  
-                  <!-- NEW SECTION: Zone & Performance Metrics -->
-                  <div class="bg-blue-900/10 border border-blue-700/30 rounded-lg p-4 space-y-4">
-                    <div class="flex items-center gap-2 mb-2">
-                      <i data-lucide="activity" class="w-4 h-4 text-blue-400"></i>
-                      <span class="text-sm font-semibold text-blue-300">Zone & Performance Data (Optional)</span>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          Avg Z2 Pace (MM:SS)
-                        </label>
-                        <input 
-                          type="text" 
-                          id="modalZ2Pace"
-                          class="input-field"
-                          placeholder="6:30"
-                          pattern="[0-9]{1,2}:[0-9]{2}"
-                          value="${session.z2Pace ? secondsToPace(session.z2Pace) : ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          From watch zones screen
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          Time in Z2 (min)
-                        </label>
-                        <input 
-                          type="number" 
-                          id="modalZ2Time"
-                          class="input-field"
-                          placeholder="40"
-                          min="0"
-                          value="${session.z2Time || ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          Minutes in Z2 (124-140 bpm)
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div class="bg-blue-900/20 border border-blue-600/20 rounded p-3">
-                      <p class="text-xs text-blue-200">
-                        <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
-                        <strong>Pro Tip:</strong> Check your Garmin watch zones screen after each run to track Z2 pace improvement over time.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          Avg Cadence (spm)
-                        </label>
-                        <input 
-                          type="number" 
-                          id="modalAvgCadence"
-                          class="input-field"
-                          placeholder="168"
-                          min="140"
-                          max="200"
-                          value="${session.avgCadence || ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          Target: 165-180 spm
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          VO2 Max Estimate
-                        </label>
-                        <input 
-                          type="number" 
-                          id="modalVO2Max"
-                          class="input-field"
-                          placeholder="52"
-                          min="30"
-                          max="80"
-                          value="${session.vo2Max || ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          From Garmin Connect
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          Elevation Gain (m)
-                        </label>
-                        <input 
-                          type="number" 
-                          id="modalElevationGain"
-                          class="input-field"
-                          placeholder="120"
-                          min="0"
-                          value="${session.elevationGain || ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          Total climb
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <label class="block text-sm text-slate-400 mb-1">
-                          Elevation Loss (m)
-                        </label>
-                        <input 
-                          type="number" 
-                          id="modalElevationLoss"
-                          class="input-field"
-                          placeholder="115"
-                          min="0"
-                          value="${session.elevationLoss || ''}"
-                        >
-                        <p class="text-xs text-slate-500 mt-1">
-                          Total descent
-                        </p>
-                      </div>
-                    </div>
-                
-                
-                <!-- Notes (always show) -->
-                <div>
-                  <label class="block text-sm text-slate-400 mb-2">Notes</label>
-                  <textarea 
-                    id="modalNotes"
-                    class="input-field"
-                    rows="3"
-                    placeholder="How did the session feel? Any issues or highlights?"
-                  >${session.notes || ''}</textarea>
-                </div>
-              </div>
-              
-              <div class="p-6 border-t border-slate-700 flex gap-3">
-                <button onclick="app.closeModal()" class="btn-secondary flex-1">
-                  <i data-lucide="x"></i>
-                  Cancel
-                </button>
-                <button onclick="app.saveSession()" class="btn-primary flex-1">
-                  <i data-lucide="save"></i>
-                  ${isAdd ? 'Add' : 'Update'} Session
+
+                <button
+                  className="btn btn-secondary btn-small w-full"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSessionTypeFilter('All Types');
+                    setPhaseFilter('All Phases');
+                    setFromDate('');
+                    setToDate('');
+                    setQuickFilter('All');
+                  }}
+                >
+                  ✕ Clear Filters
                 </button>
               </div>
             </div>
+
+            {/* Summary Stats */}
+            <div className="card p-4">
+              <h3 className="text-sm font-semibold text-slate-400 mb-3">
+                📊 Summary ({summaryStats.totalSessions} sessions)
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="metric-card">
+                  <h4 className="text-xs text-slate-400 mb-1">Total Distance</h4>
+                  <div className="text-2xl font-bold text-cyan-400">{summaryStats.totalDistance} km</div>
+                </div>
+
+                <div className="metric-card">
+                  <h4 className="text-xs text-slate-400 mb-1">Total Time</h4>
+                  <div className="text-2xl font-bold text-emerald-400">{(summaryStats.totalTime / 60).toFixed(1)} hrs</div>
+                </div>
+
+                <div className="metric-card">
+                  <h4 className="text-xs text-slate-400 mb-1">Avg Heart Rate</h4>
+                  <div className="text-2xl font-bold text-rose-400">{summaryStats.avgHR || '--'} bpm</div>
+                </div>
+
+                <div className="metric-card">
+                  <h4 className="text-xs text-slate-400 mb-1">Avg RPE</h4>
+                  <div className="text-2xl font-bold text-amber-400">{summaryStats.avgRPE}/10</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Session Type Badges */}
+            {sessionTypeBreakdown.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {sessionTypeBreakdown.map(([type, count]) => {
+                  const badgeColors = ['badge-blue', 'badge-cyan', 'badge-emerald', 'badge-amber', 'badge-purple', 'badge-rose'];
+                  const color = badgeColors[sessionTypeBreakdown.indexOf([type, count]) % badgeColors.length];
+                  return (
+                    <span key={type} className={`badge ${color}`}>
+                      {getSessionIcon(type)} {type} {count}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Add Session Button */}
+            <div className="flex justify-between items-center">
+              <button className="btn btn-primary" onClick={openAddModal}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="10" cy="10" r="9"></circle>
+                  <line x1="10" y1="6" x2="10" y2="14"></line>
+                  <line x1="6" y1="10" x2="14" y2="10"></line>
+                </svg>
+                Add Session
+              </button>
+              
+              <div className="text-sm text-slate-400">
+                Showing {paginatedSessions.length} of {filteredSessions.length}
+              </div>
+            </div>
+
+            {/* Session List */}
+            <div className="space-y-2">
+              {paginatedSessions.length === 0 ? (
+                <div className="card p-8 text-center">
+                  <p className="text-slate-400">No sessions found. Try adjusting your filters.</p>
+                </div>
+              ) : (
+                paginatedSessions.map((session, index) => (
+                  <div
+                    key={session.id}
+                    className="session-card fade-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                    onClick={() => openViewModal(session)}
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      {/* Left: Icon + Type + Date */}
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="text-2xl">{getSessionIcon(session.sessionType)}</div>
+                        <div>
+                          <div className="font-semibold text-white">{session.sessionType || 'Unknown'}</div>
+                          <div className="text-xs text-slate-400">
+                            {formatDate(session.date)} • Week {session.weekNumber || '?'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Stats inline + Actions */}
+                      <div className="flex items-center gap-4">
+                        {/* Stats - always inline */}
+                        <div className="flex gap-4 text-xs">
+                          <div className="text-right">
+                            <div className="text-slate-400">Distance</div>
+                            <div className="font-semibold text-cyan-400">
+                              {(session.distance || 0).toFixed(1)} km
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-slate-400">Duration</div>
+                            <div className="font-semibold text-emerald-400 mono">
+                              {(session.duration / 60).toFixed(1)} hrs
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-slate-400">Pace</div>
+                            <div className="font-semibold text-indigo-400 mono">
+                              {formatPace(session.avgPace)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button
+                            className="action-btn action-btn-edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(session);
+                            }}
+                          >
+                            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M11 4l3 3L7 14H4v-3L11 4z"></path>
+                            </svg>
+                          </button>
+                          <button
+                            className="action-btn action-btn-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteSession(session.id);
+                            }}
+                          >
+                            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14"></path>
+                              <line x1="10" y1="11" x2="10" y2="17"></line>
+                              <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 flex-wrap">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                >
+                  ‹ Previous
+                </button>
+
+                {[...Array(totalPages)].map((_, i) => {
+                  const pageNum = i + 1;
+                  if (
+                    pageNum === 1 ||
+                    pageNum === totalPages ||
+                    (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        key={pageNum}
+                        className={`pagination-btn ${currentPage === pageNum ? 'active' : ''}`}
+                        onClick={() => setCurrentPage(pageNum)}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  } else if (pageNum === currentPage - 2 || pageNum === currentPage + 2) {
+                    return <span key={pageNum} className="text-slate-500">...</span>;
+                  }
+                  return null;
+                })}
+
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next ›
+                </button>
+              </div>
+            )}
           </div>
-        `;
-      }
-      
-      attachEventListeners() {
-        // Search input
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-          searchInput.addEventListener('input', (e) => {
-            this.updateFilter('search', e.target.value);
-          });
-        }
-        
-        // Type filter
-        const typeFilter = document.getElementById('typeFilter');
-        if (typeFilter) {
-          typeFilter.value = this.filters.type;
-          typeFilter.addEventListener('change', (e) => {
-            this.updateFilter('type', e.target.value);
-          });
-        }
-        
-        // Phase filter
-        const phaseFilter = document.getElementById('phaseFilter');
-        if (phaseFilter) {
-          phaseFilter.value = this.filters.phase;
-          phaseFilter.addEventListener('change', (e) => {
-            this.updateFilter('phase', e.target.value);
-          });
-        }
-        
-        // Date filters
-        const dateFromFilter = document.getElementById('dateFromFilter');
-        if (dateFromFilter) {
-          dateFromFilter.addEventListener('change', (e) => {
-            this.updateFilter('dateFrom', e.target.value);
-          });
-        }
-        
-        const dateToFilter = document.getElementById('dateToFilter');
-        if (dateToFilter) {
-          dateToFilter.addEventListener('change', (e) => {
-            this.updateFilter('dateTo', e.target.value);
-          });
-        }
-        
-        // Modal session type change
-        const modalSessionType = document.getElementById('modalSessionType');
-        if (modalSessionType) {
-          modalSessionType.addEventListener('change', (e) => {
-            this.editingSession.sessionType = e.target.value;
-            this.render();
-            lucide.createIcons();
-          });
-        }
-        
-        // Modal date change with DD/MM/YYYY support
-        const modalDate = document.getElementById('modalDate');
-        if (modalDate) {
-          modalDate.addEventListener('change', (e) => {
-            this.editingSession.date = e.target.value;
-          });
-          
-          // Allow typing DD/MM/YYYY
-          modalDate.addEventListener('blur', (e) => {
-            const input = e.target.value;
-            if (input.includes('/')) {
-              const parsed = parseDateInput(input);
-              if (parsed) {
-                e.target.value = parsed;
-                this.editingSession.date = parsed;
-              }
-            }
-          });
-        }
-        
-        // Modal other fields
-        const modalFields = [
-         'modalPhase', 'modalDistance', 'modalDuration', 
-         'modalAvgPace', 'modalRpe', 'modalAvgHr', 'modalMaxHr',
-         'modalZ2Pace', 'modalZ2Time',
-         'modalAvgCadence', 'modalVO2Max', 'modalElevationGain', 'modalElevationLoss',  // NEW
-         'modalNotes', 'modalPedicabHours'
-       ];
-        
-        modalFields.forEach(fieldId => {
-          const field = document.getElementById(fieldId);
-          if (field) {
-            field.addEventListener('input', (e) => {
-              const key = fieldId.replace('modal', '').replace(/^./, str => str.toLowerCase());
-              this.editingSession[key] = e.target.value;
-            });
-          }
-        });
-      }
+
+          {/* Modal System */}
+          {showModal && modalType === 'view' && selectedSession && (
+            <div className="modal-backdrop" onClick={closeModal}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold flex items-center gap-2">
+                      {getSessionIcon(selectedSession.sessionType)} {selectedSession.sessionType}
+                    </h2>
+                    <p className="text-sm text-slate-400">{formatDate(selectedSession.date)} • {selectedSession.phase}</p>
+                  </div>
+                  <button onClick={closeModal} className="text-slate-400 hover:text-white text-2xl">×</button>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 space-y-4">
+                  {/* Performance Metrics */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="metric-card">
+                      <h4 className="text-xs text-slate-400 mb-1">Distance</h4>
+                      <div className="text-xl font-bold text-cyan-400">{(selectedSession.distance || 0).toFixed(1)} km</div>
+                    </div>
+                    <div className="metric-card">
+                      <h4 className="text-xs text-slate-400 mb-1">Duration</h4>
+                      <div className="text-xl font-bold text-emerald-400">{Math.round(selectedSession.duration || 0)} min</div>
+                    </div>
+                    <div className="metric-card">
+                      <h4 className="text-xs text-slate-400 mb-1">Avg Pace</h4>
+                      <div className="text-xl font-bold text-indigo-400 mono">{formatPace(selectedSession.avgPace)}</div>
+                    </div>
+                    <div className="metric-card">
+                      <h4 className="text-xs text-slate-400 mb-1">RPE</h4>
+                      <div className="text-xl font-bold text-amber-400">{selectedSession.rpe || '--'}/10</div>
+                    </div>
+                  </div>
+
+                  {/* Heart Rate */}
+                  {(selectedSession.avgHr || selectedSession.maxHr) && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {selectedSession.avgHr && (
+                        <div className="metric-card">
+                          <h4 className="text-xs text-slate-400 mb-1">Avg HR</h4>
+                          <div className="text-xl font-bold text-rose-400">{selectedSession.avgHr} bpm</div>
+                        </div>
+                      )}
+                      {selectedSession.maxHr && (
+                        <div className="metric-card">
+                          <h4 className="text-xs text-slate-400 mb-1">Max HR</h4>
+                          <div className="text-xl font-bold text-rose-300">{selectedSession.maxHr} bpm</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Zone Data */}
+                  {(selectedSession.z2Pace || selectedSession.z2Time || selectedSession.avgCadence) && (
+                    <div className="card p-3 bg-blue-900/10 border-blue-700/30">
+                      <h4 className="text-sm font-semibold text-blue-300 mb-2">Zone & Performance Data</h4>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        {selectedSession.z2Pace && (
+                          <div>
+                            <div className="text-slate-400">Z2 Pace</div>
+                            <div className="font-semibold mono">{formatPace(selectedSession.z2Pace)}</div>
+                          </div>
+                        )}
+                        {selectedSession.z2Time && (
+                          <div>
+                            <div className="text-slate-400">Time in Z2</div>
+                            <div className="font-semibold">{selectedSession.z2Time} min</div>
+                          </div>
+                        )}
+                        {selectedSession.avgCadence && (
+                          <div>
+                            <div className="text-slate-400">Avg Cadence</div>
+                            <div className="font-semibold">{selectedSession.avgCadence} spm</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  {selectedSession.notes && (
+                    <div className="card p-3 bg-slate-800/50">
+                      <h4 className="text-sm font-semibold text-slate-300 mb-1">Notes</h4>
+                      <p className="text-sm text-slate-400">{selectedSession.notes}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-700 flex gap-2">
+                  <button className="btn btn-primary flex-1" onClick={() => {
+                    setModalType('edit');
+                    setEditingSession(selectedSession);
+                  }}>
+                    Edit Session
+                  </button>
+                  <button className="btn btn-secondary" onClick={closeModal}>Close</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Add/Edit Modal */}
+          {showModal && (modalType === 'add' || modalType === 'edit') && (
+            <div className="modal-backdrop" onClick={closeModal}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                  <h2 className="text-xl font-bold">
+                    {modalType === 'add' ? '➕ Add' : '✏️ Edit'} Session
+                  </h2>
+                  <button onClick={closeModal} className="text-slate-400 hover:text-white text-2xl">×</button>
+                </div>
+
+                {/* Form */}
+                <div className="p-4 space-y-4">
+                  {/* Session Type */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-400 mb-2">Session Type *</label>
+                    <select id="modalSessionType" className="input-field" defaultValue={editingSession?.sessionType || 'Easy Run'}>
+                      <option value="Easy Run">Easy Run</option>
+                      <option value="Long Run">Long Run</option>
+                      <option value="Tempo Run">Tempo Run</option>
+                      <option value="Speed Intervals">Speed Intervals</option>
+                      <option value="Recovery Run">Recovery Run</option>
+                      <option value="Futsal">Futsal</option>
+                      <option value="Pedicab">Pedicab</option>
+                      <option value="Strength Training">Strength Training</option>
+                      <option value="Cross-Training">Cross-Training</option>
+                    </select>
+                  </div>
+
+                  {/* Date & Phase */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-400 mb-2">Date *</label>
+                      <input
+                        type="date"
+                        id="modalDate"
+                        className="input-field"
+                        defaultValue={editingSession?.date || new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-400 mb-2">Phase *</label>
+                      <select id="modalPhase" className="input-field" defaultValue={editingSession?.phase || 'Base'}>
+                        <option value="Base">Base</option>
+                        <option value="Build">Build</option>
+                        <option value="Specialty">Specialty</option>
+                        <option value="Taper">Taper</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Pedicab Hours */}
+                  {editingSession?.sessionType === 'Pedicab' && (
+                    <div className="card p-3 bg-amber-900/10 border-amber-700/30">
+                      <label className="block text-sm font-semibold text-slate-400 mb-2">Hours Worked *</label>
+                      <input
+                        type="number"
+                        id="modalPedicabHours"
+                        className="input-field"
+                        placeholder="6"
+                        step="0.5"
+                        min="0"
+                        defaultValue={editingSession?.duration ? (editingSession.duration / 60).toFixed(1) : '6'}
+                      />
+                      <p className="text-xs text-amber-300 mt-2">
+                        ℹ️ Auto-fills: Distance = hours × 3km, Pace 6:30, HR 120/145, RPE 5
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Futsal Info */}
+                  {editingSession?.sessionType === 'Futsal' && (
+                    <div className="card p-3 bg-purple-900/10 border-purple-700/30">
+                      <p className="text-sm text-purple-300">
+                        ℹ️ Auto-fills: 60min, 8km, 7:30 pace, HR 165/185, RPE 8
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Running Fields */}
+                  {editingSession?.sessionType !== 'Pedicab' && editingSession?.sessionType !== 'Futsal' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Distance (km)</label>
+                          <input
+                            type="number"
+                            id="modalDistance"
+                            className="input-field"
+                            placeholder="10.5"
+                            step="0.1"
+                            min="0"
+                            defaultValue={editingSession?.distance || ''}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Duration (min)</label>
+                          <input
+                            type="number"
+                            id="modalDuration"
+                            className="input-field"
+                            placeholder="66"
+                            min="0"
+                            defaultValue={editingSession?.duration || ''}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg Pace (MM:SS)</label>
+                          <input
+                            type="text"
+                            id="modalAvgPace"
+                            className="input-field"
+                            placeholder="6:30"
+                            defaultValue={editingSession?.avgPace ? formatPace(editingSession.avgPace) : ''}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">RPE (1-10)</label>
+                          <input
+                            type="number"
+                            id="modalRpe"
+                            className="input-field"
+                            placeholder="7"
+                            min="1"
+                            max="10"
+                            defaultValue={editingSession?.rpe || ''}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg HR (bpm)</label>
+                          <input
+                            type="number"
+                            id="modalAvgHr"
+                            className="input-field"
+                            placeholder="142"
+                            min="0"
+                            defaultValue={editingSession?.avgHr || ''}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Max HR (bpm)</label>
+                          <input
+                            type="number"
+                            id="modalMaxHr"
+                            className="input-field"
+                            placeholder="165"
+                            min="0"
+                            defaultValue={editingSession?.maxHr || ''}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Zone Data */}
+                      <div className="card p-3 bg-blue-900/10 border-blue-700/30 space-y-3">
+                        <h4 className="text-sm font-semibold text-blue-300">Zone & Performance Data (Optional)</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs text-slate-400 mb-1">Avg Z2 Pace (MM:SS)</label>
+                            <input
+                              type="text"
+                              id="modalZ2Pace"
+                              className="input-field"
+                              placeholder="6:30"
+                              defaultValue={editingSession?.z2Pace ? formatPace(editingSession.z2Pace) : ''}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs text-slate-400 mb-1">Time in Z2 (min)</label>
+                            <input
+                              type="number"
+                              id="modalZ2Time"
+                              className="input-field"
+                              placeholder="40"
+                              min="0"
+                              defaultValue={editingSession?.z2Time || ''}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-slate-400 mb-1">Avg Cadence (spm)</label>
+                          <input
+                            type="number"
+                            id="modalAvgCadence"
+                            className="input-field"
+                            placeholder="168"
+                            min="140"
+                            max="200"
+                            defaultValue={editingSession?.avgCadence || ''}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Notes */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-400 mb-2">Notes</label>
+                    <textarea
+                      id="modalNotes"
+                      className="input-field"
+                      placeholder="How did the session feel?"
+                      rows="3"
+                      defaultValue={editingSession?.notes || ''}
+                    ></textarea>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-slate-700 flex gap-2">
+                  <button className="btn btn-primary flex-1" onClick={handleSaveSession}>
+                    {modalType === 'add' ? 'Add Session' : 'Save Changes'}
+                  </button>
+                  <button className="btn btn-secondary" onClick={closeModal}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <BottomNav currentPage="history" />
+        </div>
+      );
     }
-    
-    // Initialize app
-    const app = new HistoryPanel();
-    window.app = app;
+
+    ReactDOM.render(<TrainingHistory />, document.getElementById('root'));
   </script>
 </body>
 </html>
