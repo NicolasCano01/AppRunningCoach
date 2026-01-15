@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Running Coach Pro - Training History Management">
   <meta name="theme-color" content="#0ea5e9">
-  <title>Running Coach Pro - Session History</title>
+  <title>Running Coach Pro - Session History V8</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -109,79 +109,160 @@
     .nav-item span {
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.5px;
     }
 
-    /* Card Styles */
+    /* Cards & Layout */
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
+      background: rgba(59, 130, 246, 0.05);
+      border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 12px;
       padding: 12px;
-      position: relative;
-      transition: all 0.2s;
-    }
-
-    .metric-card:hover {
-      border-color: var(--accent-blue);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
 
     .session-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 12px;
-      transition: all 0.2s;
+      padding: 16px;
       cursor: pointer;
+      transition: all 0.2s;
     }
 
     .session-card:hover {
       border-color: var(--accent-blue);
+      transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-      transform: translateY(-1px);
     }
 
-    .session-card.selected {
-      border-color: var(--accent-emerald);
-      background: rgba(16, 185, 129, 0.05);
-    }
-
-    /* Badge styles */
+    /* Badges */
     .badge {
       display: inline-flex;
       align-items: center;
+      gap: 4px;
       padding: 4px 12px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
-      gap: 4px;
     }
 
     .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     .badge-cyan { background: rgba(6, 182, 212, 0.2); color: #22d3ee; }
     .badge-emerald { background: rgba(16, 185, 129, 0.2); color: #34d399; }
     .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .badge-purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
     .badge-rose { background: rgba(244, 63, 94, 0.2); color: #fb7185; }
+    .badge-purple { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
 
+    /* Intensity Badge - NEW */
+    .intensity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .intensity-high {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.3), rgba(139, 92, 246, 0.3));
+      border: 2px solid rgba(244, 63, 94, 0.5);
+      color: #fda4af;
+    }
+
+    .intensity-moderate {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(16, 185, 129, 0.3));
+      border: 2px solid rgba(6, 182, 212, 0.5);
+      color: #67e8f9;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--accent-blue);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 13px;
+    }
+
+    /* Input Fields */
+    .input-field {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-field:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Filter Pills */
     .filter-pill {
       padding: 8px 16px;
       border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s;
+      white-space: nowrap;
       cursor: pointer;
+      transition: all 0.2s;
     }
 
     .filter-pill:hover {
@@ -195,99 +276,60 @@
       color: white;
     }
 
-    .btn {
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: 600;
-      transition: all 0.2s;
-      cursor: pointer;
-      border: none;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-primary {
-      background: var(--accent-blue);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-    }
-
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent-blue);
-      color: var(--accent-blue);
-    }
-
-    .btn-small {
-      padding: 6px 12px;
-      font-size: 13px;
-      border-radius: 8px;
-    }
-
-    .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: none;
+      z-index: 2000;
+      padding: 16px;
     }
 
-    .action-btn-edit {
-      background: rgba(245, 158, 11, 0.2);
-      color: #fbbf24;
+    .modal-content {
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
     }
 
-    .action-btn-edit:hover {
-      background: rgba(245, 158, 11, 0.3);
-      transform: scale(1.05);
+    /* Spinner */
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(59, 130, 246, 0.2);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
     }
 
-    .action-btn-delete {
-      background: rgba(244, 63, 94, 0.2);
-      color: #fb7185;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .action-btn-delete:hover {
-      background: rgba(244, 63, 94, 0.3);
-      transform: scale(1.05);
-    }
-
+    /* Pagination */
     .pagination-btn {
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 8px 14px;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
+      border-radius: 8px;
       color: var(--text-primary);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     .pagination-btn:hover:not(:disabled) {
+      background: var(--bg-elevated);
       border-color: var(--accent-blue);
-      color: var(--accent-blue);
-    }
-
-    .pagination-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .pagination-btn.active {
@@ -296,82 +338,12 @@
       color: white;
     }
 
-    /* Modal Styles */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.2s ease;
+    .pagination-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
 
-    .modal-content {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      max-width: 600px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      animation: slideUp 0.3s ease;
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 10px 14px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .input-field:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .input-field::placeholder {
-      color: var(--text-muted);
-    }
-
-    textarea.input-field {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-      from { 
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to { 
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.4s ease-out forwards;
-    }
-
+    /* Collapsible */
     .collapsible-content {
       max-height: 0;
       overflow: hidden;
@@ -379,24 +351,52 @@
     }
 
     .collapsible-content.expanded {
-      max-height: 500px;
+      max-height: 800px;
     }
 
-    .spinner {
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-top-color: var(--accent-blue);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 0.8s linear infinite;
+    /* Auto-fill Info Box - NEW */
+    .auto-fill-info {
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: start;
+      gap: 10px;
+      margin-top: 8px;
+      animation: slideIn 0.3s ease;
     }
 
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    @media (max-width: 768px) {
+    .auto-fill-info .icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Calculated TSS Display - NEW */
+    .tss-display {
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .tss-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #a78bfa;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
       .metric-card { padding: 10px; }
       .session-card { padding: 10px; }
       .session-card .flex { flex-wrap: wrap; }
@@ -416,7 +416,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <script type="text/babel">
-    const { useState, useEffect, useMemo } = React;
+    const { useState, useEffect, useMemo, useRef } = React;
 
     // Firebase Configuration
     const firebaseConfig = {
@@ -433,6 +433,37 @@
     }
     const db = firebase.firestore();
     const auth = firebase.auth();
+
+    // TSS Calculation Functions (from blueprint)
+    const calculateTSS = (sessionType, formData) => {
+      const duration = parseFloat(formData.duration) || 0;
+      const distance = parseFloat(formData.distance) || 0;
+      const rpe = parseFloat(formData.rpe) || 0;
+      const routeType = formData.routeType || 'flat';
+
+      if (sessionType === 'Futsal') {
+        // Formula: (duration/60) × 95 × (RPE / 8)
+        return ((duration / 60) * 95 * (rpe / 8)).toFixed(1);
+      }
+      
+      if (sessionType === 'Pedicab') {
+        // Formula: hours × 12 × routeMultiplier
+        const hours = duration / 60;
+        const routeMultiplier = routeType === 'hilly' ? 1.3 : 1.0;
+        return (hours * 12 * routeMultiplier).toFixed(1);
+      }
+      
+      if (sessionType.includes('Run') && distance > 0 && rpe > 0) {
+        // Formula: distance × 6.5 × (RPE / 6)
+        return (distance * 6.5 * (rpe / 6)).toFixed(1);
+      }
+
+      if (sessionType === 'Strength Training') {
+        return ((duration / 60) * 30).toFixed(1);
+      }
+
+      return 0;
+    };
 
     // Bottom Navigation Component
     const BottomNav = ({ currentPage }) => (
@@ -507,7 +538,15 @@
       const [selectedSession, setSelectedSession] = useState(null);
       const [editingSession, setEditingSession] = useState(null);
       
+      // NEW: Form state for prefilling
+      const [currentSessionType, setCurrentSessionType] = useState('Easy Run');
+      const [formData, setFormData] = useState({});
+      const [calculatedTSS, setCalculatedTSS] = useState(0);
+      
       const sessionsPerPage = 20;
+
+      const sessionTypes = ['All Types', 'Easy Run', 'Long Run', 'Tempo Run', 'Speed Intervals', 'Recovery Run', 'Futsal', 'Pedicab', 'Strength Training', 'Cross-Training'];
+      const phases = ['All Phases', 'Base', 'Build', 'Specialty', 'Taper'];
 
       // Helper functions
       const parseSessionDate = (dateStr) => {
@@ -551,6 +590,51 @@
         };
         return icons[type] || '🏃';
       };
+
+      // NEW: Get default values based on session type
+      const getSessionDefaults = (sessionType) => {
+        switch (sessionType) {
+          case 'Futsal':
+            return {
+              duration: 60,
+              distance: null,
+              avgPace: null,
+              avgHr: 165,
+              maxHr: 185,
+              rpe: 8,
+              intensityFactor: 1.05,
+              routeType: null
+            };
+          case 'Pedicab':
+            return {
+              duration: 360, // 6 hours in minutes
+              distance: null,
+              avgPace: null,
+              avgHr: 120,
+              maxHr: 145,
+              rpe: 5,
+              intensityFactor: 0.65,
+              routeType: 'flat'
+            };
+          default:
+            return {
+              duration: null,
+              distance: null,
+              avgPace: null,
+              avgHr: null,
+              maxHr: null,
+              rpe: null,
+              intensityFactor: null,
+              routeType: null
+            };
+        }
+      };
+
+      // NEW: Update TSS when form data changes
+      useEffect(() => {
+        const tss = calculateTSS(currentSessionType, formData);
+        setCalculatedTSS(tss);
+      }, [currentSessionType, formData]);
 
       // Load sessions from Firebase
       const loadSessions = async () => {
@@ -605,10 +689,10 @@
 
         if (searchTerm) {
           const term = searchTerm.toLowerCase();
-          filtered = filtered.filter(s => 
-            (s.sessionType || '').toLowerCase().includes(term) ||
-            (s.notes || '').toLowerCase().includes(term) ||
-            (s.route || '').toLowerCase().includes(term)
+          filtered = filtered.filter(s =>
+            (s.notes && s.notes.toLowerCase().includes(term)) ||
+            (s.route && s.route.toLowerCase().includes(term)) ||
+            (s.sessionType && s.sessionType.toLowerCase().includes(term))
           );
         }
 
@@ -624,40 +708,29 @@
           const from = new Date(fromDate);
           filtered = filtered.filter(s => parseSessionDate(s.date) >= from);
         }
+
         if (toDate) {
           const to = new Date(toDate);
+          to.setHours(23, 59, 59, 999);
           filtered = filtered.filter(s => parseSessionDate(s.date) <= to);
         }
 
         return filtered;
       }, [sessions, searchTerm, sessionTypeFilter, phaseFilter, quickFilter, fromDate, toDate]);
 
-      // Calculate summary stats (with avgHr fix - lowercase 'r')
+      // Summary stats
       const summaryStats = useMemo(() => {
-        const totalDistance = filteredSessions.reduce((sum, s) => {
-          const dist = s.distance || 0;
-          return sum + dist;
-        }, 0);
-
-        const totalTime = filteredSessions.reduce((sum, s) => {
-          const duration = s.duration || 0;
-          return sum + duration;
-        }, 0);
-
-        const sessionsWithHr = filteredSessions.filter(s => s.avgHr);
-        const avgHR = sessionsWithHr.length > 0
-          ? Math.round(sessionsWithHr.reduce((sum, s) => sum + s.avgHr, 0) / sessionsWithHr.length)
-          : 0;
-
-        const sessionsWithRPE = filteredSessions.filter(s => s.rpe);
-        const avgRPE = sessionsWithRPE.length > 0
-          ? (sessionsWithRPE.reduce((sum, s) => sum + s.rpe, 0) / sessionsWithRPE.length).toFixed(1)
-          : 0;
+        const totalDistance = filteredSessions.reduce((sum, s) => sum + (s.distance || 0), 0);
+        const totalTime = filteredSessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+        const hrSessions = filteredSessions.filter(s => s.avgHr);
+        const avgHR = hrSessions.length > 0 ? Math.round(hrSessions.reduce((sum, s) => sum + s.avgHr, 0) / hrSessions.length) : 0;
+        const rpeSessions = filteredSessions.filter(s => s.rpe);
+        const avgRPE = rpeSessions.length > 0 ? (rpeSessions.reduce((sum, s) => sum + s.rpe, 0) / rpeSessions.length).toFixed(1) : 0;
 
         return {
           totalSessions: filteredSessions.length,
           totalDistance: totalDistance.toFixed(1),
-          totalTime: Math.round(totalTime),
+          totalTime,
           avgHR,
           avgRPE
         };
@@ -667,54 +740,32 @@
       const sessionTypeBreakdown = useMemo(() => {
         const breakdown = {};
         filteredSessions.forEach(s => {
-          const type = s.sessionType || 'Unknown';
-          breakdown[type] = (breakdown[type] || 0) + 1;
+          breakdown[s.sessionType] = (breakdown[s.sessionType] || 0) + 1;
         });
-        return Object.entries(breakdown)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 8);
+        return Object.entries(breakdown).sort((a, b) => b[1] - a[1]);
       }, [filteredSessions]);
 
       // Pagination
-      const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
       const paginatedSessions = useMemo(() => {
         const startIndex = (currentPage - 1) * sessionsPerPage;
         return filteredSessions.slice(startIndex, startIndex + sessionsPerPage);
       }, [filteredSessions, currentPage]);
 
-      const sessionTypes = useMemo(() => {
-        const types = new Set(sessions.map(s => s.sessionType).filter(Boolean));
-        return ['All Types', ...Array.from(types)];
-      }, [sessions]);
+      const totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
 
-      const phases = useMemo(() => {
-        const phaseSet = new Set(sessions.map(s => s.phase).filter(Boolean));
-        return ['All Phases', ...Array.from(phaseSet)];
-      }, [sessions]);
-
-      // Modal handlers
-      const openViewModal = (session) => {
-        setSelectedSession(session);
-        setModalType('view');
-        setShowModal(true);
-      };
-
+      // Modal actions
       const openAddModal = () => {
-        setEditingSession({
-          sessionType: 'Easy Run',
-          phase: 'Base',
-          date: new Date().toISOString().split('T')[0]
-        });
+        const defaults = getSessionDefaults('Easy Run');
+        setCurrentSessionType('Easy Run');
+        setEditingSession(null);
+        setFormData(defaults);
         setModalType('add');
         setShowModal(true);
       };
-      
-      // Make openAddModal available globally for bottom nav
-	    window.openAddModal = openAddModal;
 
-      const openEditModal = (session) => {
-        setEditingSession(session);
-        setModalType('edit');
+      const openViewModal = (session) => {
+        setSelectedSession(session);
+        setModalType('view');
         setShowModal(true);
       };
 
@@ -722,80 +773,83 @@
         setShowModal(false);
         setSelectedSession(null);
         setEditingSession(null);
+        setCurrentSessionType('Easy Run');
+        setFormData({});
+        setCalculatedTSS(0);
+      };
+
+      // NEW: Handle session type change in form
+      const handleSessionTypeChange = (newType) => {
+        setCurrentSessionType(newType);
+        const defaults = getSessionDefaults(newType);
+        
+        // If editing, preserve existing values, otherwise use defaults
+        if (editingSession && editingSession.sessionType === newType) {
+          setFormData({
+            ...defaults,
+            ...editingSession
+          });
+        } else {
+          setFormData(defaults);
+        }
+      };
+
+      // NEW: Handle individual form field changes
+      const handleFormChange = (field, value) => {
+        setFormData(prev => ({
+          ...prev,
+          [field]: value
+        }));
       };
 
       // Save session
       const handleSaveSession = async () => {
         try {
-          const user = auth.currentUser;
-          if (!user) throw new Error('Not authenticated');
+          const sessionType = document.getElementById('modalSessionType').value;
+          const date = document.getElementById('modalDate').value;
+          const phase = document.getElementById('modalPhase').value;
 
-          const sessionData = {
-            sessionType: document.getElementById('modalSessionType').value,
-            date: document.getElementById('modalDate').value,
-            phase: document.getElementById('modalPhase').value,
-            notes: document.getElementById('modalNotes')?.value || ''
+          if (!date || !phase) {
+            alert('Please fill in all required fields (Date, Phase)');
+            return;
+          }
+
+          let sessionData = {
+            sessionType,
+            date,
+            phase,
+            ...formData
           };
 
-          // Pedicab-specific
-          if (sessionData.sessionType === 'Pedicab') {
-            const hours = parseFloat(document.getElementById('modalPedicabHours').value) || 6;
-            sessionData.duration = hours * 60;
-            sessionData.distance = hours * 3;
-            sessionData.avgPace = 390; // 6:30
-            sessionData.avgHr = 120;
-            sessionData.maxHr = 145;
-            sessionData.rpe = 5;
-          } 
-          // Futsal-specific
-          else if (sessionData.sessionType === 'Futsal') {
-            sessionData.duration = 60;
-            sessionData.distance = 8;
-            sessionData.avgPace = 450; // 7:30
-            sessionData.avgHr = 165;
-            sessionData.maxHr = 185;
-            sessionData.rpe = 8;
+          // Special handling for Pedicab hours
+          if (sessionType === 'Pedicab') {
+            const pedicabHours = parseFloat(document.getElementById('modalPedicabHours').value) || 6;
+            sessionData.duration = pedicabHours * 60;
+            sessionData.pedicabHours = pedicabHours;
           }
-          // Running sessions
-          else {
-            const distanceVal = document.getElementById('modalDistance').value;
-            const durationVal = document.getElementById('modalDuration').value;
-            const paceVal = document.getElementById('modalAvgPace').value;
-            const rpeVal = document.getElementById('modalRpe').value;
-            const avgHrVal = document.getElementById('modalAvgHr').value;
-            const maxHrVal = document.getElementById('modalMaxHr').value;
-            const z2PaceVal = document.getElementById('modalZ2Pace')?.value;
-            const z2TimeVal = document.getElementById('modalZ2Time')?.value;
-            const cadenceVal = document.getElementById('modalAvgCadence')?.value;
 
-            if (distanceVal) sessionData.distance = parseFloat(distanceVal);
-            if (durationVal) sessionData.duration = parseFloat(durationVal);
-            if (paceVal) sessionData.avgPace = paceToSeconds(paceVal);
-            if (rpeVal) sessionData.rpe = parseInt(rpeVal);
-            if (avgHrVal) sessionData.avgHr = parseInt(avgHrVal);
-            if (maxHrVal) sessionData.maxHr = parseInt(maxHrVal);
-            if (z2PaceVal) sessionData.z2Pace = paceToSeconds(z2PaceVal);
-            if (z2TimeVal) sessionData.z2Time = parseFloat(z2TimeVal);
-            if (cadenceVal) sessionData.avgCadence = parseInt(cadenceVal);
+          // Clean up null/empty values
+          Object.keys(sessionData).forEach(key => {
+            if (sessionData[key] === null || sessionData[key] === '' || sessionData[key] === undefined) {
+              delete sessionData[key];
+            }
+          });
+
+          // Add TSS if calculated
+          if (calculatedTSS > 0) {
+            sessionData.estimatedTSS = parseFloat(calculatedTSS);
           }
-		   
-		  // Calculate week number from training start date
-			const trainingStartDate = new Date('2025-11-10');
-			const sessionDate = new Date(sessionData.date);
-			const daysSinceStart = Math.floor((sessionDate - trainingStartDate) / (1000 * 60 * 60 * 24));
-			const weekNumber = Math.floor(daysSinceStart / 7) + 1;
-			sessionData.weekNumber = weekNumber > 0 ? weekNumber : 1; 
-		  
+
+          const user = auth.currentUser;
           if (modalType === 'add') {
             await db.collection('users').doc(user.uid).collection('sessions').add(sessionData);
             console.log('✅ Session added');
           } else {
-            await db.collection('users').doc(user.uid).collection('sessions')
-              .doc(editingSession.id).update(sessionData);
+            await db.collection('users').doc(user.uid).collection('sessions').doc(editingSession.id).update(sessionData);
             console.log('✅ Session updated');
           }
 
-          loadSessions();
+          await loadSessions();
           closeModal();
         } catch (error) {
           console.error('❌ Save error:', error);
@@ -817,6 +871,12 @@
           alert('Failed to delete session');
         }
       };
+
+      // Expose openAddModal globally for nav button
+      useEffect(() => {
+        window.openAddModal = openAddModal;
+        return () => { window.openAddModal = null; };
+      }, []);
 
       if (loading) {
         return (
@@ -998,89 +1058,57 @@
               </button>
               
               <div className="text-sm text-slate-400">
-                Showing {paginatedSessions.length} of {filteredSessions.length}
+                Page {currentPage} of {totalPages || 1}
               </div>
             </div>
 
-            {/* Session List */}
-            <div className="space-y-2">
+            {/* Sessions List */}
+            <div className="space-y-3">
               {paginatedSessions.length === 0 ? (
                 <div className="card p-8 text-center">
-                  <p className="text-slate-400">No sessions found. Try adjusting your filters.</p>
+                  <p className="text-slate-400 text-lg">No sessions found</p>
+                  <p className="text-slate-500 text-sm mt-2">Try adjusting your filters or add a new session</p>
                 </div>
               ) : (
-                paginatedSessions.map((session, index) => (
+                paginatedSessions.map(session => (
                   <div
                     key={session.id}
-                    className="session-card fade-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    className="session-card"
                     onClick={() => openViewModal(session)}
                   >
-                    <div className="flex items-center justify-between gap-4">
-                      {/* Left: Icon + Type + Date */}
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <div className="text-2xl">{getSessionIcon(session.sessionType)}</div>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{getSessionIcon(session.sessionType)}</span>
                         <div>
-                          <div className="font-semibold text-white">{session.sessionType || 'Unknown'}</div>
-                          <div className="text-xs text-slate-400">
-                            {formatDate(session.date)} • Week {session.weekNumber || '?'}
-                          </div>
+                          <h3 className="font-bold text-white">{session.sessionType}</h3>
+                          <p className="text-xs text-slate-400">{formatDate(session.date)}</p>
                         </div>
                       </div>
+                      <span className="badge badge-blue">{session.phase}</span>
+                    </div>
 
-                      {/* Right: Stats inline + Actions */}
-                      <div className="flex items-center gap-4">
-                        {/* Stats - always inline */}
-                        <div className="flex gap-4 text-xs">
-                          <div className="text-right">
-                            <div className="text-slate-400">Distance</div>
-                            <div className="font-semibold text-cyan-400">
-                              {(session.distance || 0).toFixed(1)} km
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-slate-400">Duration</div>
-                            <div className="font-semibold text-emerald-400 mono">
-                              {(session.duration / 60).toFixed(1)} hrs
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-slate-400">Pace</div>
-                            <div className="font-semibold text-indigo-400 mono">
-                              {formatPace(session.avgPace)}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex gap-2 flex-shrink-0">
-                          <button
-                            className="action-btn action-btn-edit"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditModal(session);
-                            }}
-                          >
-                            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M11 4l3 3L7 14H4v-3L11 4z"></path>
-                            </svg>
-                          </button>
-                          <button
-                            className="action-btn action-btn-delete"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteSession(session.id);
-                            }}
-                          >
-                            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14"></path>
-                              <line x1="10" y1="11" x2="10" y2="17"></line>
-                              <line x1="14" y1="11" x2="14" y2="17"></line>
-                            </svg>
-                          </button>
-                        </div>
+                    <div className="grid grid-cols-4 gap-2 text-sm">
+                      <div>
+                        <div className="text-slate-400 text-xs">Distance</div>
+                        <div className="font-semibold text-cyan-400">{(session.distance || 0).toFixed(1)} km</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-xs">Duration</div>
+                        <div className="font-semibold text-emerald-400">{Math.round(session.duration || 0)} min</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-xs">Pace</div>
+                        <div className="font-semibold text-indigo-400 mono">{formatPace(session.avgPace)}</div>
+                      </div>
+                      <div>
+                        <div className="text-slate-400 text-xs">RPE</div>
+                        <div className="font-semibold text-amber-400">{session.rpe || '--'}/10</div>
                       </div>
                     </div>
+
+                    {session.notes && (
+                      <p className="text-sm text-slate-400 mt-2 line-clamp-1">{session.notes}</p>
+                    )}
                   </div>
                 ))
               )}
@@ -1094,7 +1122,7 @@
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                 >
-                  ‹ Previous
+                  ‹ Prev
                 </button>
 
                 {[...Array(totalPages)].map((_, i) => {
@@ -1130,7 +1158,7 @@
             )}
           </div>
 
-          {/* Modal System */}
+          {/* View Modal */}
           {showModal && modalType === 'view' && selectedSession && (
             <div className="modal-backdrop" onClick={closeModal}>
               <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -1185,6 +1213,16 @@
                     </div>
                   )}
 
+                  {/* TSS Display */}
+                  {selectedSession.estimatedTSS && (
+                    <div className="card p-3 bg-purple-900/10 border-purple-700/30">
+                      <div className="flex justify-between items-center">
+                        <div className="text-sm text-purple-300 font-semibold">Training Stress Score</div>
+                        <div className="text-2xl font-bold text-purple-400 mono">{selectedSession.estimatedTSS}</div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Zone Data */}
                   {(selectedSession.z2Pace || selectedSession.z2Time || selectedSession.avgCadence) && (
                     <div className="card p-3 bg-blue-900/10 border-blue-700/30">
@@ -1226,6 +1264,9 @@
                   <button className="btn btn-primary flex-1" onClick={() => {
                     setModalType('edit');
                     setEditingSession(selectedSession);
+                    setCurrentSessionType(selectedSession.sessionType);
+                    const defaults = getSessionDefaults(selectedSession.sessionType);
+                    setFormData({ ...defaults, ...selectedSession });
                   }}>
                     Edit Session
                   </button>
@@ -1252,7 +1293,12 @@
                   {/* Session Type */}
                   <div>
                     <label className="block text-sm font-semibold text-slate-400 mb-2">Session Type *</label>
-                    <select id="modalSessionType" className="input-field" defaultValue={editingSession?.sessionType || 'Easy Run'}>
+                    <select 
+                      id="modalSessionType" 
+                      className="input-field" 
+                      value={currentSessionType}
+                      onChange={(e) => handleSessionTypeChange(e.target.value)}
+                    >
                       <option value="Easy Run">Easy Run</option>
                       <option value="Long Run">Long Run</option>
                       <option value="Tempo Run">Tempo Run</option>
@@ -1287,84 +1333,50 @@
                     </div>
                   </div>
 
-                  {/* Pedicab Hours */}
-                  {editingSession?.sessionType === 'Pedicab' && (
-                    <div className="card p-3 bg-amber-900/10 border-amber-700/30">
-                      <label className="block text-sm font-semibold text-slate-400 mb-2">Hours Worked *</label>
-                      <input
-                        type="number"
-                        id="modalPedicabHours"
-                        className="input-field"
-                        placeholder="6"
-                        step="0.5"
-                        min="0"
-                        defaultValue={editingSession?.duration ? (editingSession.duration / 60).toFixed(1) : '6'}
-                      />
-                      <p className="text-xs text-amber-300 mt-2">
-                        ℹ️ Auto-fills: Distance = hours × 3km, Pace 6:30, HR 120/145, RPE 5
-                      </p>
-                    </div>
-                  )}
+                  {/* FUTSAL SPECIFIC SECTION */}
+                  {currentSessionType === 'Futsal' && (
+                    <div className="space-y-3">
+                      {/* Intensity Badge */}
+                      <div className="intensity-badge intensity-high">
+                        <span className="icon">⚽</span>
+                        <span>HIGH INTENSITY SESSION</span>
+                      </div>
 
-                  {/* Futsal Info */}
-                  {editingSession?.sessionType === 'Futsal' && (
-                    <div className="card p-3 bg-purple-900/10 border-purple-700/30">
-                      <p className="text-sm text-purple-300">
-                        ℹ️ Auto-fills: 60min, 8km, 7:30 pace, HR 165/185, RPE 8
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Running Fields */}
-                  {editingSession?.sessionType !== 'Pedicab' && editingSession?.sessionType !== 'Futsal' && (
-                    <>
-                      <div className="grid grid-cols-2 gap-3">
+                      {/* Auto-fill Info */}
+                      <div className="auto-fill-info" style={{ background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(244, 63, 94, 0.15))', border: '2px solid rgba(139, 92, 246, 0.3)' }}>
+                        <span className="icon">✨</span>
                         <div>
-                          <label className="block text-sm font-semibold text-slate-400 mb-2">Distance (km)</label>
-                          <input
-                            type="number"
-                            id="modalDistance"
-                            className="input-field"
-                            placeholder="10.5"
-                            step="0.1"
-                            min="0"
-                            defaultValue={editingSession?.distance || ''}
-                          />
+                          <div className="font-semibold text-purple-300 mb-1">Auto-Filled Values</div>
+                          <div className="text-xs text-purple-200 space-y-1">
+                            <div>• Duration: 60 minutes (Tue fixed constraint)</div>
+                            <div>• Avg HR: 165 bpm | Max HR: 185 bpm</div>
+                            <div>• RPE: 8/10 (Z4-Z5 intensity)</div>
+                            <div>• Intensity Factor: 1.05</div>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Editable Fields */}
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-semibold text-slate-400 mb-2">Duration (min)</label>
                           <input
                             type="number"
-                            id="modalDuration"
                             className="input-field"
-                            placeholder="66"
+                            value={formData.duration || 60}
+                            onChange={(e) => handleFormChange('duration', e.target.value)}
                             min="0"
-                            defaultValue={editingSession?.duration || ''}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg Pace (MM:SS)</label>
-                          <input
-                            type="text"
-                            id="modalAvgPace"
-                            className="input-field"
-                            placeholder="6:30"
-                            defaultValue={editingSession?.avgPace ? formatPace(editingSession.avgPace) : ''}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-slate-400 mb-2">RPE (1-10)</label>
                           <input
                             type="number"
-                            id="modalRpe"
                             className="input-field"
-                            placeholder="7"
+                            value={formData.rpe || 8}
+                            onChange={(e) => handleFormChange('rpe', e.target.value)}
                             min="1"
                             max="10"
-                            defaultValue={editingSession?.rpe || ''}
                           />
                         </div>
                       </div>
@@ -1374,22 +1386,183 @@
                           <label className="block text-sm font-semibold text-slate-400 mb-2">Avg HR (bpm)</label>
                           <input
                             type="number"
-                            id="modalAvgHr"
                             className="input-field"
-                            placeholder="142"
+                            value={formData.avgHr || 165}
+                            onChange={(e) => handleFormChange('avgHr', e.target.value)}
                             min="0"
-                            defaultValue={editingSession?.avgHr || ''}
                           />
                         </div>
                         <div>
                           <label className="block text-sm font-semibold text-slate-400 mb-2">Max HR (bpm)</label>
                           <input
                             type="number"
-                            id="modalMaxHr"
                             className="input-field"
+                            value={formData.maxHr || 185}
+                            onChange={(e) => handleFormChange('maxHr', e.target.value)}
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PEDICAB SPECIFIC SECTION */}
+                  {currentSessionType === 'Pedicab' && (
+                    <div className="space-y-3">
+                      {/* Intensity Badge */}
+                      <div className="intensity-badge intensity-moderate">
+                        <span className="icon">🚴</span>
+                        <span>CROSS-TRAINING ENDURANCE</span>
+                      </div>
+
+                      {/* Auto-fill Info */}
+                      <div className="auto-fill-info" style={{ background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.15))', border: '2px solid rgba(6, 182, 212, 0.3)' }}>
+                        <span className="icon">✨</span>
+                        <div>
+                          <div className="font-semibold text-cyan-300 mb-1">Auto-Filled Values</div>
+                          <div className="text-xs text-cyan-200 space-y-1">
+                            <div>• Duration: 6 hours (Sat shifts)</div>
+                            <div>• Avg HR: 120 bpm | Max HR: 145 bpm</div>
+                            <div>• RPE: 5/10 (Z2-Z3 intensity)</div>
+                            <div>• Intensity Factor: 0.65</div>
+                            <div>• TSS varies by route type (flat/hilly)</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hours Input */}
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-400 mb-2">Hours Worked *</label>
+                        <input
+                          type="number"
+                          id="modalPedicabHours"
+                          className="input-field"
+                          value={(formData.duration || 360) / 60}
+                          onChange={(e) => handleFormChange('duration', e.target.value * 60)}
+                          placeholder="6"
+                          step="0.5"
+                          min="0"
+                        />
+                      </div>
+
+                      {/* Route Type */}
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-400 mb-2">Route Type</label>
+                        <select
+                          className="input-field"
+                          value={formData.routeType || 'flat'}
+                          onChange={(e) => handleFormChange('routeType', e.target.value)}
+                        >
+                          <option value="flat">Flat (1.0x multiplier)</option>
+                          <option value="hilly">Hilly (1.3x multiplier)</option>
+                        </select>
+                      </div>
+
+                      {/* Editable Fields */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">RPE (1-10)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.rpe || 5}
+                            onChange={(e) => handleFormChange('rpe', e.target.value)}
+                            min="1"
+                            max="10"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg HR (bpm)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.avgHr || 120}
+                            onChange={(e) => handleFormChange('avgHr', e.target.value)}
+                            min="0"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* RUNNING FIELDS (for non-special sessions) */}
+                  {currentSessionType !== 'Pedicab' && currentSessionType !== 'Futsal' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Distance (km)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.distance || ''}
+                            onChange={(e) => handleFormChange('distance', e.target.value)}
+                            placeholder="10.5"
+                            step="0.1"
+                            min="0"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Duration (min)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.duration || ''}
+                            onChange={(e) => handleFormChange('duration', e.target.value)}
+                            placeholder="66"
+                            min="0"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg Pace (MM:SS)</label>
+                          <input
+                            type="text"
+                            className="input-field"
+                            value={formData.avgPace ? formatPace(formData.avgPace) : ''}
+                            onChange={(e) => {
+                              const paceSeconds = paceToSeconds(e.target.value);
+                              handleFormChange('avgPace', paceSeconds);
+                            }}
+                            placeholder="6:30"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">RPE (1-10)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.rpe || ''}
+                            onChange={(e) => handleFormChange('rpe', e.target.value)}
+                            placeholder="7"
+                            min="1"
+                            max="10"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Avg HR (bpm)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.avgHr || ''}
+                            onChange={(e) => handleFormChange('avgHr', e.target.value)}
+                            placeholder="142"
+                            min="0"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-semibold text-slate-400 mb-2">Max HR (bpm)</label>
+                          <input
+                            type="number"
+                            className="input-field"
+                            value={formData.maxHr || ''}
+                            onChange={(e) => handleFormChange('maxHr', e.target.value)}
                             placeholder="165"
                             min="0"
-                            defaultValue={editingSession?.maxHr || ''}
                           />
                         </div>
                       </div>
@@ -1402,21 +1575,24 @@
                             <label className="block text-xs text-slate-400 mb-1">Avg Z2 Pace (MM:SS)</label>
                             <input
                               type="text"
-                              id="modalZ2Pace"
                               className="input-field"
+                              value={formData.z2Pace ? formatPace(formData.z2Pace) : ''}
+                              onChange={(e) => {
+                                const paceSeconds = paceToSeconds(e.target.value);
+                                handleFormChange('z2Pace', paceSeconds);
+                              }}
                               placeholder="6:30"
-                              defaultValue={editingSession?.z2Pace ? formatPace(editingSession.z2Pace) : ''}
                             />
                           </div>
                           <div>
                             <label className="block text-xs text-slate-400 mb-1">Time in Z2 (min)</label>
                             <input
                               type="number"
-                              id="modalZ2Time"
                               className="input-field"
+                              value={formData.z2Time || ''}
+                              onChange={(e) => handleFormChange('z2Time', e.target.value)}
                               placeholder="40"
                               min="0"
-                              defaultValue={editingSession?.z2Time || ''}
                             />
                           </div>
                         </div>
@@ -1424,16 +1600,27 @@
                           <label className="block text-xs text-slate-400 mb-1">Avg Cadence (spm)</label>
                           <input
                             type="number"
-                            id="modalAvgCadence"
                             className="input-field"
+                            value={formData.avgCadence || ''}
+                            onChange={(e) => handleFormChange('avgCadence', e.target.value)}
                             placeholder="168"
                             min="140"
                             max="200"
-                            defaultValue={editingSession?.avgCadence || ''}
                           />
                         </div>
                       </div>
                     </>
+                  )}
+
+                  {/* Calculated TSS Display */}
+                  {calculatedTSS > 0 && (
+                    <div className="tss-display">
+                      <div>
+                        <div className="text-xs text-purple-300 font-semibold">Estimated TSS</div>
+                        <div className="text-xs text-slate-400">Training Stress Score</div>
+                      </div>
+                      <div className="tss-value">{calculatedTSS}</div>
+                    </div>
                   )}
 
                   {/* Notes */}
@@ -1444,7 +1631,8 @@
                       className="input-field"
                       placeholder="How did the session feel?"
                       rows="3"
-                      defaultValue={editingSession?.notes || ''}
+                      value={formData.notes || ''}
+                      onChange={(e) => handleFormChange('notes', e.target.value)}
                     ></textarea>
                   </div>
                 </div>
