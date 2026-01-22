@@ -778,13 +778,20 @@
 
       // Calculate current metrics
       const currentMetrics = useMemo(() => {
+        // Safely convert to number, handling both strings and numbers
+        const toNumber = (val) => {
+          if (val === null || val === undefined) return 0;
+          const num = parseFloat(val);
+          return isNaN(num) ? 0 : num;
+        };
+
         const totalSessions = filteredSessions.length;
         const totalDistance = filteredSessions.reduce((sum, s) => {
-          const dist = s.distance || s.actual?.distance || 0;
+          const dist = toNumber(s.distance || s.actual?.distance);
           return sum + dist;
         }, 0);
         const totalTime = filteredSessions.reduce((sum, s) => {
-          const duration = s.duration || s.actual?.duration || 0;
+          const duration = toNumber(s.duration || s.actual?.duration);
           return sum + duration;
         }, 0);
 
