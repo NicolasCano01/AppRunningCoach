@@ -720,12 +720,19 @@
 
       // Summary stats
       const summaryStats = useMemo(() => {
-        const totalDistance = filteredSessions.reduce((sum, s) => sum + (s.distance || 0), 0);
-        const totalTime = filteredSessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+        // Safely convert to number, handling both strings and numbers
+        const toNumber = (val) => {
+          if (val === null || val === undefined) return 0;
+          const num = parseFloat(val);
+          return isNaN(num) ? 0 : num;
+        };
+
+        const totalDistance = filteredSessions.reduce((sum, s) => sum + toNumber(s.distance), 0);
+        const totalTime = filteredSessions.reduce((sum, s) => sum + toNumber(s.duration), 0);
         const hrSessions = filteredSessions.filter(s => s.avgHr);
-        const avgHR = hrSessions.length > 0 ? Math.round(hrSessions.reduce((sum, s) => sum + s.avgHr, 0) / hrSessions.length) : 0;
+        const avgHR = hrSessions.length > 0 ? Math.round(hrSessions.reduce((sum, s) => sum + toNumber(s.avgHr), 0) / hrSessions.length) : 0;
         const rpeSessions = filteredSessions.filter(s => s.rpe);
-        const avgRPE = rpeSessions.length > 0 ? (rpeSessions.reduce((sum, s) => sum + s.rpe, 0) / rpeSessions.length).toFixed(1) : 0;
+        const avgRPE = rpeSessions.length > 0 ? (rpeSessions.reduce((sum, s) => sum + toNumber(s.rpe), 0) / rpeSessions.length).toFixed(1) : 0;
 
         return {
           totalSessions: filteredSessions.length,
@@ -827,6 +834,18 @@
             sessionData.duration = pedicabHours * 60;
             sessionData.pedicabHours = pedicabHours;
           }
+
+          // CRITICAL FIX: Convert all numeric fields to actual numbers
+          const numericFields = ['distance', 'duration', 'avgPace', 'avgHr', 'maxHr', 'rpe', 
+                                 'intensityFactor', 'z2Pace', 'z2Time', 'avgCadence', 'pedicabHours'];
+          numericFields.forEach(field => {
+            if (sessionData[field] !== undefined && sessionData[field] !== null && sessionData[field] !== '') {
+              const numValue = parseFloat(sessionData[field]);
+              if (!isNaN(numValue)) {
+                sessionData[field] = numValue;
+              }
+            }
+          });
 
           // Clean up null/empty values
           Object.keys(sessionData).forEach(key => {
