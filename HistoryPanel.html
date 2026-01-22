@@ -1109,11 +1109,11 @@
                     <div className="grid grid-cols-4 gap-2 text-sm">
                       <div>
                         <div className="text-slate-400 text-xs">Distance</div>
-                        <div className="font-semibold text-cyan-400">{(session.distance || 0).toFixed(1)} km</div>
+                        <div className="font-semibold text-cyan-400">{(parseFloat(session.distance) || 0).toFixed(1)} km</div>
                       </div>
                       <div>
                         <div className="text-slate-400 text-xs">Duration</div>
-                        <div className="font-semibold text-emerald-400">{Math.round(session.duration || 0)} min</div>
+                        <div className="font-semibold text-emerald-400">{Math.round(parseFloat(session.duration) || 0)} min</div>
                       </div>
                       <div>
                         <div className="text-slate-400 text-xs">Pace</div>
@@ -1198,11 +1198,11 @@
                   <div className="grid grid-cols-2 gap-3">
                     <div className="metric-card">
                       <h4 className="text-xs text-slate-400 mb-1">Distance</h4>
-                      <div className="text-xl font-bold text-cyan-400">{(selectedSession.distance || 0).toFixed(1)} km</div>
+                      <div className="text-xl font-bold text-cyan-400">{(parseFloat(selectedSession.distance) || 0).toFixed(1)} km</div>
                     </div>
                     <div className="metric-card">
                       <h4 className="text-xs text-slate-400 mb-1">Duration</h4>
-                      <div className="text-xl font-bold text-emerald-400">{Math.round(selectedSession.duration || 0)} min</div>
+                      <div className="text-xl font-bold text-emerald-400">{Math.round(parseFloat(selectedSession.duration) || 0)} min</div>
                     </div>
                     <div className="metric-card">
                       <h4 className="text-xs text-slate-400 mb-1">Avg Pace</h4>
