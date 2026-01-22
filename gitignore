@@ -1,0 +1,151 @@
+# ============================================
+# RUNNING COACH PRO - GIT IGNORE
+# ============================================
+# This file tells Git which files to never commit to GitHub
+# Essential for keeping secrets and credentials safe
+
+# ============================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ============================================
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Firebase Admin SDK private keys (NEVER commit these!)
+firebase-adminsdk-*.json
+serviceAccountKey.json
+google-credentials.json
+
+# API keys configuration (if you extract to separate file)
+api-keys.js
+secrets.js
+config.local.js
+
+# ============================================
+# FIREBASE
+# ============================================
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
+database-rules.json
+storage.rules
+
+# ============================================
+# DEPENDENCIES
+# ============================================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# BUILD OUTPUT
+# ============================================
+dist/
+build/
+out/
+.next/
+.cache/
+
+# ============================================
+# IDE / EDITOR
+# ============================================
+# VS Code
+.vscode/
+.vscode-test/
+*.code-workspace
+
+# JetBrains (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# ============================================
+# OPERATING SYSTEM
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# LOGS & TEMPORARY FILES
+# ============================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ============================================
+# TESTING
+# ============================================
+coverage/
+.nyc_output/
+*.lcov
+
+# ============================================
+# PYTHON (if you add Python backend)
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# ============================================
+# IMPORTANT NOTES
+# ============================================
+# 
+# This .gitignore protects against accidental credential leaks.
+# However, you should ALSO:
+#
+# 1. Review all commits before pushing
+# 2. Never paste credentials in chat/forums
+# 3. Use environment variables for secrets
+# 4. Rotate credentials if accidentally exposed
+# 5. Enable GitHub secret scanning alerts
+#
+# If you accidentally commit a secret:
+# 1. Rotate/change the secret immediately
+# 2. Use git-filter-branch to remove from history
+# 3. Force push the cleaned history
+#
+# ============================================
