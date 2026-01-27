@@ -566,8 +566,10 @@
       };
 
       const paceToSeconds = (mmss) => {
-        if (!mmss || !mmss.includes(':')) return 0;
+        if (!mmss) return null; // Allow empty
+        if (!mmss.includes(':')) return null; // Keep null while typing
         const [mins, secs] = mmss.split(':').map(Number);
+        if (isNaN(mins) || isNaN(secs)) return null;
         return mins * 60 + secs;
       };
 
@@ -841,8 +843,11 @@
           numericFields.forEach(field => {
             if (sessionData[field] !== undefined && sessionData[field] !== null && sessionData[field] !== '') {
               const numValue = parseFloat(sessionData[field]);
-              if (!isNaN(numValue)) {
+              if (!isNaN(numValue) && numValue > 0) {
                 sessionData[field] = numValue;
+              } else {
+                // If can't convert to valid number, remove the field
+                delete sessionData[field];
               }
             }
           });
@@ -873,6 +878,24 @@
         } catch (error) {
           console.error('❌ Save error:', error);
           alert('Failed to save session');
+        }
+      };
+
+      // Delete session
+      const handleDeleteSession = async (sessionId) => {
+        if (!confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
+          return;
+        }
+
+        try {
+          const user = auth.currentUser;
+          await db.collection('users').doc(user.uid).collection('sessions').doc(sessionId).delete();
+          console.log('✅ Session deleted');
+          await loadSessions();
+          closeModal();
+        } catch (error) {
+          console.error('❌ Delete error:', error);
+          alert('Failed to delete session');
         }
       };
 
@@ -1289,6 +1312,13 @@
                   }}>
                     Edit Session
                   </button>
+                  <button 
+                    className="btn" 
+                    style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white' }}
+                    onClick={() => handleDeleteSession(selectedSession.id)}
+                  >
+                    Delete
+                  </button>
                   <button className="btn btn-secondary" onClick={closeModal}>Close</button>
                 </div>
               </div>
@@ -1338,12 +1368,18 @@
                         type="date"
                         id="modalDate"
                         className="input-field"
+                        key={editingSession?.id || 'new'}
                         defaultValue={editingSession?.date || new Date().toISOString().split('T')[0]}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-400 mb-2">Phase *</label>
-                      <select id="modalPhase" className="input-field" defaultValue={editingSession?.phase || 'Base'}>
+                      <select 
+                        id="modalPhase" 
+                        className="input-field" 
+                        key={editingSession?.id || 'new-phase'}
+                        defaultValue={editingSession?.phase || 'Base'}
+                      >
                         <option value="Base">Base</option>
                         <option value="Build">Build</option>
                         <option value="Specialty">Specialty</option>
@@ -1539,10 +1575,25 @@
                           <input
                             type="text"
                             className="input-field"
-                            value={formData.avgPace ? formatPace(formData.avgPace) : ''}
+                            value={formData.avgPace !== null && formData.avgPace !== undefined && typeof formData.avgPace === 'number' ? formatPace(formData.avgPace) : (formData.avgPace || '')}
                             onChange={(e) => {
-                              const paceSeconds = paceToSeconds(e.target.value);
-                              handleFormChange('avgPace', paceSeconds);
+                              const inputValue = e.target.value;
+                              // Store raw value while typing, convert on blur
+                              if (inputValue.includes(':')) {
+                                const paceSeconds = paceToSeconds(inputValue);
+                                handleFormChange('avgPace', paceSeconds);
+                              } else {
+                                // Keep raw input while user is typing
+                                handleFormChange('avgPace', inputValue);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // Convert to seconds on blur if valid
+                              const inputValue = e.target.value;
+                              if (inputValue.includes(':')) {
+                                const paceSeconds = paceToSeconds(inputValue);
+                                handleFormChange('avgPace', paceSeconds);
+                              }
                             }}
                             placeholder="6:30"
                           />
@@ -1595,10 +1646,25 @@
                             <input
                               type="text"
                               className="input-field"
-                              value={formData.z2Pace ? formatPace(formData.z2Pace) : ''}
+                              value={formData.z2Pace !== null && formData.z2Pace !== undefined && typeof formData.z2Pace === 'number' ? formatPace(formData.z2Pace) : (formData.z2Pace || '')}
                               onChange={(e) => {
-                                const paceSeconds = paceToSeconds(e.target.value);
-                                handleFormChange('z2Pace', paceSeconds);
+                                const inputValue = e.target.value;
+                                // Store raw value while typing, convert on blur
+                                if (inputValue.includes(':')) {
+                                  const paceSeconds = paceToSeconds(inputValue);
+                                  handleFormChange('z2Pace', paceSeconds);
+                                } else {
+                                  // Keep raw input while user is typing
+                                  handleFormChange('z2Pace', inputValue);
+                                }
+                              }}
+                              onBlur={(e) => {
+                                // Convert to seconds on blur if valid
+                                const inputValue = e.target.value;
+                                if (inputValue.includes(':')) {
+                                  const paceSeconds = paceToSeconds(inputValue);
+                                  handleFormChange('z2Pace', paceSeconds);
+                                }
                               }}
                               placeholder="6:30"
                             />
