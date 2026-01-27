@@ -543,6 +543,12 @@
       const [formData, setFormData] = useState({});
       const [calculatedTSS, setCalculatedTSS] = useState(0);
       
+      // NEW: Temporary state for pace inputs (raw user input)
+      const [paceInputs, setPaceInputs] = useState({
+        avgPace: '',
+        z2Pace: ''
+      });
+      
       const sessionsPerPage = 20;
 
       const sessionTypes = ['All Types', 'Easy Run', 'Long Run', 'Tempo Run', 'Speed Intervals', 'Recovery Run', 'Futsal', 'Pedicab', 'Strength Training', 'Cross-Training'];
@@ -767,7 +773,12 @@
         const defaults = getSessionDefaults('Easy Run');
         setCurrentSessionType('Easy Run');
         setEditingSession(null);
-        setFormData(defaults);
+        setFormData({
+          ...defaults,
+          date: new Date().toISOString().split('T')[0],
+          phase: 'Base'
+        });
+        setPaceInputs({ avgPace: '', z2Pace: '' });
         setModalType('add');
         setShowModal(true);
       };
@@ -784,6 +795,7 @@
         setEditingSession(null);
         setCurrentSessionType('Easy Run');
         setFormData({});
+        setPaceInputs({ avgPace: '', z2Pace: '' });
         setCalculatedTSS(0);
       };
 
@@ -815,8 +827,8 @@
       const handleSaveSession = async () => {
         try {
           const sessionType = document.getElementById('modalSessionType').value;
-          const date = document.getElementById('modalDate').value;
-          const phase = document.getElementById('modalPhase').value;
+          const date = formData.date;
+          const phase = formData.phase;
 
           if (!date || !phase) {
             alert('Please fill in all required fields (Date, Phase)');
@@ -1308,7 +1320,17 @@
                     setEditingSession(selectedSession);
                     setCurrentSessionType(selectedSession.sessionType);
                     const defaults = getSessionDefaults(selectedSession.sessionType);
-                    setFormData({ ...defaults, ...selectedSession });
+                    setFormData({ 
+                      ...defaults, 
+                      ...selectedSession,
+                      date: selectedSession.date || new Date().toISOString().split('T')[0],
+                      phase: selectedSession.phase || 'Base'
+                    });
+                    // Initialize pace inputs with formatted values for editing
+                    setPaceInputs({
+                      avgPace: selectedSession.avgPace ? formatPace(selectedSession.avgPace) : '',
+                      z2Pace: selectedSession.z2Pace ? formatPace(selectedSession.z2Pace) : ''
+                    });
                   }}>
                     Edit Session
                   </button>
@@ -1366,19 +1388,17 @@
                       <label className="block text-sm font-semibold text-slate-400 mb-2">Date *</label>
                       <input
                         type="date"
-                        id="modalDate"
                         className="input-field"
-                        key={editingSession?.id || 'new'}
-                        defaultValue={editingSession?.date || new Date().toISOString().split('T')[0]}
+                        value={formData.date || new Date().toISOString().split('T')[0]}
+                        onChange={(e) => handleFormChange('date', e.target.value)}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-400 mb-2">Phase *</label>
                       <select 
-                        id="modalPhase" 
                         className="input-field" 
-                        key={editingSession?.id || 'new-phase'}
-                        defaultValue={editingSession?.phase || 'Base'}
+                        value={formData.phase || 'Base'}
+                        onChange={(e) => handleFormChange('phase', e.target.value)}
                       >
                         <option value="Base">Base</option>
                         <option value="Build">Build</option>
@@ -1575,24 +1595,28 @@
                           <input
                             type="text"
                             className="input-field"
-                            value={formData.avgPace !== null && formData.avgPace !== undefined && typeof formData.avgPace === 'number' ? formatPace(formData.avgPace) : (formData.avgPace || '')}
+                            value={paceInputs.avgPace}
                             onChange={(e) => {
-                              const inputValue = e.target.value;
-                              // Store raw value while typing, convert on blur
-                              if (inputValue.includes(':')) {
-                                const paceSeconds = paceToSeconds(inputValue);
-                                handleFormChange('avgPace', paceSeconds);
-                              } else {
-                                // Keep raw input while user is typing
-                                handleFormChange('avgPace', inputValue);
-                              }
+                              // Just update the raw input, don't format yet
+                              setPaceInputs(prev => ({ ...prev, avgPace: e.target.value }));
                             }}
                             onBlur={(e) => {
-                              // Convert to seconds on blur if valid
+                              // On blur, convert to seconds and update formData
                               const inputValue = e.target.value;
                               if (inputValue.includes(':')) {
                                 const paceSeconds = paceToSeconds(inputValue);
-                                handleFormChange('avgPace', paceSeconds);
+                                if (paceSeconds !== null && paceSeconds > 0) {
+                                  handleFormChange('avgPace', paceSeconds);
+                                  // Format it properly
+                                  setPaceInputs(prev => ({ ...prev, avgPace: formatPace(paceSeconds) }));
+                                } else {
+                                  // Invalid, clear it
+                                  handleFormChange('avgPace', null);
+                                  setPaceInputs(prev => ({ ...prev, avgPace: '' }));
+                                }
+                              } else if (!inputValue) {
+                                // Empty, clear it
+                                handleFormChange('avgPace', null);
                               }
                             }}
                             placeholder="6:30"
@@ -1646,24 +1670,28 @@
                             <input
                               type="text"
                               className="input-field"
-                              value={formData.z2Pace !== null && formData.z2Pace !== undefined && typeof formData.z2Pace === 'number' ? formatPace(formData.z2Pace) : (formData.z2Pace || '')}
+                              value={paceInputs.z2Pace}
                               onChange={(e) => {
-                                const inputValue = e.target.value;
-                                // Store raw value while typing, convert on blur
-                                if (inputValue.includes(':')) {
-                                  const paceSeconds = paceToSeconds(inputValue);
-                                  handleFormChange('z2Pace', paceSeconds);
-                                } else {
-                                  // Keep raw input while user is typing
-                                  handleFormChange('z2Pace', inputValue);
-                                }
+                                // Just update the raw input, don't format yet
+                                setPaceInputs(prev => ({ ...prev, z2Pace: e.target.value }));
                               }}
                               onBlur={(e) => {
-                                // Convert to seconds on blur if valid
+                                // On blur, convert to seconds and update formData
                                 const inputValue = e.target.value;
                                 if (inputValue.includes(':')) {
                                   const paceSeconds = paceToSeconds(inputValue);
-                                  handleFormChange('z2Pace', paceSeconds);
+                                  if (paceSeconds !== null && paceSeconds > 0) {
+                                    handleFormChange('z2Pace', paceSeconds);
+                                    // Format it properly
+                                    setPaceInputs(prev => ({ ...prev, z2Pace: formatPace(paceSeconds) }));
+                                  } else {
+                                    // Invalid, clear it
+                                    handleFormChange('z2Pace', null);
+                                    setPaceInputs(prev => ({ ...prev, z2Pace: '' }));
+                                  }
+                                } else if (!inputValue) {
+                                  // Empty, clear it
+                                  handleFormChange('z2Pace', null);
                                 }
                               }}
                               placeholder="6:30"
