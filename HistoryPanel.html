@@ -594,7 +594,41 @@
     // GARMIN IMPORT MODAL COMPONENT
     // ============================================================================
     
-    function GarminImportModal({ user, onClose, onImportComplete }) {
+        
+    const GarminImportModal = ({ user, onClose, onImportComplete }) => {
+     const [status, setStatus] = React.useState('idle'); // idle, authenticating, fetching, saving
+
+	   const handleImport = async (email, password) => {
+	   try {
+	     setStatus('authenticating');
+	     const authRes = await fetch(`${WORKER_URL}/auth`, {
+	       method: 'POST',
+	       headers: { 'Content-Type': 'application/json' },
+	       body: JSON.stringify({ email, password })
+	     });
+	     
+	     const authData = await authRes.json();
+	     if (!authRes.ok) throw new Error(authData.error || 'Auth failed');
+	
+	     setStatus('fetching');
+	     const actRes = await fetch(`${WORKER_URL}/activities?email=${encodeURIComponent(email)}`);
+	     const activities = await actRes.json();
+	
+	     // Batch save to Firestore using the user.uid
+	     setStatus('saving');
+	     const batch = db.batch();
+	     activities.forEach(activity => {
+	       const docRef = db.collection('users').doc(user.uid).collection('sessions').doc();
+	       batch.set(docRef, { ...activity, userId: user.uid, source: 'garmin' });
+	     });
+	     await batch.commit();
+	     
+	     onImportComplete(activities.length);
+	   } catch (err) {
+	     alert(`Import Error: ${err.message}`);
+	     setStatus('idle');
+	   }
+	 };
       const [authStep, setAuthStep] = useState('check');
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
