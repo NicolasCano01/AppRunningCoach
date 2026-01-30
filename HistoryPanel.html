@@ -462,7 +462,7 @@
   <script type="text/babel">
     const { useState, useEffect, useMemo, useRef } = React;
     
-    const GARMIN_WORKER_URL = 'https://garmin-proxy.nicoca17.workers.dev/'; 
+    const GARMIN_WORKER_URL = 'https://garmin-proxy.nicoca17.workers.dev'; 
     const TRAINING_START_DATE = '2024-11-10';
 
     // Firebase Configuration
@@ -596,16 +596,7 @@
     
         
     const GarminImportModal = ({ user, onClose, onImportComplete }) => {
-     const [status, setStatus] = React.useState('idle'); // idle, authenticating, fetching, saving
-
-	   const handleImport = async (email, password) => {
-	   try {
-	     setStatus('authenticating');
-	     const authRes = await fetch(`${WORKER_URL}/auth`, {
-	       method: 'POST',
-	       headers: { 'Content-Type': 'application/json' },
-	       body: JSON.stringify({ email, password })
-	     });
+     
 	     
 	     const authData = await authRes.json();
 	     if (!authRes.ok) throw new Error(authData.error || 'Auth failed');
